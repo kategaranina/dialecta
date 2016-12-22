@@ -17,13 +17,9 @@
 		<grammeme propertyOf="POST"><name>PREP</name><alias>ПР</alias><description>предлог</description></grammeme>
 		<grammeme propertyOf="POST"><name>CONJ</name><alias>СОЮЗ</alias><description>союз</description></grammeme>
 		<grammeme propertyOf="POST"><name>PRCL</name><alias>ЧАСТ</alias><description>частица</description><example>бы, же, лишь</example></grammeme>
-		<grammeme propertyOf="POST"><name>INTJ</name><alias>МЕЖД</alias><description>междометие</description></grammeme>
+		<grammeme propertyOf="POST"><name>INTJ</name><alias>МЕЖД</alias><description>междометие</description></grammeme>    
     
-	<grammeme toForms="NOUN:1,NUMR:1"><name>ANim</name><label>Animacy</label><alias>Од-неод</alias><description>одушевлённость / одушевлённость не выражена</description></grammeme>
-		<grammeme propertyOf="ANim"><name>anim</name><alias>од</alias><description>одушевлённое</description><example>человек, ангел, утопленник</example></grammeme>
-		<grammeme propertyOf="ANim"><name>inan</name><alias>неод</alias><description>неодушевлённое</description><example>рука, облако, культура</example></grammeme>
-    
-	<grammeme toForms="NOUN:2,ADJF:1,ADJS:1,COMP:1,VERB.past:3,PRTF:1,PRTS:1,NPRO:1"><name>GNdr</name><label>Gender</label><alias>хр</alias><description>род / род не выражен</description></grammeme>
+	<grammeme toForms="NOUN:2,ADJF.sing:1,ADJS.sing:1,COMP:1,VERB.past.sing:3,PRTF:1,PRTS:1,NPRO:1"><name>GNdr</name><label>Gender</label><alias>хр</alias><description>род / род не выражен</description></grammeme>
 		<grammeme propertyOf="GNdr"><name>masc</name><alias>мр</alias><description>мужской род</description><example>работник, стол</example><override>m</override></grammeme>
 		<grammeme propertyOf="GNdr"><name>femn</name><alias>жр</alias><description>женский род</description><example>работница, табуретка</example><override>f</override></grammeme>
 		<grammeme propertyOf="GNdr"><name>neut</name><alias>ср</alias><description>средний род</description><example>животное, озеро</example><override>n</override></grammeme>
@@ -32,8 +28,8 @@
 	<grammeme toForms="NOUN:3,ADJF:2,ADJS:2,COMP:2,VERB:4,PRTF:2,PRTS:2,NPRO:2"><name>NMbr</name><label>Number</label><alias>Число</alias><description>число</description></grammeme>
 		<grammeme propertyOf="NMbr"><name>sing</name><alias>ед</alias><description>единственное число</description><override>sg</override></grammeme>
 		<grammeme propertyOf="NMbr"><name>plur</name><alias>мн</alias><description>множественное число</description><override>pl</override></grammeme>
-			<grammeme propertyOf="NMbr" extends="sing" widget='checkbox' lemma='True'><name>Sgtm</name><alias>sg</alias><description>singularia tantum</description></grammeme>
-			<grammeme propertyOf="NMbr" extends="plur" widget='checkbox' lemma='True'><name>Pltm</name><alias>pl</alias><description>pluralia tantum</description></grammeme>
+	
+
 
     <grammeme toForms="NOUN:4,ADJF:3,COMP:3,PRTF:3,NPRO:3,NUMR:2"  default='True'><name>CAse</name><label>Case</label><alias>Падеж</alias><description>категория падежа</description></grammeme>
 		<grammeme propertyOf="CAse"><name>nomn</name><alias>им</alias><description>именительный падеж</description><example>хомяк ест</example><override>nom</override></grammeme>
@@ -43,7 +39,7 @@
 		<grammeme propertyOf="CAse"><name>ablt</name><alias>тв</alias><description>творительный падеж</description><example>зерно съедено хомяком</example><override>ins</override></grammeme>
 		<grammeme propertyOf="CAse" ><name>loct</name><alias>пр</alias><description>предложный падеж</description><override>loc</override></grammeme>
 		<grammeme propertyOf="CAse" toForms="NOUN"><name>voct</name><alias>зв</alias><description>звательный падеж</description><example>Саш, пойдем в кино</example><override>voc</override></grammeme>
-		<grammeme propertyOf="CAse" toForms="NOUN" trimco='True'><name>Coun</name><alias>сч</alias><description>счётная форма</description><example>два часа́, три шара́</example><override>adnum</override></grammeme>
+	
 			<grammeme propertyOf="CAse" extends="gent" default='True'><name>gen1</name><alias>рд1</alias><description>первый родительный падеж</description><example>у нас нет хомяка</example><override>gen1</override></grammeme>
 			<grammeme propertyOf="CAse" extends="gent"><name>gen2</name><alias>рд2</alias><description>второй родительный (частичный) падеж</description><example>ложка сахару (gen - производство сахара); стаканяду (gen - нет яда)</example><override>gen2</override></grammeme>
 			<grammeme propertyOf="CAse" extends="datv" default='True'><name>dat1</name><alias>дт1</alias><description>основной дательный падеж</description></grammeme>
@@ -57,12 +53,7 @@
     <grammeme extends="NOUN" lemma='True'><name>Name</name><label>First Name</label><alias>имя</alias><description>имя</description></grammeme>
     <grammeme extends="NOUN" lemma='True'><name>Surn</name><label>Last Name</label><alias>фам</alias><description>фамилия</description></grammeme>
     <grammeme extends="NOUN" lemma='True'><name>Patr</name><label>Patronimic Name</label><alias>отч</alias><description>отчество</description></grammeme>
-    <grammeme extends="NOUN" lemma='True'><name>Geox</name><label>Toponym</label><alias>гео</alias><description>топоним</description></grammeme>
-    <grammeme extends="NOUN" lemma='True'><name>Orgn</name><label>Organization</label><alias>орг</alias><description>организация</description></grammeme>
-    <grammeme extends="NOUN" lemma='True'><name>Trad</name><label>Trade Mark</label><alias>tm</alias><description>торговая марка</description></grammeme>
-    <grammeme extends="ADJF"><name>Subx</name><label>Substantivated</label><alias>субст?</alias><description>возможна субстантивация</description></grammeme>
-    <grammeme extends="ADJF"><name>Supr</name><label>Superlative</label><alias>превосх</alias><description>превосходная степень</description></grammeme>
-    <grammeme extends="ADJF" lemma='True'><name>Qual</name><label>Qualifying</label><alias>кач</alias><description>качественное</description></grammeme>
+    <grammeme extends="NOUN" lemma='True'><name>Geox</name><label>Toponym</label><alias>гео</alias><description>топоним</description></grammeme> 
     <grammeme extends="NOUN,ADJF,ADVB,NUMR" lemma='True'><name>Apro</name><label>Pronominal</label><alias>мест-п</alias><description>местоименное</description></grammeme>
     <grammeme extends="NUMR" lemma='True'><name>Anum</name><label>Ordinal</label><alias>числ-п</alias><description>порядковое</description></grammeme>
     <grammeme extends="NPRO" lemma='True'><name>Poss</name><label>Possesive</label><alias>притяж</alias><description>притяжательное</description></grammeme>
@@ -75,13 +66,7 @@
 		<grammeme propertyOf="ASpc"><name>perf</name><alias>сов</alias><description>совершенный вид</description><example>пошёл, встречу</example><override>prf</override></grammeme>
 		<grammeme propertyOf="ASpc"><name>impf</name><alias>несов</alias><description>несовершенный вид</description><override>ipfv</override></grammeme>
     
-	<grammeme toForms="VERB:20,INFN:20,PRTF:20,PRTS:20,GRND:20" lemma='True'><name>TRns</name><label>Transitivity</label><alias>Перех</alias><description>категория переходности</description></grammeme>
-		<grammeme propertyOf="TRns"><name>tran</name><alias>перех</alias><description>переходный</description></grammeme>
-		<grammeme propertyOf="TRns"><name>intr</name><alias>неперех</alias><description>непереходный</description></grammeme>
     
-	<grammeme extends="NOUN,ADJF,COMP,PRTF,NPRO"  lemma='True'><name>Fixd</name><label>Fixed</label><alias>0</alias><description>неизменяемое</description></grammeme>
-	<grammeme extends="VERB"  lemma='True'><name>Impe</name><label>Impersonal</label><alias>безл</alias><description>безличный</description></grammeme>
-    <grammeme extends="VERB"><name>Uimp</name><label>Impersonal Usage</label><alias>безл-у</alias><description>безличное употребление</description></grammeme>
     <grammeme extends="VERB"><name>Mult</name><label>Multiple</label><alias>мног</alias><description>многократный</description></grammeme>
     <grammeme extends="VERB,NPRO"><name>Refl</name><label>Reflexive</label><alias>возвр</alias><description>возвратный</description><override>ref</override></grammeme>
     
@@ -106,30 +91,17 @@
 	<grammeme toForms="PRTF:4,PRTS:4"><name>VOic</name><label>Voice</label><alias>Залог</alias><description>категория залога</description></grammeme>
 		<grammeme propertyOf="VOic"><name>actv</name><alias>действ</alias><description>действительный залог</description></grammeme>
 		<grammeme propertyOf="VOic"><name>pssv</name><alias>страд</alias><description>страдательный залог</description></grammeme>
-    
-	<grammeme extends="ALLFORMS"><name>Infr</name><label>Informal</label><alias>разг</alias><description>разговорное</description></grammeme>
-    <grammeme extends="ALLFORMS"><name>Slng</name><label>Slang</label><alias>жарг</alias><description>жаргонное</description></grammeme>
-    <grammeme extends="ALLFORMS"><name>Arch</name><label>Archaic</label><alias>арх</alias><description>устаревшее</description></grammeme>
-    <grammeme extends="ALLFORMS"><name>Litr</name><label>Literature</label><alias>лит</alias><description>литературный вариант</description></grammeme>
-    <grammeme extends="ALLFORMS"><name>Erro</name><label>Misspelled</label><alias>опеч</alias><description>опечатка</description></grammeme>
-    <grammeme extends="ALLFORMS"><name>Dist</name><label>Distorted</label><alias>искаж</alias><description>искажение</description></grammeme>
-    <grammeme extends="NPRO"><name>Ques</name><label>Question</label><alias>вопр</alias><description>вопросительное</description></grammeme>
-    <grammeme extends="NPRO"><name>Dmns</name><label>Demonstrative</label><alias>указ</alias><description>указательное</description><override>Dem</override></grammeme>
-    <grammeme extends="ALLFORMS"><name>Prnt</name><label>Parenthesis</label><alias>вводн</alias><description>вводное слово</description><override>Parenth</override></grammeme>
+
+    <grammeme extends="NPRO"><name>Ques</name><label>Question</label><alias>вопр</alias><description>вопросительное</description></grammeme> 
     <grammeme extends="NOUN"><name>V-be</name><label>V-be Ending</label><alias>*ье</alias><description>форма на -ье</description></grammeme>
     <grammeme extends="ADJS"><name>V-en</name><label>V-en Ending</label><alias>*енен</alias><description>форма на -енен</description></grammeme>
     <grammeme extends="Patr"><name>V-ie</name><label>V-ie Ending</label><alias>*ие</alias><description>отчество через -ие-</description></grammeme>
-    <grammeme extends="NOUN"><name>V-bi</name><label>V-bi Ending</label><alias>*ьи</alias><description>форма на -ьи</description></grammeme>
-    <grammeme extends="GRND"><name>Fimp</name><label>Imperfect Gerundive</label><alias>*несов</alias><description>деепричастие от глагола несовершенного вида</description></grammeme>
-    <grammeme extends="ALLFORMS"><name>Prdx</name><label>Predicate</label><alias>предк?</alias><description>может выступать в роли предикатива</description></grammeme>
+    <grammeme extends="NOUN"><name>V-bi</name><label>V-bi Ending</label><alias>*ьи</alias><description>форма на -ьи</description></grammeme>	 
     <grammeme extends="NUMR"><name>Coll</name><label>Collective Numeral</label><alias>собир</alias><description>собирательное числительное</description></grammeme>
     <grammeme extends="GRND"><name>V-sh</name><label>V-sh Ending</label><alias>*ши</alias><description>деепричастие на -ши</description></grammeme>
-    <grammeme extends="NOUN"><name>Af-p</name><label>After Prep.</label><alias>*предл</alias><description>форма после предлога</description></grammeme>
-    <grammeme extends="anim"><name>Inmx</name><label>Used as Inanimate</label><alias>неодуш?</alias><description>может использоваться как неодушевлённое</description></grammeme>
     <grammeme extends="PREP"><name>Vpre</name><label>Prep. Variation</label><alias>в_предл</alias><description>Вариант предлога ( со, подо, ...)</description></grammeme>
-    <grammeme extends="NPRO"><name>Anph</name><label>Anaphoric Pron.</label><alias>Анаф</alias><description>Анафорическое (местоимение)</description></grammeme>
-    <grammeme extends="NOUN"><name>Init</name><label>Initial</label><alias>иниц</alias><description>Инициал</description></grammeme>
-    <grammeme extends="NOUN,PRTF,PRTS,GRND"><name>Adjx</name><label>Used as Adj.</label><alias>прил?</alias><description>может выступать в роли прилагательного</description></grammeme>
+  
+
 
 	<grammeme extends="VERB" trimco='True'><name>AUX</name><label>Auxiliary Verb</label><alias>вспом</alias><description>вспомогательный глалол</description></grammeme>
 	<grammeme extends="VERB" trimco='True'><name>COP</name><label>Copula</label><alias>связ</alias><description>cвязка (копула)</description></grammeme>
