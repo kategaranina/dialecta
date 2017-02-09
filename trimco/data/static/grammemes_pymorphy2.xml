@@ -63,7 +63,7 @@
     <grammeme extends="COMP"><name>V-ej</name><label>V-oj Comparative</label><alias>*ей</alias><description>форма компаратива на -ей</description></grammeme>
 	
 	<grammeme toForms="VERB:2,INFN:1"><name>ASpc</name><label>Aspect</label><alias>Вид</alias><description>категория вида</description></grammeme>
-		<grammeme propertyOf="ASpc"><name>perf</name><alias>сов</alias><description>совершенный вид</description><example>пошёл, встречу</example><override>prf</override></grammeme>
+		<grammeme propertyOf="ASpc"><name>perf</name><alias>сов</alias><description>совершенный вид</description><example>пошёл, встречу</example><override>pfv</override></grammeme>
 		<grammeme propertyOf="ASpc"><name>impf</name><alias>несов</alias><description>несовершенный вид</description><override>ipfv</override></grammeme>
     
     
@@ -82,17 +82,15 @@
     
 	<grammeme toForms="VERB:2"><name>MOod</name><label>Mood</label><alias>Накл</alias><description>категория наклонения</description></grammeme>
 		<grammeme propertyOf="MOod"><name>indc</name><alias>изъяв</alias><description>изъявительное наклонение</description><override>ind</override></grammeme>
-		<grammeme propertyOf="MOod"><name>impr</name><alias>повел</alias><description>повелительное наклонение</description><override>imp</override></grammeme>
-    
-	<grammeme toForms="VERB.impr:5"><name>INvl</name><label>Involvement</label><alias>Совм</alias><description>категория совместности</description></grammeme>
-		<grammeme propertyOf="INvl"><name>incl</name><alias>вкл</alias><description>говорящий включён в действие</description><example>идем, идемте</example></grammeme>
-		<grammeme propertyOf="INvl"><name>excl</name><alias>выкл</alias><description>говорящий не включён в действие</description><example>идите</example></grammeme>
+		<grammeme propertyOf="MOod"><name>impr</name><alias>повел</alias><description>повелительное наклонение</description><override>imp</override></grammeme>  
+		<grammeme propertyOf="MOod"><name>irrl</name><alias>субъюн</alias><description>сослагательное наклонение</description><override>irr</override></grammeme>
+ 
     
 	<grammeme toForms="PRTF:4,PRTS:4"><name>VOic</name><label>Voice</label><alias>Залог</alias><description>категория залога</description></grammeme>
-		<grammeme propertyOf="VOic"><name>actv</name><alias>действ</alias><description>действительный залог</description></grammeme>
-		<grammeme propertyOf="VOic"><name>pssv</name><alias>страд</alias><description>страдательный залог</description></grammeme>
+		<grammeme propertyOf="VOic"><name>actv</name><alias>действ</alias><description>действительный залог</description><override>PA</override></grammeme>
+		<grammeme propertyOf="VOic"><name>pssv</name><alias>страд</alias><description>страдательный залог</description><override>PP</override></grammeme>
 
-    <grammeme extends="NPRO"><name>Ques</name><label>Question</label><alias>вопр</alias><description>вопросительное</description></grammeme> 
+    <grammeme extends="NPRO"><name>Ques</name><label>Question</label><alias>вопр</alias><description>вопросительное</description><override>Q</override></grammeme> 
     <grammeme extends="NOUN"><name>V-be</name><label>V-be Ending</label><alias>*ье</alias><description>форма на -ье</description></grammeme>
     <grammeme extends="ADJS"><name>V-en</name><label>V-en Ending</label><alias>*енен</alias><description>форма на -енен</description></grammeme>
     <grammeme extends="Patr"><name>V-ie</name><label>V-ie Ending</label><alias>*ие</alias><description>отчество через -ие-</description></grammeme>
@@ -104,6 +102,7 @@
 
 
 	<grammeme extends="VERB" trimco='True'><name>AUX</name><label>Auxiliary Verb</label><alias>вспом</alias><description>вспомогательный глалол</description></grammeme>
+	<grammeme extends="VERB.impr,NPRO" trimco='True'><name>incl</name><label>Inclusive</label><alias>вкл</alias><description>говорящий включён в действие</description><example>идем, идемте</example></grammeme>
 	<grammeme extends="VERB" trimco='True'><name>COP</name><label>Copula</label><alias>связ</alias><description>cвязка (копула)</description></grammeme>
 	<grammeme extends="CONJ" trimco='True'><name>COMPL</name><label>Complementizer</label><alias>компл</alias><description>союз-комплементайзер (подчинительный союз)</description></grammeme>
 	<grammeme extends="NOUN,ADJF" trimco='True'><name>dim</name><label>Deminutive</label><alias>дим</alias><description>деминутив</description></grammeme>
@@ -122,4 +121,6 @@
 	<grammeme extends="CAse" trimco='True'><name>dial.case</name><label>Dial. Case</label><alias>диал.падеж</alias><description>описывает употребление (с точки зрения литературного языка) одной падежной формы вместо другой</description><example>ходила по ягодам (вм. по ягоды)</example></grammeme>
 	<grammeme extends="ADJF" trimco='True'><name>dial.contr</name><label>Dial. Contraction</label><alias>диал.стяж</alias><description>стяжённая форма прилагательного</description><example>хорошу</example></grammeme>
 	<grammeme extends="ADVB" trimco='True'><name>dial.pref</name><label>Dial. Prefix</label><alias>диал.преф</alias><description>наличие префикса</description><example>взамуж 'замуж'</example></grammeme>
+	<grammeme extends="VERB,PRTF,PRTS" trimco='True'><name>2PVB</name><label>Double Prefix</label><alias>дв.преф</alias><description>двойной префик</description><example>понаехали</example></grammeme>
+	<grammeme extends="NPRO" trimco='True'><name>short</name><label>Short Form</label><alias></alias><description>краткая форма</description></grammeme>
 </grammemes>
