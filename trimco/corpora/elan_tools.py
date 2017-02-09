@@ -731,6 +731,8 @@ class elan_to_html:
 
   def build_annotation_menu(self):
     
+    print(self.annotation_menu.menu_html_str_1)    
+    print('man_annot')
     return [self.annotation_menu.menu_html_str_1,
             self.annotation_menu.menu_html_str_2,
             ]
@@ -779,10 +781,12 @@ class annotation_menu_from_xml:
 
   def get_options_for_id(self, id_raw):
     
-    options_str = ''
+    #print("Generating options for annotation")
+    options_str = "<option_id='blank'></option>"
     for option_tag in self.tree.xpath("grammeme[contains(@propertyOf,'%s')]" %(id_raw)):
       option_id = self.terms_dict[option_tag.xpath('name/text()')[0]]['newID']
       options_str = "%s<option id='%s'>%s</option>" %(options_str, option_id, option_id)
+    #print(options_str)
     return options_str
 
   def get_main_options(self):
@@ -801,6 +805,7 @@ class annotation_menu_from_xml:
                                                                                                          self.get_options_for_id(id_raw),
                                                                                                          )
       main_options_tag_str = '%s<div class="manualAnnotationContainer">%s%s</div>' %(main_options_tag_str, label_tag_str, select_tag_str)
+    #print(main_options_tag_str)
     return main_options_tag_str
     #return '<div id="basic_params">%s</div>' %(main_options_tag_str)
 
@@ -824,7 +829,7 @@ class annotation_menu_from_xml:
 
   def override_abbreviations(self, tag):
 
-    tags_lst = re.split('[, -]', tag)
+    tags_lst = [t for t in re.split('[, -]', tag) if t != '']
     i = 0
     while i < len(tags_lst):
       try:

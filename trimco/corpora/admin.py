@@ -130,6 +130,7 @@ class RecordingAdmin(VersionAdmin):
     self.standartizator.start_standartizator()
 
     annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
+    print(annot_menu_select) 
     
     context = {'ctext': self.elan_converter.html,
                'audio_path': self.recording_obj.audio.name,
