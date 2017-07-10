@@ -1,4 +1,7 @@
 from django.db import models
+#from corpora.models import Recording
+#from info.models import Location 
+#from normalization.models import Model
 
 class GlossingRule(models.Model):
 
@@ -35,6 +38,7 @@ class Dialect(models.Model):
   abbreviation = models.CharField(max_length=5)
   to_language = models.ForeignKey('Language')
   description = models.TextField(blank=True)
+  #model_to_normalize = models.ForeignKey(Model, blank=True, null=True)
 
   def __str__(self):
     return self.abbreviation
@@ -80,5 +84,11 @@ class NormalizationModel(models.Model):
 
   def __str__(self):
     return self.to_dialect.abbreviation
+
+#class NormModel(models.Model):
+
+#  to_dialect = models.ForeignKey(Dialect)
+#  recordings = models.ManyToManyField(Recording, blank=true)
+  
 
 
