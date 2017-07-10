@@ -57,7 +57,7 @@ class Recording(models.Model):
                                       verbose_name='Speakers') #THESE TO BE CONSTRUCTED FROM INF1..INF4
   to_interviewers = models.ManyToManyField(Interviewer, blank=True,
                                       verbose_name='Interviewers') #not used right now
-  
+  checked = models.BooleanField(verbose_name='Manually checked', default=False)
 ##  def clean(self):
 ##    # Don't allow draft entries to have a pub_date.
 ##    date_and_letter = '_'.join(self.string_id.split('_')[:2])
@@ -111,6 +111,11 @@ class Recording(models.Model):
     if self.pk!=None and self.data!=None:
         return mark_safe('<a href="/admin/corpora/recording/%s/edit" class="grp-button">Edit</a>' %(self.pk))
     return '(add transcription data and save to enable editing)'
+
+  def annotate_transcription(self):
+    if self.pk!=None and self.data!=None:
+        return mark_safe('<a href="/admin/corpora/recording/%s/auto" class="grp-button">Annotate the whole transcription</a>' %(self.pk))
+    return '(add transcription data and save to enable automatic annotation)'
 
   def file_check(self): 
     if self.string_id!=None:

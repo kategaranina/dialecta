@@ -10,6 +10,8 @@ from decimal import *
 from django.conf import settings
 from django.conf.urls.static import static
 from corpora.models import *
+from normalization.models import Model
+#import trimco.config as config
 
 #import enchant # replace with something installable (see occur. below)
 
@@ -137,6 +139,7 @@ class orthographic_data:
         else:
           var_lst_temp.append([eq_str, eq_points])
       return var_lst_temp
+
 
 class standartizator(orthographic_data):
   
@@ -466,11 +469,22 @@ class standartizator(orthographic_data):
 
   def auto_annotation(self, token):
     
+    with open('token.tmp', 'w') as f:
+    	f.write(token)
+    #os.system('echo ' + token + '> token.tmp')
+    model = self.models_dict[str(self.dialect)]
+    #print(model)
+    os.system('python2 ' + self.path + 'normalise.py token.tmp ' + model)
+    #os.system('cat token.tmp.norm')
     try:
-      normalization = self.generate_dict_for_translit_token(token)[0][0]
+      normalization = open('token.tmp.norm').read().split('\t')[1].lower().strip()
+      os.system('rm token.tmp.*')
+      #normalization = self.generate_dict_for_translit_token(token)[0][0]
+      print(token, normalization)
       return (token, normalization, self.get_annotation_options_list(normalization)[0])
     except IndexError:
       return None    
+
 
 '''
 def pack_tags_to_dict(tags_lst, p):
@@ -480,6 +494,62 @@ def pack_tags_to_dict(tags_lst, p):
     if getattr(p.tag, tag)!=None:
       tags_dict[tag] = getattr(p.tag, tag)
 '''
+class Standartizator(): #takes model's name
+
+  def __init__(self, dialect=''): 
+
+    self.dialect = dialect
+    self.model = Model.objects.get(to_dialect = self.dialect)  #gets appropriate model by dialect's name
+                                                               #this corresponds to the name of model's directory inside csmtiser
+    self.path = settings.NORMALIZER_PATH #specified in the last line of trimco.settings.py
+    self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+    self.morph_rus = pymorphy2.MorphAnalyzer() #this should be replaced by some context-dependent analyser, i.e. mystem
+
+  def get_annotation(self, text): 
+
+    annotations = []
+    nrm_list = self.normalize(text)
+    for nrm in nrm_list:
+      annotation = [(word, self.get_annotation_options_list(word)[0]) for word in nrm] #we take only first (=most likely) variant
+      annotations.append(annotation) 
+    return(annotations)
+
+  def normalize(self, text_to_normalize): #clauses are separated by '\n\n', words inside clause are separeted by '\n'
+
+    with open('tmp', 'w') as f:
+      f.write(text_to_normalize)
+    #os.system('echo ' + token + '> token.tmp')
+    #print(model)
+    os.system('python2 ' + self.path + 'normalise.py tmp ' + str(self.model))
+    #os.system('cat tmp.norm')
+    try:
+      clauses = open('tmp.norm').read().split('\n\n')
+      lines = [clause.split('\n') for clause in clauses if clause]
+      #an element of lines looks like:
+      #['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
+      normalization_list = []
+      for line in lines:
+        words = [word.split('\t')[1].lower() for word in line]
+        normalization_list.append(words)
+      #normalization = ' '.join([line.split('\t')[1].lower() for line in output if line])
+      #normalization_list = [word.split('\t')[1].lower() for word in words if word]
+      #os.system('rm tmp.*')
+      #normalization = self.generate_dict_for_translit_token(token)[0][0]
+      print(len(normalization_list))
+      return (normalization_list) #returns a list of lists 
+    except IndexError:
+      return None  
+
+  def get_annotation_options_list(self, token):
+    
+    result_lst = []
+    for annot in self.morph_rus.parse(token):
+      if annot.score > 0.001:
+        tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+        result_lst.append([annot.normal_form, tag, annot.score])
+    return result_lst
+
+
 
 class Tier:
 
@@ -578,16 +648,117 @@ class ElanObject:
     Elan.to_eaf(self.path, self.Eaf, pretty=True)
     os.remove(self.path+'.bak')
 
-class elan_to_html:
+'''
+class annotate_elan:
 
   def __init__(self, file_obj, _format=''):
+    self.file_obj = file_obj
+    self.elan_obj = ElanObject(self.file_obj.data.path)
+    #self.audio_file_path = self.file_obj.audio.name
+    self.format = _format
+    #self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+    #self.mode = mode
+    self.dialect = self.file_obj.to_dialect #MIGHT NOT WORK
+    print(self.dialect)
+
+  def annotate
+'''
+
+class elan_to_html:
+
+  def __init__(self, file_obj, mode='', _format=''): 
 
     self.file_obj = file_obj
     self.elan_obj = ElanObject(self.file_obj.data.path)
     self.audio_file_path = self.file_obj.audio.name
+    self.path = self.file_obj.data.path
     self.format = _format
     self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
-    self.build_html()
+    self.mode = mode
+    self.dialect = self.file_obj.to_dialect #gets 'Dialect' field of recording
+    print(self.dialect)
+    print(self.mode)
+    if not self.mode:
+      self.build_html()
+    elif self.mode == 'auto-annotation': #first auto-annotation of the whole elan is performed, 
+                                         #then elan is saved and then html is build
+      self.make_backup()
+      self.reannotate_elan()
+      self.elan_obj.save()
+      self.build_html()
+
+  def make_backup(self):
+
+    print('Creating backup of current annotation')
+
+    import datetime
+    now = datetime.datetime.now()
+    cur = now.strftime("%Y-%m-%d_%H%M")
+    new_file =  '{}_backup_{}.eaf'.format(str(self.path).split('/')[-1][:-4], cur)
+    os.system('mkdir -p {}/backups'.format(settings.MEDIA_ROOT))
+    os.system('cp {} {}/backups/{}'.format(self.path, settings.MEDIA_ROOT, new_file))
+
+
+  def reannotate_elan(self):
+
+    standartizator = Standartizator(self.dialect)
+
+    tier_names = []
+    starts = []
+    ends = []
+    transcripts = []
+
+    for annot_data in self.elan_obj.annot_data_lst:
+      tier_name = annot_data[3]
+      tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
+      if tier_obj.attributes['TIER_ID']!='comment':
+        start, end, transcript = annot_data[0], annot_data[1], self.clean_transcription(annot_data[2].strip())
+        tier_names.append(tier_name)
+        starts.append(start)
+        ends.append(end)
+        transcripts.append(transcript)
+
+    transcript = '\n'.join(transcripts)
+    annotations = standartizator.get_annotation(transcript)
+    #print(annotations)
+
+    for tier_name, start, end, transcript, annotation in zip(tier_names, starts, ends, transcripts, annotations):
+      #tier_name = annot_data[3]
+      #tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
+      #if tier_obj.attributes['TIER_ID']!='comment':
+        #start = annot_data[0]
+        #end = annot_data[1]
+        #transcript = annot_data[2]
+        #annotations = standartizator.get_annotation(transcript) # this thing would return list of words in the following format:
+                                                                # (normalized token, [lemma, tag, annotation score (probability, generated by pymorphy)])
+      t_counter = 0
+      annot_value_lst = []
+      nrm_value_lst = []
+      for token in annotation:
+        nrm = token[0]
+        lemma = token[1][0]
+        morph = token[1][1]
+        try:
+          if lemma+morph != '':
+            annot_value_lst.append('%s:%s:%s' %(t_counter, lemma, morph))
+          if nrm != '':
+            nrm_value_lst.append('%s:%s' %(t_counter, nrm))
+        except IndexError:
+          print('Exception while saving. Normalization: %s,' \
+                'Lemmata: %s, Morphology: %s, Counter: %s' % (nrm, lemma, morph, t_counter))
+        t_counter += 1
+
+      if annot_value_lst != []:
+        self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
+      if nrm_value_lst != []:
+        self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
+      #self.elan_obj.save()
+
+  def clean_transcription(self, transcription):
+    reg = re.compile('(\.\.\.|\?|\[|\]|\.|!|unint)')
+    reg_spaces = re.compile('\ +')
+    return(reg.sub('', transcription))
+
 
   def build_html(self):
     
@@ -600,14 +771,16 @@ class elan_to_html:
       tier_name = annot_data[3]
       tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
       if tier_obj.attributes['TIER_ID']!='comment':
+        transcript = annot_data[2]
+
         normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
         annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
-      
         [participant, tier_status] = self.get_participant_tag_and_status(tier_obj)
         audio_div = self.get_audio_annot_div(annot_data[0], annot_data[1])
-        annot_div = self.get_annot_div(tier_name, participant, annot_data[2], normz_tokens_dict, annot_tokens_dict)
+        annot_div = self.get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
         html += '<div class="annot_wrapper %s">%s%s</div>' %(tier_status, audio_div, annot_div)
         i += 1
+
     self.html = '<div class="eaf_display">%s</div>' %(html)
     
   def get_additional_tags_dict(self, tier_name, start, end):
