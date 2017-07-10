@@ -114,7 +114,7 @@ class Recording(models.Model):
 
   def annotate_transcription(self):
     if self.pk!=None and self.data!=None:
-        return mark_safe('<a href="/admin/corpora/recording/%s/auto" class="grp-button">Annotate the whole transcription</a>' %(self.pk))
+        return mark_safe('<a href="/admin/corpora/recording/%s/auto" class="grp-button">Perform automatic annotation</a>' %(self.pk))
     return '(add transcription data and save to enable automatic annotation)'
 
   def file_check(self): 
