@@ -32,7 +32,7 @@ from reversion.admin import VersionAdmin
 @admin.register(Recording)
 class RecordingAdmin(VersionAdmin):
 
-  list_display = ('string_id', 'audio','speakerlist', 'title')
+  list_display = ('string_id', 'audio','speakerlist', 'title', 'checked')
   search_fields = ('to_speakers__string_id',)
   list_max_show_all = 500
   list_per_page = 200
@@ -43,7 +43,8 @@ class RecordingAdmin(VersionAdmin):
   fields = (
             ('string_id'),
             ('audio','data'),
-            ('edit_transcription'),
+            ('edit_transcription', 'annotate_transcription'),
+            ('checked'),
             ('recording_date', 'recording_time', 'recording_place'),
             ('file_check'),
             ('audio_data', 'participants'),
@@ -58,7 +59,7 @@ class RecordingAdmin(VersionAdmin):
             ('to_dialect'),
             ('recording_device'),
             )
-  readonly_fields = ('audio_data','participants','speakerlist','file_check','edit_transcription')
+  readonly_fields = ('audio_data','participants','speakerlist','file_check','edit_transcription', 'annotate_transcription')
 
 ##  form = RenameCheckboxAdminForm
   save_as=True
@@ -75,6 +76,7 @@ class RecordingAdmin(VersionAdmin):
         
     urls = super(RecordingAdmin, self).get_urls()
     my_urls = [url(r'\d+/edit/$', self.admin_site.admin_view(self.edit)),
+               url(r'\d+/auto/$', self.admin_site.admin_view(self.auto_annotate)),
                url(r'\d+/train/$', self.admin_site.admin_view(self.train)),
                url(r'^ajax/$', self.ajax_dispatcher, name='ajax'),
                ]
@@ -124,7 +126,10 @@ class RecordingAdmin(VersionAdmin):
   def edit(self, request):
 
     self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
-    self.elan_converter = elan_to_html(self.recording_obj)
+    self.elan_converter = elan_to_html(self.recording_obj) #, mode='auto-annotation')
+
+    #print(self.recording_obj.model_to_normalize)
+    #self.annotation = Standartizator(self.recording_obj.model_to_normalize)
     
     self.standartizator = standartizator(self.recording_obj.to_dialect)
     self.standartizator.start_standartizator()
@@ -139,6 +144,25 @@ class RecordingAdmin(VersionAdmin):
                'annot_menu_checkboxes' : annot_menu_checkboxes,
                }
     return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
+
+  @transaction.atomic
+  def auto_annotate(self, request):
+
+    self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
+    self.elan_converter = elan_to_html(self.recording_obj, mode='auto-annotation')
+
+    annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
+
+    annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
+    
+    context = {'ctext': self.elan_converter.html,
+               'audio_path': self.recording_obj.audio.name,
+               'media': self.media['js'],
+               'annot_menu_select' : annot_menu_select,
+               'annot_menu_checkboxes' : annot_menu_checkboxes,
+               }
+    return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
+
 
   @transaction.atomic
   def train(self, request):

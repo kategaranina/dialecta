@@ -10,6 +10,8 @@ from decimal import *
 from django.conf import settings
 from django.conf.urls.static import static
 from corpora.models import *
+from normalization.models import Model
+#import trimco.config as config
 
 #import enchant # replace with something installable (see occur. below)
 
@@ -138,367 +140,350 @@ class orthographic_data:
 					var_lst_temp.append([eq_str, eq_points])
 			return var_lst_temp
 
+
 class standartizator(orthographic_data):
-	
-	def __init__(self, dialect=''):
+  
+  def __init__(self, dialect=''):
 
-		self.dialect = dialect
-		self.model = NormalizationModel.objects.get(to_dialect = self.dialect)
-		self.morph_rus = pymorphy2.MorphAnalyzer()
-		self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
-		#self.be_spellchecker = enchant.Dict("be_BY")
+    self.dialect = dialect
+    self.model = NormalizationModel.objects.get(to_dialect = self.dialect)
+    self.morph_rus = pymorphy2.MorphAnalyzer()
+    self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+    #self.be_spellchecker = enchant.Dict("be_BY")
 
-	def update_model(self, new_examples_dict, exceptions_lst=[]):
+  def update_model(self, examples_dict, exceptions_lst):
 
-		examples_str = ''
-		self.examples_lst = self.load_examples_from_model()
-		self.examples_dict = self.get_examples_dict()
-		for key in new_examples_dict.keys():
-			if key not in self.examples_dict:
-				examples_str += '%s;%s\n' %(key, new_examples_dict[key])
-				#print(key, new_examples_dict[key])
-		self.model.examples = self.model.examples + examples_str
-		if len(exceptions_lst) > 0:
-			self.model.exceptions = self.model.exceptions + ';'.join(exceptions_lst)
-		print(len(self.model.examples.split('\n')))
-		self.model.save()
-		
-		
-	def remove_examples_from_model(self, examples_dict):
-		#doesn't work properly!! rewrite it later 
-		
-		examples_str = ''
-		self.examples_lst = self.load_examples_from_model()
-		self.examples_dict = self.get_examples_dict()
-		#print(self.examples_dict)
-		#print('examples from page:')
-		#print(examples_dict)
-		for key in self.examples_dict.keys():
-			if key not in examples_dict: #or key in examples_dict and self.examples_dict[key] != examples_dict[key]:
-				#print(key, ';'.join(self.examples_dict[key]))
-				examples_str += '%s;%s\n' %(key, ';'.join(self.examples_dict[key]))
-		#print(len(examples_str.split('\n')))
-		self.model.examples = examples_str
-		#print(len(self.model.examples.split('\n')))
-		self.model.save()
-		
-		
-	def spellchecker_hub(self, token):
+    examples_str = ''
+    for key in examples_dict.keys():
+      if type(examples_dict[key][0]) == str:
+        examples_str += '%s;%s\n' %(key, ';'.join(examples_dict[key]))
+    self.model.examples = examples_str
+    self.model.exceptions = ';'.join(exceptions_lst)
+    self.model.save()
 
-		result_lst = [token]
-		if self.dialect.__str__() == 'MP':
-			result_lst = self.belarusian_spellchecker(token)
-		elif self.dialect.__str__() == 'RUSP':
-			result_lst = self.yandex_spellchecker(token)
-		return result_lst
+  def spellchecker_hub(self, token):
 
-	def yandex_spellchecker(self, token):
+    result_lst = [token]
+    if self.dialect.__str__() == 'MP':
+      result_lst = self.belarusian_spellchecker(token)
+    elif self.dialect.__str__() == 'RUSP':
+      result_lst = self.yandex_spellchecker(token)
+    return result_lst
 
-		url = 'http://speller.yandex.net/services/spellservice/checkText?text='+quote(token)
-		result = urlopen(url).read()
-		result_xml = etree.fromstring(result)
-		if len(result_xml.xpath('error')) > 0:
-			return result_xml.xpath('error/s/text()')
-		else:
-			return [token]
+  def yandex_spellchecker(self, token):
 
-	def belarusian_spellchecker(self, token):
+    url = 'http://speller.yandex.net/services/spellservice/checkText?text='+quote(token)
+    result = urlopen(url).read()
+    result_xml = etree.fromstring(result)
+    if len(result_xml.xpath('error')) > 0:
+      return result_xml.xpath('error/s/text()')
+    else:
+      return [token]
 
-##		if self.be_spellchecker.check(token)==False:
-##			return self.be_spellchecker.suggest(token)
-##		else:
-		return [token]
+  def belarusian_spellchecker(self, token):
 
-	def percent(self, share, total):
+##    if self.be_spellchecker.check(token)==False:
+##      return self.be_spellchecker.suggest(token)
+##    else:
+    return [token]
 
-		getcontext().prec = 5
-		getcontext().rounding = ROUND_DOWN
-		return (Decimal(share) / Decimal(total)) * Decimal(100)
+  def percent(self, share, total):
 
-	def start_standartizator(self):
-		
-		self.equations_lst = []
-		self.uneq_lst = []
+    getcontext().prec = 5
+    getcontext().rounding = ROUND_DOWN
+    return (Decimal(share) / Decimal(total)) * Decimal(100)
 
-		self.longer_lst = []
-		self.shorter_lst = []
+  def start_standartizator(self):
+    
+    self.equations_lst = []
+    self.uneq_lst = []
 
-		self.check_and_learn_option = False
-		self.learning_report_option = True
-		self.var_lst_limit = 5
-		self.spellchecker_option = True	
-		self.spell_check_lst_limit = 5
-		try:
-			self.yandex_spellchecker('')
-		except URLError:
-			print('spellchecker off: yandex web spellchecker API access error')
-			self.spellchecker_option = False
-		
-		self.examples_counter = 0
-		self.found_counter = 0
-		self.fail_counter = 0
-		self.uneq_counter = 0
-		self.t_s_diff = 0
-		#path = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'wsgi', 'static', 'orth_%s.csv' %(self.lang))
-		#examples_lst = self.load_examples_from_file(path)
-		self.examples_lst = self.load_examples_from_model()
-		self.examples_dict = self.get_examples_dict()
-		self.exceptions_lst = self.model.exceptions.split(';')
-		for example in self.examples_lst:
-			self.check_and_learn(example[0], example[1])
-		self.process_longer_trans_exx()
-		#self.process_shorter_trans_exx()
-		#print(self.longer_lst, len(self.longer_lst))
-		#print(self.shorter_lst, len(self.shorter_lst))
-		self.print_learning_report()
+    self.longer_lst = []
+    self.shorter_lst = []
 
-	def preprocess_trans(self, trans):
-		trans = trans.lower()
-		for char in ["'", 'a', 'e', 'i', 'u']:
-			trans = re.sub(char+'+', char, trans)
-		return trans
+    self.check_and_learn_option = False
+    self.learning_report_option = True
+    self.var_lst_limit = 5
+    self.spellchecker_option = True  
+    self.spell_check_lst_limit = 5
+    try:
+      self.yandex_spellchecker('')
+    except URLError:
+      print('spellchecker off: yandex web spellchecker API access error')
+      self.spellchecker_option = False
+    
+    self.examples_counter = 0
+    self.found_counter = 0
+    self.fail_counter = 0
+    self.uneq_counter = 0
+    self.t_s_diff = 0
+    #path = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'wsgi', 'static', 'orth_%s.csv' %(self.lang))
+    #examples_lst = self.load_examples_from_file(path)
+    self.examples_lst = self.load_examples_from_model()
+    self.examples_dict = self.get_examples_dict()
+    self.exceptions_lst = self.model.exceptions.split(';')
+    for example in self.examples_lst:
+      self.check_and_learn(example[0], example[1])
+    self.process_longer_trans_exx()
+    #self.process_shorter_trans_exx()
+    #print(self.longer_lst, len(self.longer_lst))
+    #print(self.shorter_lst, len(self.shorter_lst))
+    self.print_learning_report()
 
-	def get_examples_dict(self):
-		examples_dict = {}
-		for el in self.examples_lst:
-			examples_dict[el[0]] = el[1:]
-		return examples_dict
-		
-	def print_learning_report(self):
-		if self.check_and_learn_option == True and self.learning_report_option == True and self.examples_counter > 0:
-			'''print('Total checked: %s\nFound: %s: %s %%\nFailed: %s: %s %%' %(self.examples_counter,
-																																	 self.found_counter,
-																																	 self.percent(self.found_counter, self.examples_counter),
-																																	 self.fail_counter,
-																																	 self.percent(self.fail_counter, self.examples_counter),
-																																	 ))'''
-			if self.t_s_diff > 0 and self.uneq_counter > 0:
-				pass
-				print('average gap between translit and standartized: %s' %(self.t_s_diff / self.uneq_counter))
+  def preprocess_trans(self, trans):
+    trans = trans.lower()
+    for char in ["'", 'a', 'e', 'i', 'u']:
+      trans = re.sub(char+'+', char, trans)
+    return trans
+
+  def get_examples_dict(self):
+    examples_dict = {}
+    for el in self.examples_lst:
+      examples_dict[el[0]] = el[1:]
+    return examples_dict
+    
+  def print_learning_report(self):
+    if self.check_and_learn_option == True and self.learning_report_option == True and self.examples_counter > 0:
+      '''print('Total checked: %s\nFound: %s: %s %%\nFailed: %s: %s %%' %(self.examples_counter,
+                                                                   self.found_counter,
+                                                                   self.percent(self.found_counter, self.examples_counter),
+                                                                   self.fail_counter,
+                                                                   self.percent(self.fail_counter, self.examples_counter),
+                                                                   ))'''
+      if self.t_s_diff > 0 and self.uneq_counter > 0:
+        pass
+        print('average gap between translit and standartized: %s' %(self.t_s_diff / self.uneq_counter))
 
 
-	def load_examples_from_model(self):
+  def load_examples_from_model(self):
 
-		print('loading examples from db')
-		examples_lst = []
-		print(len(self.model.examples.splitlines()))
-		for line in self.model.examples.splitlines():
-			line = line.rstrip()
-			#print(line)
+    print('loading examples from db')
+    examples_lst = []
+    for line in self.model.examples.splitlines():
+      line = line.rstrip()
 
-			#regular: token - language
-			if 'sep=' not in line and len(line.split(';')) == 2:
-				trans, standz = line.split(';')
-				#sys.stdout.buffer.write(line.encode('utf-8'))
-				if len(trans) != 0 and len(standz) != 0 and [trans.lower(), standz.lower()] not in examples_lst:
-					#print(trans.lower(), standz.lower())
-					examples_lst.append([trans.lower(), standz.lower()])
+      #regular: token - language
+      if 'sep=' not in line and len(line.split(';')) == 2:
+        trans, standz = line.split(';')
+        #sys.stdout.buffer.write(line.encode('utf-8'))
+        if len(trans) != 0 and len(standz) != 0 and [trans.lower(), standz.lower()] not in examples_lst:
+          examples_lst.append([trans.lower(), standz.lower()])
 
-			#bilingual: token - language1 - language2
-			if 'sep=' not in line and len(line.split(';')) == 3: 
-				trans, standz, additional = line.split(';')
-				if len(trans) != 0 and len(standz) != 0 and len(additional) != 0 and [trans.lower(), standz.lower(), additional.lower()] not in examples_lst:
-					examples_lst.append([trans.lower(), standz.lower(), additional.lower()])
-		examples_lst = sorted(examples_lst, key = lambda item: self.get_example_stability_rating(item[0], item[1]))
-		return examples_lst
-		
-	def load_examples_from_file(self, path):
+      #bilingual: token - language1 - language2
+      if 'sep=' not in line and len(line.split(';')) == 3: 
+        trans, standz, additional = line.split(';')
+        if len(trans) != 0 and len(standz) != 0 and len(additional) != 0 and [trans.lower(), standz.lower(), additional.lower()] not in examples_lst:
+          examples_lst.append([trans.lower(), standz.lower(), additional.lower()])
+    examples_lst = sorted(examples_lst, key = lambda item: self.get_example_stability_rating(item[0], item[1]))
+    return examples_lst
+    
+  def load_examples_from_file(self, path):
 
-		examples_lst = []
-		
-		try:
-			print('loading examples from dictionary: %s' %(path))
-			file = codecs.open(path, 'r', 'utf-8')
-			for line in file:
-				line = line.rstrip()
-				if 'sep=' not in line and len(line.split(';')) == 2:
-					trans, standz = line.split(';')
-					#sys.stdout.buffer.write(line.encode('utf-8'))
-					#print([trans.encode('utf-8'), standz.encode('utf-8')])
-					if len(trans) != 0 and len(standz) != 0 and [trans.lower(), standz.lower()] not in examples_lst:
-						examples_lst.append([trans.lower(), standz.lower()])
-			examples_lst = sorted(examples_lst, key = lambda item: self.get_example_stability_rating(item[0], item[1]))
-			file.close()
-		except FileNotFoundError:
-			print('file reading error by loading examples dictionary')
-		return examples_lst
+    examples_lst = []
+    
+    try:
+      print('loading examples from dictionary: %s' %(path))
+      file = codecs.open(path, 'r', 'utf-8')
+      for line in file:
+        line = line.rstrip()
+        if 'sep=' not in line and len(line.split(';')) == 2:
+          trans, standz = line.split(';')
+          #sys.stdout.buffer.write(line.encode('utf-8'))
+          #print([trans.encode('utf-8'), standz.encode('utf-8')])
+          if len(trans) != 0 and len(standz) != 0 and [trans.lower(), standz.lower()] not in examples_lst:
+            examples_lst.append([trans.lower(), standz.lower()])
+      examples_lst = sorted(examples_lst, key = lambda item: self.get_example_stability_rating(item[0], item[1]))
+      file.close()
+    except FileNotFoundError:
+      print('file reading error by loading examples dictionary')
+    return examples_lst
 
-	def get_example_stability_rating(self, trans, standz):
+  def get_example_stability_rating(self, trans, standz):
 
-		if len(trans) == len(standz):
-			return [0,len(trans),0]
-		elif len(trans) > len(standz):
-			return [1,len(trans)-len(standz),len(trans)]
-		elif len(trans) < len(standz):
-			return [2,len(standz)-len(trans),len(trans)]			
-			
-	def check_and_learn(self, trans, standz):
-		
-		trans = self.preprocess_trans(trans)
-		standz = standz.lower()
-		self.examples_counter += 1
-		
-		if self.check_and_learn_option == True:
-			vars_lst = list(map(lambda item: item[0], self.generate_variants(trans)))
-			if self.var_lst_limit != None:
-				vars_lst = vars_lst[:self.var_lst_limit-1]
-			if standz in vars_lst:
-				self.found_counter += 1
-			else:
-				if self.spellchecker_option == True:
-					self.run_vars_through_spellchecker(trans, standz, vars_lst)
-				else:
-					self.learn_example(trans, standz)
-		else:
-			self.learn_example(trans, standz)
+    if len(trans) == len(standz):
+      return [0,len(trans),0]
+    elif len(trans) > len(standz):
+      return [1,len(trans)-len(standz),len(trans)]
+    elif len(trans) < len(standz):
+      return [2,len(standz)-len(trans),len(trans)]      
+      
+  def check_and_learn(self, trans, standz):
+    
+    trans = self.preprocess_trans(trans)
+    standz = standz.lower()
+    self.examples_counter += 1
+    
+    if self.check_and_learn_option == True:
+      vars_lst = list(map(lambda item: item[0], self.generate_variants(trans)))
+      if self.var_lst_limit != None:
+        vars_lst = vars_lst[:self.var_lst_limit-1]
+      if standz in vars_lst:
+        self.found_counter += 1
+      else:
+        if self.spellchecker_option == True:
+          self.run_vars_through_spellchecker(trans, standz, vars_lst)
+        else:
+          self.learn_example(trans, standz)
+    else:
+      self.learn_example(trans, standz)
 
-	def run_vars_through_spellchecker(self, trans, standz, vars_lst):
+  def run_vars_through_spellchecker(self, trans, standz, vars_lst):
 
-		if len(vars_lst) > 0:
-			spell_check_lst = self.spellchecker_hub(vars_lst[0])
-			if self.spell_check_lst_limit != None:
-				spell_check_lst = spell_check_lst[:self.spell_check_lst_limit-1]
-			if standz in spell_check_lst:
-				self.found_counter += 1
-			else:
-				self.learn_example(trans, standz)
-		else:
-			self.learn_example(trans, standz)
+    if len(vars_lst) > 0:
+      spell_check_lst = self.spellchecker_hub(vars_lst[0])
+      if self.spell_check_lst_limit != None:
+        spell_check_lst = spell_check_lst[:self.spell_check_lst_limit-1]
+      if standz in spell_check_lst:
+        self.found_counter += 1
+      else:
+        self.learn_example(trans, standz)
+    else:
+      self.learn_example(trans, standz)
 
-	def learn_example(self, trans, standz):
-		
-		self.fail_counter += 1
+  def learn_example(self, trans, standz):
+    
+    self.fail_counter += 1
 
-		if len(standz) == 1:
-			i = 0
-			while i < len(trans):
-				if i == 0: 
-					s = standz
-				else:
-					s = ''
-				self.equate(trans[i], s, trans, i)
-				i += 1
-		elif len(trans) == len(standz):
-			self.add_same_len(trans, standz)
-		elif len(trans) > len(standz):
-			self.longer_lst.append((trans, standz))
-		elif len(trans) < len(standz):
-			self.shorter_lst.append((trans, standz))
-	
-	def add_same_len(self, trans, standz):
-		
-		i = 0
-		while i < len(trans):
-			self.equate(trans[i], standz[i], trans, i)
-			i += 1
+    if len(standz) == 1:
+      i = 0
+      while i < len(trans):
+        if i == 0: 
+          s = standz
+        else:
+          s = ''
+        self.equate(trans[i], s, trans, i)
+        i += 1
+    elif len(trans) == len(standz):
+      self.add_same_len(trans, standz)
+    elif len(trans) > len(standz):
+      self.longer_lst.append((trans, standz))
+    elif len(trans) < len(standz):
+      self.shorter_lst.append((trans, standz))
+  
+  def add_same_len(self, trans, standz):
+    
+    i = 0
+    while i < len(trans):
+      self.equate(trans[i], standz[i], trans, i)
+      i += 1
 
-	def process_longer_trans_exx(self):
-		
-		for trans, standz in self.longer_lst:
-			index_dict = {}
-			n = 0
-			previous_standz_char = ''
-			while n < len(standz):
-				i = n
-				while i < len(trans):
-					occur_lst = list(map(lambda item: item[0], self.match(trans[i], self.get_context(trans, i))))
-					if standz[n] in occur_lst:
-						try:
-							if previous_standz_char!=standz[n]:
-								index_dict[n] = i
-								previous_standz_char = standz[n]
-								break
-						except IndexError:
-							index_dict[n] = i
-							previous_standz_char = standz[n]
-							break
-					i+=1
-				n+=1
-			self.add_longer_trans_matches(trans, standz, index_dict)
+  def process_longer_trans_exx(self):
 
-	def add_longer_trans_matches(self, trans, standz, index_dict):
+    for trans, standz in self.longer_lst:
+      index_dict = {}
+      n = 0
+      previous_standz_char = ''
+      while n < len(standz):
+        i = n
+        while i < len(trans):
+          occur_lst = list(map(lambda item: item[0], self.match(trans[i], self.get_context(trans, i))))
+          if standz[n] in occur_lst:
+            try:
+              if previous_standz_char!=standz[n]:
+                index_dict[n] = i
+                previous_standz_char = standz[n]
+                break
+            except IndexError:
+              index_dict[n] = i
+              previous_standz_char = standz[n]
+              break
+          i+=1
+        n+=1
+      self.add_longer_trans_matches(trans, standz, index_dict)
 
-		if len(standz) > len(index_dict):
-			covered_standz_pos_lst = sorted(index_dict.keys())
-			covered_trans_pos_lst = sorted(list(map(lambda item: index_dict[item], index_dict.keys())))
-			
-			missing_standz_pos_lst = sorted(list(set(range(len(standz))) - set(covered_standz_pos_lst)))
-			missing_trans_pos_lst = sorted(list(set(range(len(trans))) - set(covered_trans_pos_lst)))
+  def add_longer_trans_matches(self, trans, standz, index_dict):
 
-			#missing matches:
-			for n in missing_standz_pos_lst:
-				for i in missing_trans_pos_lst:
-					if i >= n:
-						index_dict[n] = i
-						break
-		for n in index_dict.keys():
-			i = index_dict[n]
-			self.equate(trans[i], standz[n], trans, i)
-			n+=1
+    if len(standz) > len(index_dict):
+      covered_standz_pos_lst = sorted(index_dict.keys())
+      covered_trans_pos_lst = sorted(list(map(lambda item: index_dict[item], index_dict.keys())))
+      
+      missing_standz_pos_lst = sorted(list(set(range(len(standz))) - set(covered_standz_pos_lst)))
+      missing_trans_pos_lst = sorted(list(set(range(len(trans))) - set(covered_trans_pos_lst)))
 
-	def add_shorter_trans(self, trans, standz):
-		#self.uneq_counter += 1
-		#self.t_s_diff += len(trans) - len(standz)
-		#self.fail_counter += 1
-		self.examples_counter += -1 #remove when such examples are proccessed
-		pass
+      #missing matches:
+      for n in missing_standz_pos_lst:
+        for i in missing_trans_pos_lst:
+          if i >= n:
+            index_dict[n] = i
+            break
+    for n in index_dict.keys():
+      i = index_dict[n]
+      self.equate(trans[i], standz[n], trans, i)
+      n+=1
 
-	def equate(self, glyph, equation, string, i):
+  def add_shorter_trans(self, trans, standz):
+    #self.uneq_counter += 1
+    #self.t_s_diff += len(trans) - len(standz)
+    #self.fail_counter += 1
+    self.examples_counter += -1 #remove when such examples are proccessed
+    pass
 
-		context = self.get_context(string, i)
-		self.update_g_eq(glyph, equation, context)
+  def equate(self, glyph, equation, string, i):
 
-	def spellchecker_filter(self, vars_lst):
+    context = self.get_context(string, i)
+    self.update_g_eq(glyph, equation, context)
 
-		results_dict = {}
-		for var in vars_lst:
-			try:
-				temp_lst = self.spellchecker_hub(var[0])
-				if temp_lst == []:
-					pass
-				elif temp_lst[0] == var[0]: #IF CORRECT SPELLING
-					if var[0] not in list(results_dict.keys()):
-						results_dict[var[0]] = 5
-					else:
-						results_dict[var[0]] += 5
-				else:
-					for el in temp_lst:
-						if el not in list(results_dict.keys()):
-							results_dict[el] = 1
-						else:
-							results_dict[el] += 1
-			except URLError:
-				return vars_lst
-				#return list(map(lambda item: item[0], vars_lst))
-		if results_dict != {}:
-			return sorted(list(results_dict.items()), key = lambda el: -el[1]) #[:10]
-		return vars_lst
-	
-	def generate_dict_for_translit_token(self, token):
+  def spellchecker_filter(self, vars_lst):
 
-		token = self.preprocess_trans(token)
-		vars_lst = self.generate_variants(token)[:20]
-		if self.spellchecker_option == True:
-			vars_lst = self.spellchecker_filter(vars_lst)
-		#print(token, vars_lst)
-		return vars_lst
+    results_dict = {}
+    for var in vars_lst:
+      try:
+        temp_lst = self.spellchecker_hub(var[0])
+        if temp_lst == []:
+          pass
+        elif temp_lst[0] == var[0]: #IF CORRECT SPELLING
+          if var[0] not in list(results_dict.keys()):
+            results_dict[var[0]] = 5
+          else:
+            results_dict[var[0]] += 5
+        else:
+          for el in temp_lst:
+            if el not in list(results_dict.keys()):
+              results_dict[el] = 1
+            else:
+              results_dict[el] += 1
+      except URLError:
+        return vars_lst
+        #return list(map(lambda item: item[0], vars_lst))
+    if results_dict != {}:
+      return sorted(list(results_dict.items()), key = lambda el: -el[1]) #[:10]
+    return vars_lst
+  
+  def generate_dict_for_translit_token(self, token):
 
-	def get_annotation_options_list(self, token):
-		
-		result_lst = []
-		for annot in self.morph_rus.parse(token):
-			if annot.score > 0.001:
-				tag = self.annotation_menu.override_abbreviations(str(annot.tag))
-				result_lst.append([annot.normal_form, tag, annot.score])
-		return result_lst
+    token = self.preprocess_trans(token)
+    vars_lst = self.generate_variants(token)[:20]
+    if self.spellchecker_option == True:
+      vars_lst = self.spellchecker_filter(vars_lst)
+    #print(token, vars_lst)
+    return vars_lst
 
-	def auto_annotation(self, token):
-		
-		try:
-			normalization = self.generate_dict_for_translit_token(token)[0][0]
-			return (token, normalization, self.get_annotation_options_list(normalization)[0])
-		except IndexError:
-			return None		
+  def get_annotation_options_list(self, token):
+    
+    result_lst = []
+    for annot in self.morph_rus.parse(token):
+      if annot.score > 0.001:
+        tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+        result_lst.append([annot.normal_form, tag, annot.score])
+    return result_lst
+
+  def auto_annotation(self, token):
+    
+    with open('token.tmp', 'w') as f:
+    	f.write(token)
+    #os.system('echo ' + token + '> token.tmp')
+    model = self.models_dict[str(self.dialect)]
+    #print(model)
+    os.system('python2 ' + self.path + 'normalise.py token.tmp ' + model)
+    #os.system('cat token.tmp.norm')
+    try:
+      normalization = open('token.tmp.norm').read().split('\t')[1].lower().strip()
+      os.system('rm token.tmp.*')
+      #normalization = self.generate_dict_for_translit_token(token)[0][0]
+      print(token, normalization)
+      return (token, normalization, self.get_annotation_options_list(normalization)[0])
+    except IndexError:
+      return None    
 
 '''
 def pack_tags_to_dict(tags_lst, p):
@@ -508,6 +493,62 @@ def pack_tags_to_dict(tags_lst, p):
 		if getattr(p.tag, tag)!=None:
 			tags_dict[tag] = getattr(p.tag, tag)
 '''
+class Standartizator(): #takes model's name
+
+  def __init__(self, dialect=''): 
+
+    self.dialect = dialect
+    self.model = Model.objects.get(to_dialect = self.dialect)  #gets appropriate model by dialect's name
+                                                               #this corresponds to the name of model's directory inside csmtiser
+    self.path = settings.NORMALIZER_PATH #specified in the last line of trimco.settings.py
+    self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+    self.morph_rus = pymorphy2.MorphAnalyzer() #this should be replaced by some context-dependent analyser, i.e. mystem
+
+  def get_annotation(self, text): 
+
+    annotations = []
+    nrm_list = self.normalize(text)
+    for nrm in nrm_list:
+      annotation = [(word, self.get_annotation_options_list(word)[0]) for word in nrm] #we take only first (=most likely) variant
+      annotations.append(annotation) 
+    return(annotations)
+
+  def normalize(self, text_to_normalize): #clauses are separated by '\n\n', words inside clause are separeted by '\n'
+
+    with open('tmp', 'w') as f:
+      f.write(text_to_normalize)
+    #os.system('echo ' + token + '> token.tmp')
+    #print(model)
+    os.system('python2 ' + self.path + 'normalise.py tmp ' + str(self.model))
+    #os.system('cat tmp.norm')
+    try:
+      clauses = open('tmp.norm').read().split('\n\n')
+      lines = [clause.split('\n') for clause in clauses if clause]
+      #an element of lines looks like:
+      #['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
+      normalization_list = []
+      for line in lines:
+        words = [word.split('\t')[1].lower() for word in line]
+        normalization_list.append(words)
+      #normalization = ' '.join([line.split('\t')[1].lower() for line in output if line])
+      #normalization_list = [word.split('\t')[1].lower() for word in words if word]
+      #os.system('rm tmp.*')
+      #normalization = self.generate_dict_for_translit_token(token)[0][0]
+      print(len(normalization_list))
+      return (normalization_list) #returns a list of lists 
+    except IndexError:
+      return None  
+
+  def get_annotation_options_list(self, token):
+    
+    result_lst = []
+    for annot in self.morph_rus.parse(token):
+      if annot.score > 0.001:
+        tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+        result_lst.append([annot.normal_form, tag, annot.score])
+    return result_lst
+
+
 
 class Tier:
 
@@ -608,176 +649,247 @@ class ElanObject:
 
 class elan_to_html:
 
-	def __init__(self, file_obj, _format=''):
+  def __init__(self, file_obj, mode='', _format=''): 
 
-		self.file_obj = file_obj
-		self.elan_obj = ElanObject(self.file_obj.data.path)
-		self.audio_file_path = self.file_obj.audio.name
-		self.format = _format
-		self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
-		self.build_html()
+    self.file_obj = file_obj
+    self.elan_obj = ElanObject(self.file_obj.data.path)
+    self.audio_file_path = self.file_obj.audio.name
+    self.path = self.file_obj.data.path
+    self.format = _format
+    self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+    self.mode = mode
+    self.dialect = self.file_obj.to_dialect #gets 'Dialect' field of recording
+    print(self.dialect)
+    print(self.mode)
+    if not self.mode:
+      self.build_html()
+    elif self.mode == 'auto-annotation': #first auto-annotation of the whole elan is performed, 
+                                         #then elan is saved and then html is build
+      self.make_backup()
+      self.reannotate_elan()
+      self.elan_obj.save()
+      self.build_html()
 
-	def build_html(self):
-		
-		html = ''
-		print('Transcription > Standard learning examples:', self.file_obj.data.path)
-		i = 0
-		html += self.get_audio_link()
-		self.participants_dict = {}
-		for annot_data in self.elan_obj.annot_data_lst:
-			tier_name = annot_data[3]
-			tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
-			if tier_obj.attributes['TIER_ID']!='comment':
-				normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
-				annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
-			
-				[participant, tier_status] = self.get_participant_tag_and_status(tier_obj)
-				audio_div = self.get_audio_annot_div(annot_data[0], annot_data[1])
-				annot_div = self.get_annot_div(tier_name, participant, annot_data[2], normz_tokens_dict, annot_tokens_dict)
-				html += '<div class="annot_wrapper %s">%s%s</div>' %(tier_status, audio_div, annot_div)
-				i += 1
-		self.html = '<div class="eaf_display">%s</div>' %(html)
-		
-	def get_additional_tags_dict(self, tier_name, start, end):
+  def make_backup(self):
 
-		tokens_dict = {}
-		try:
-			nrm_annot_lst = self.elan_obj.Eaf.get_annotation_data_at_time(tier_name, (start+end) / 2 )
-			if nrm_annot_lst != []:
-				nrm_annot = nrm_annot_lst[0][-1]
-				for el in ([el.split(':') for el in nrm_annot.split('|')]):
-					tokens_dict[int(el[0])] = el[1:]
-			return tokens_dict
-		except KeyError:
-			return tokens_dict
+    print('Creating backup of current annotation')
 
-	def get_participant_tag_and_status(self, tier_obj):
-		
-		participant = ''
-		tier_status = ''
-		if tier_obj != None:
-			participant = tier_obj.attributes['PARTICIPANT'].title()
-			if participant not in self.participants_dict.keys():
-					self.participants_dict[participant] = '. '.join([namepart[0] for namepart in filter(None, participant.split(' '))])+'.'
-			else:
-				participant = self.participants_dict[participant]
-			if '_i_' in tier_obj.attributes['TIER_ID']:
-				tier_status = ' inwr'
-			elif '_n_' in tier_obj.attributes['TIER_ID']:
-				tier_status = ' inwd'
-		return [participant, tier_status]
+    import datetime
+    now = datetime.datetime.now()
+    cur = now.strftime("%Y-%m-%d_%H%M")
+    new_file =  '{}_backup_{}.eaf'.format(str(self.path).split('/')[-1][:-4], cur)
+    os.system('mkdir -p {}/backups'.format(settings.MEDIA_ROOT))
+    os.system('cp {} {}/backups/{}'.format(self.path, settings.MEDIA_ROOT, new_file))
 
-	def get_annot_div(self, tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict):
-		
-		transcript = self.prettify_transcript(transcript)
-		if annot_tokens_dict != {}:
-			transcript = self.add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dict)
-		return '<div class="annot" tier_name="%s"><span class="participant">%s</span><span class="transcript">%s</span></div>' %(tier_name, participant, transcript,)
 
-	def get_audio_annot_div(self, stttime, endtime):
-		
-		return '<div class="audiofragment" starttime="%s" endtime="%s"><button class="fa fa-spinner off"></button></div>' %(stttime, endtime)
+  def reannotate_elan(self):
 
-	def get_audio_link(self):
-		
-		return '<audio id="elan_audio" src="/media/%s" preload=""></audio>' %(self.audio_file_path)
+    standartizator = Standartizator(self.dialect)
 
-	def prettify_transcript(self, transcript):
+    tier_names = []
+    starts = []
+    ends = []
+    transcripts = []
 
-		if transcript[-1] in [' ']:
-			transcript = transcript[:-1]
-		new_transcript = ''
-		tokens_lst = re.split('([ ])', transcript)
-		
-		for el in tokens_lst:
-			el = el.strip()
-			if len(el) > 0:
-				if el in ['...','?','!']:
-					el = '<tech>%s</tech>' %(el)
-				elif el[-1] in ['?','!']:
-					el = '<token><trt>%s</trt></token><tech>%s</tech>' %(el[:-1], el[-1])
-				elif '[' in el and ']' in el:
-					el_lst = list(filter(re.compile('[a-zA-Z]').match, re.split('[\[\]]', el))) #splitting [ ] and removing non-alphabetic values
-					el = ''
-					for el_2 in el_lst:
-						if 'unint' in el_2 or '.' in el_2:
-							el += '<note>%s.</note>' %(el_2.strip('.'))
-						else:
-							el += '<token><trt>%s</trt></token>' %(el_2)
-				elif el not in [' ', '']:
-					el = '<token><trt>%s</trt></token>' %(el)
-				new_transcript += el
-		return new_transcript
+    for annot_data in self.elan_obj.annot_data_lst:
+      tier_name = annot_data[3]
+      tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
+      if tier_obj.attributes['TIER_ID']!='comment':
+        start, end, transcript = annot_data[0], annot_data[1], self.clean_transcription(annot_data[2].strip())
+        tier_names.append(tier_name)
+        starts.append(start)
+        ends.append(end)
+        transcripts.append(transcript)
 
-	def add_annotation_to_transcript(self, transcript, normz_tokens_dict, annot_tokens_dict):
+    transcript = '\n'.join(transcripts)
+    annotations = standartizator.get_annotation(transcript)
+    #print(annotations)
 
-		i = 0
-		transcript_obj = etree.fromstring('<c>'+transcript+'</c>')
-		for tag in transcript_obj.iterchildren():
-			if tag.tag == 'token':
-				if i in annot_tokens_dict.keys():
-					morph_tags = self.annotation_menu.override_abbreviations(annot_tokens_dict[i][1]) #DB
-					tag.insert(0, etree.fromstring('<morph>'+morph_tags+'</morph>'))
-					tag.insert(0, etree.fromstring('<lemma>'+annot_tokens_dict[i][0]+'</lemma>'))
-				if i in normz_tokens_dict.keys():
-					tag.insert(0, etree.fromstring('<nrm>'+normz_tokens_dict[i][0]+'</nrm>'))
-				i += 1
-		return etree.tostring(transcript_obj)[3:-4].decode('utf-8')
+    for tier_name, start, end, transcript, annotation in zip(tier_names, starts, ends, transcripts, annotations):
+      #tier_name = annot_data[3]
+      #tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
+      #if tier_obj.attributes['TIER_ID']!='comment':
+        #start = annot_data[0]
+        #end = annot_data[1]
+        #transcript = annot_data[2]
+        #annotations = standartizator.get_annotation(transcript) # this thing would return list of words in the following format:
+                                                                # (normalized token, [lemma, tag, annotation score (probability, generated by pymorphy)])
+      t_counter = 0
+      annot_value_lst = []
+      nrm_value_lst = []
+      for token in annotation:
+        nrm = token[0]
+        lemma = token[1][0]
+        morph = token[1][1]
+        try:
+          if lemma+morph != '':
+            annot_value_lst.append('%s:%s:%s' %(t_counter, lemma, morph))
+          if nrm != '':
+            nrm_value_lst.append('%s:%s' %(t_counter, nrm))
+        except IndexError:
+          print('Exception while saving. Normalization: %s,' \
+                'Lemmata: %s, Morphology: %s, Counter: %s' % (nrm, lemma, morph, t_counter))
+        t_counter += 1
 
-	def get_examples_from_page(self): 
-		#returns a dictionary with original tokens (transcriptions; as keys) and their normalizations (as values)
-		
-		new_examples = {}
-		html_obj = etree.fromstring(self.html)
-		for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
-			for token in el.xpath('*//token'):
-				#print(token.xpath('trt/text()'), token.xpath('nrm/text()'))
-				if len(token.xpath('nrm/text()')) > 0:
-					tkn = token.xpath('trt/text()')[0]
-					nrm = token.xpath('nrm/text()')[0]
-					if tkn not in new_examples:
-						new_examples[tkn.lower()] = nrm.lower()
-						
-		return new_examples
-	
-	def save_html_to_elan(self, html):
-		
-		html_obj = etree.fromstring(html)
-		for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
-			tier_name = el.xpath('*[@class="annot"]/@tier_name')[0]
-			raw_start = el.xpath('*[@class="audiofragment"]/@starttime')[0]
-			raw_end = el.xpath('*[@class="audiofragment"]/@endtime')[0]
-			start = int(Decimal(raw_start))
-			end = int(Decimal(raw_end))
-			t_counter = 0
-			annot_value_lst = []
-			nrm_value_lst = []
-			for token in el.xpath('*//token'):	
-				nrm_lst = token.xpath('nrm/text()')
-				lemma_lst = token.xpath('lemma/text()')
-				morph_lst = token.xpath('morph/text()')
-				try:
-					if lemma_lst+morph_lst != []:
-						annot_value_lst.append('%s:%s:%s' %(t_counter, lemma_lst[0], morph_lst[0]))
-					if nrm_lst != []:
-						nrm_value_lst.append('%s:%s' %(t_counter, nrm_lst[0]))
-				except IndexError:
-					print('Exception while saving. Normalization: %s,' \
-								'Lemmata: %s, Morphology: %s, Counter: %s'
-								% (nrm_lst, lemma_lst, morph_lst, t_counter)
-								)
-				t_counter += 1
-			if annot_value_lst != []:
-				self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
-			if nrm_value_lst != []:
-				self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
-		self.elan_obj.save()
+      if annot_value_lst != []:
+        self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
+      if nrm_value_lst != []:
+        self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
+      #self.elan_obj.save()
 
-	def build_annotation_menu(self):
-		
-		return [self.annotation_menu.menu_html_str_1,
-						self.annotation_menu.menu_html_str_2,
-						]
+  def clean_transcription(self, transcription):
+    reg = re.compile('(\.\.\.|\?|\[|\]|\.|!|unint)')
+    reg_spaces = re.compile('\ +')
+    return(reg.sub('', transcription))
+
+
+  def build_html(self):
+    
+    html = ''
+    print('Transcription > Standard learning examples:', self.file_obj.data.path)
+    i = 0
+    html += self.get_audio_link()
+    self.participants_dict = {}
+    for annot_data in self.elan_obj.annot_data_lst:
+      tier_name = annot_data[3]
+      tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
+      if tier_obj.attributes['TIER_ID']!='comment':
+        transcript = annot_data[2]
+
+        normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
+        annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
+        [participant, tier_status] = self.get_participant_tag_and_status(tier_obj)
+        audio_div = self.get_audio_annot_div(annot_data[0], annot_data[1])
+        annot_div = self.get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
+        html += '<div class="annot_wrapper %s">%s%s</div>' %(tier_status, audio_div, annot_div)
+        i += 1
+
+    self.html = '<div class="eaf_display">%s</div>' %(html)
+    
+  def get_additional_tags_dict(self, tier_name, start, end):
+
+    tokens_dict = {}
+    try:
+      nrm_annot_lst = self.elan_obj.Eaf.get_annotation_data_at_time(tier_name, (start+end) / 2 )
+      if nrm_annot_lst != []:
+        nrm_annot = nrm_annot_lst[0][-1]
+        for el in ([el.split(':') for el in nrm_annot.split('|')]):
+          tokens_dict[int(el[0])] = el[1:]
+      return tokens_dict
+    except KeyError:
+      return tokens_dict
+
+  def get_participant_tag_and_status(self, tier_obj):
+    
+    participant = ''
+    tier_status = ''
+    if tier_obj != None:
+      participant = tier_obj.attributes['PARTICIPANT'].title()
+      if participant not in self.participants_dict.keys():
+          self.participants_dict[participant] = '. '.join([namepart[0] for namepart in filter(None, participant.split(' '))])+'.'
+      else:
+        participant = self.participants_dict[participant]
+      if '_i_' in tier_obj.attributes['TIER_ID']:
+        tier_status = ' inwr'
+      elif '_n_' in tier_obj.attributes['TIER_ID']:
+        tier_status = ' inwd'
+    return [participant, tier_status]
+
+  def get_annot_div(self, tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict):
+    
+    transcript = self.prettify_transcript(transcript)
+    if annot_tokens_dict != {}:
+      transcript = self.add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dict)
+    return '<div class="annot" tier_name="%s"><span class="participant">%s</span><span class="transcript">%s</span></div>' %(tier_name, participant, transcript,)
+
+  def get_audio_annot_div(self, stttime, endtime):
+    
+    return '<div class="audiofragment" starttime="%s" endtime="%s"><button class="fa fa-spinner off"></button></div>' %(stttime, endtime)
+
+  def get_audio_link(self):
+    
+    return '<audio id="elan_audio" src="/media/%s" preload></audio>' %(self.audio_file_path)
+
+  def prettify_transcript(self, transcript):
+
+    if transcript[-1] in [' ']:
+      transcript = transcript[:-1]
+    new_transcript = ''
+    tokens_lst = re.split('([ ])', transcript)
+    
+    for el in tokens_lst:
+      el = el.strip()
+      if len(el) > 0:
+        if el in ['...','?','!']:
+          el = '<tech>%s</tech>' %(el)
+        elif el[-1] in ['?','!']:
+          el = '<token><trt>%s</trt></token><tech>%s</tech>' %(el[:-1], el[-1])
+        elif '[' in el and ']' in el:
+          el_lst = list(filter(re.compile('[a-zA-Z]').match, re.split('[\[\]]', el))) #splitting [ ] and removing non-alphabetic values
+          el = ''
+          for el_2 in el_lst:
+            if 'unint' in el_2 or '.' in el_2:
+              el += '<note>%s.</note>' %(el_2.strip('.'))
+            else:
+              el += '<token><trt>%s</trt></token>' %(el_2)
+        elif el not in [' ', '']:
+          el = '<token><trt>%s</trt></token>' %(el)
+        new_transcript += el
+    return new_transcript
+
+  def add_annotation_to_transcript(self, transcript, normz_tokens_dict, annot_tokens_dict):
+
+    i = 0
+    transcript_obj = etree.fromstring('<c>'+transcript+'</c>')
+    for tag in transcript_obj.iterchildren():
+      if tag.tag == 'token':
+        if i in annot_tokens_dict.keys():
+          morph_tags = self.annotation_menu.override_abbreviations(annot_tokens_dict[i][1]) #DB
+          tag.insert(0, etree.fromstring('<morph>'+morph_tags+'</morph>'))
+          tag.insert(0, etree.fromstring('<lemma>'+annot_tokens_dict[i][0]+'</lemma>'))
+        if i in normz_tokens_dict.keys():
+          tag.insert(0, etree.fromstring('<nrm>'+normz_tokens_dict[i][0]+'</nrm>'))
+        i += 1
+    return etree.tostring(transcript_obj)[3:-4].decode('utf-8')
+
+  def save_html_to_elan(self, html):
+    
+    html_obj = etree.fromstring(html)
+    for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
+      tier_name = el.xpath('*[@class="annot"]/@tier_name')[0]
+      raw_start = el.xpath('*[@class="audiofragment"]/@starttime')[0]
+      raw_end = el.xpath('*[@class="audiofragment"]/@endtime')[0]
+      start = int(Decimal(raw_start))
+      end = int(Decimal(raw_end))
+      t_counter = 0
+      annot_value_lst = []
+      nrm_value_lst = []
+      for token in el.xpath('*//token'):  
+        nrm_lst = token.xpath('nrm/text()')
+        lemma_lst = token.xpath('lemma/text()')
+        morph_lst = token.xpath('morph/text()')
+        try:
+          if lemma_lst+morph_lst != []:
+            annot_value_lst.append('%s:%s:%s' %(t_counter, lemma_lst[0], morph_lst[0]))
+          if nrm_lst != []:
+            nrm_value_lst.append('%s:%s' %(t_counter, nrm_lst[0]))
+        except IndexError:
+          print('Exception while saving. Normalization: %s,' \
+                'Lemmata: %s, Morphology: %s, Counter: %s'
+                % (nrm_lst, lemma_lst, morph_lst, t_counter)
+                )
+        t_counter += 1
+      if annot_value_lst != []:
+        self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
+      if nrm_value_lst != []:
+        self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
+    self.elan_obj.save()
+
+  def build_annotation_menu(self):
+    
+    return [self.annotation_menu.menu_html_str_1,
+            self.annotation_menu.menu_html_str_2,
+            ]
 
 from morphology.models import GlossingRule
 
