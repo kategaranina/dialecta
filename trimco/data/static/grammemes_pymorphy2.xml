@@ -19,19 +19,20 @@
 		<grammeme propertyOf="POST"><name>PRCL</name><alias>ЧАСТ</alias><description>частица</description><example>бы, же, лишь</example></grammeme>
 		<grammeme propertyOf="POST"><name>INTJ</name><alias>МЕЖД</alias><description>междометие</description></grammeme>    
     
-	<grammeme toForms="NOUN:2,ADJF.sing:1,ADJS.sing:1,COMP:1,VERB.past.sing:3,PRTF:1,PRTS:1,NPRO:1"><name>GNdr</name><label>Gender</label><alias>хр</alias><description>род / род не выражен</description></grammeme>
+	
+	<grammeme toForms="NOUN:1,ADJF.sing:1,ADJS.sing:1,COMP:1,VERB.past.sing:6,PRTF.sing:2,PRTS.sing:2,NPRO:1"><name>GNdr</name><label>Gender</label><alias>хр</alias><description>род / род не выражен</description></grammeme>
 		<grammeme propertyOf="GNdr"><name>masc</name><alias>мр</alias><description>мужской род</description><example>работник, стол</example><override>m</override></grammeme>
 		<grammeme propertyOf="GNdr"><name>femn</name><alias>жр</alias><description>женский род</description><example>работница, табуретка</example><override>f</override></grammeme>
 		<grammeme propertyOf="GNdr"><name>neut</name><alias>ср</alias><description>средний род</description><example>животное, озеро</example><override>n</override></grammeme>
 		<grammeme propertyOf="GNdr"><name>Ms-f</name><alias>ор</alias><description>общий род</description><example>задира, пьяница</example><override>mf</override></grammeme>
     
-	<grammeme toForms="NOUN:3,ADJF:2,ADJS:2,COMP:2,VERB:4,PRTF:2,PRTS:2,NPRO:2"><name>NMbr</name><label>Number</label><alias>Число</alias><description>число</description></grammeme>
+	
+	<grammeme toForms="NOUN:3,ADJF:3,ADJS:3,COMP:2,VERB:5,PRTF:4,PRTS:4,NPRO:3"><name>NMbr</name><label>Number</label><alias>Число</alias><description>число</description></grammeme>
 		<grammeme propertyOf="NMbr"><name>sing</name><alias>ед</alias><description>единственное число</description><override>sg</override></grammeme>
 		<grammeme propertyOf="NMbr"><name>plur</name><alias>мн</alias><description>множественное число</description><override>pl</override></grammeme>
 	
 
-
-    <grammeme toForms="NOUN:4,ADJF:3,COMP:3,PRTF:3,NPRO:3,NUMR:2"  default='True'><name>CAse</name><label>Case</label><alias>Падеж</alias><description>категория падежа</description></grammeme>
+    <grammeme toForms="NOUN:2,ADJF:2,COMP:3,PRTF:3,NPRO:2,NUMR:2"  default='True'><name>CAse</name><label>Case</label><alias>Падеж</alias><description>категория падежа</description></grammeme>
 		<grammeme propertyOf="CAse"><name>nomn</name><alias>им</alias><description>именительный падеж</description><example>хомяк ест</example><override>nom</override></grammeme>
 		<grammeme propertyOf="CAse"><name>gent</name><alias>рд</alias><description>родительный падеж</description><override>gen</override></grammeme>
 		<grammeme propertyOf="CAse"><name>datv</name><alias>дт</alias><description>дательный падеж</description><example>сказать хомяку спасибо</example><override>dat</override></grammeme>
@@ -62,6 +63,7 @@
     <grammeme extends="COMP"><name>Cmp2</name><label>Po- Comparative</label><alias>сравн2</alias><description>сравнительная степень на по-</description></grammeme>
     <grammeme extends="COMP"><name>V-ej</name><label>V-oj Comparative</label><alias>*ей</alias><description>форма компаратива на -ей</description></grammeme>
 	
+	
 	<grammeme toForms="VERB:2,INFN:1"><name>ASpc</name><label>Aspect</label><alias>Вид</alias><description>категория вида</description></grammeme>
 		<grammeme propertyOf="ASpc"><name>perf</name><alias>сов</alias><description>совершенный вид</description><example>пошёл, встречу</example><override>pfv</override></grammeme>
 		<grammeme propertyOf="ASpc"><name>impf</name><alias>несов</alias><description>несовершенный вид</description><override>ipfv</override></grammeme>
@@ -70,23 +72,26 @@
     <grammeme extends="VERB"><name>Mult</name><label>Multiple</label><alias>мног</alias><description>многократный</description></grammeme>
     <grammeme extends="VERB,NPRO"><name>Refl</name><label>Reflexive</label><alias>возвр</alias><description>возвратный</description><override>ref</override></grammeme>
     
-	<grammeme toForms="VERB.pres:3,VERB.futr:3,VERB.impr:3"><name>PErs</name><label>Person</label><alias>Лицо</alias><description>категория лица</description></grammeme>
+	
+	<grammeme toForms="VERB.pres:4,VERB.futr:4,VERB.impr:4"><name>PErs</name><label>Person</label><alias>Лицо</alias><description>категория лица</description></grammeme>
 		<grammeme propertyOf="PErs"><name>1per</name><alias>1л</alias><description>1 лицо</description><example>украшаю</example><override>1</override></grammeme>
 		<grammeme propertyOf="PErs"><name>2per</name><alias>2л</alias><description>2 лицо</description><example>украшаешь</example><override>2</override></grammeme>
 		<grammeme propertyOf="PErs"><name>3per</name><alias>3л</alias><description>3 лицо</description><example>украшает</example><override>3</override></grammeme>
     
-	<grammeme toForms="VERB:4"><name>TEns</name><label>Tense</label><alias>Время</alias><description>категория времени</description></grammeme>
+	
+	<grammeme toForms="VERB:1"><name>TEns</name><label>Tense</label><alias>Время</alias><description>категория времени</description></grammeme>
 		<grammeme propertyOf="TEns"><name>pres</name><alias>наст</alias><description>настоящее время</description><override>prs</override></grammeme>
 		<grammeme propertyOf="TEns"><name>past</name><alias>прош</alias><description>прошедшее время</description><override>pst</override></grammeme>
 		<grammeme propertyOf="TEns"><name>futr</name><alias>буд</alias><description>будущее время</description><override>fut</override></grammeme>
     
-	<grammeme toForms="VERB:2"><name>MOod</name><label>Mood</label><alias>Накл</alias><description>категория наклонения</description></grammeme>
+	
+	<grammeme toForms="VERB:3"><name>MOod</name><label>Mood</label><alias>Накл</alias><description>категория наклонения</description></grammeme>
 		<grammeme propertyOf="MOod"><name>indc</name><alias>изъяв</alias><description>изъявительное наклонение</description><override>ind</override></grammeme>
 		<grammeme propertyOf="MOod"><name>impr</name><alias>повел</alias><description>повелительное наклонение</description><override>imp</override></grammeme>  
 		<grammeme propertyOf="MOod"><name>irrl</name><alias>субъюн</alias><description>сослагательное наклонение</description><override>irr</override></grammeme>
  
     
-	<grammeme toForms="PRTF:4,PRTS:4"><name>VOic</name><label>Voice</label><alias>Залог</alias><description>категория залога</description></grammeme>
+	<grammeme toForms="PRTF:1,PRTS:1"><name>VOic</name><label>Voice</label><alias>Залог</alias><description>категория залога</description></grammeme>
 		<grammeme propertyOf="VOic"><name>actv</name><alias>действ</alias><description>действительный залог</description><override>PA</override></grammeme>
 		<grammeme propertyOf="VOic"><name>pssv</name><alias>страд</alias><description>страдательный залог</description><override>PP</override></grammeme>
 
@@ -109,18 +114,18 @@
 	<grammeme extends="ADJF,VERB,PRCL,PRED,PRTF,PRTS" trimco='True'><label>Negative</label><name>neg</name><alias>отр</alias><description>отрицание</description></grammeme>
 	<grammeme extends="NPRO" trimco='True'><name>rel</name><label>Relative</label><alias>отн</alias><description>относительнoе местоимениe</description></grammeme>
 	<grammeme extends="ADJF" trimco='True'><name>suber</name><label>Superlative</label><alias>превсх</alias><description>превосходная степень</description></grammeme>
-	<grammeme extends="VERB" trimco='True'><name>dial.stem</name><label>Dial. Stem</label><alias>диал.черед</alias><description>в литературнм языке не наблюдается чередования, характерного для данной основы</description><example>пекёт-печёт</example></grammeme>
-	<grammeme extends="VERB" trimco='True'><name>dial.stemalter</name><label>Dial. Stem Alteration</label><alias>диалю.осн</alias><description>изменеие основы по всей парадигме</description><example>ср. сокопляться</example></grammeme>
-	<grammeme extends="VERB" trimco='True'><name>dial.refl</name><label>Dial. Reflexive</label><alias>диал.возвр</alias><description>отличие диалектного глагола от литературного в применении возвратного постфиска</description><example>доспиется = доспеет</example></grammeme>
-	<grammeme extends="VERB" trimco='True'><name>dial.refltype</name><label>Dial. Reflexive Type</label><alias>диал.возвр.аллом</alias><description>фиксирует как алломорфы возвратного постфикса, вообще не встречающиеся в литературном языке (-се и -си), так и употребление какого-л. алломорфа, где в ЛЯ требуется другой</description><example>родилася vs. родилась</example></grammeme>
-	<grammeme extends="NOUN" trimco='True'><name>dial.gend</name><label>Dial. Gender</label><alias>диал.род</alias><description>oтвечает за отклонения от литературной нормы в сфере родовой принадлежности лексем</description><example>форточка, она открыта всю лету была</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.stem</name><label>Dial. Stem</label><alias>диал.черед</alias><description>в литературнм языке не наблюдается чередования, характерного для данной основы</description><example>пекёт-печёт</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.stemalter</name><label>Dial. Stem Alteration</label><alias>диалю.осн</alias><description>изменеие основы по всей парадигме</description><example>ср. сокопляться</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.refl</name><label>Dial. Reflexive</label><alias>диал.возвр</alias><description>отличие диалектного глагола от литературного в применении возвратного постфиска</description><example>доспиется = доспеет</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.refltype</name><label>Dial. Reflexive Type</label><alias>диал.возвр.аллом</alias><description>фиксирует как алломорфы возвратного постфикса, вообще не встречающиеся в литературном языке (-се и -си), так и употребление какого-л. алломорфа, где в ЛЯ требуется другой</description><example>родилася vs. родилась</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.gend</name><label>Dial. Gender</label><alias>диал.род</alias><description>oтвечает за отклонения от литературной нормы в сфере родовой принадлежности лексем</description><example>форточка, она открыта всю лету была</example></grammeme>
 	<grammeme extends="ALLFORMS" trimco='True'><name>dial.lex</name><label>Dial. Lex.</label><alias>диал.лекс</alias><description>форма диалектной лексемы</description><example>картошкохранилище</example></grammeme>
-	<grammeme extends="VERB" trimco='True'><name>dial.flex</name><label>Dial. Flex.</label><alias>диал.оконч</alias><description>диалектное окончание</description><example>пойдё, будё</example></grammeme>
-	<grammeme extends="CAse" trimco='True'><name>dial.type</name><label>Dial. Type</label><alias>диал.тип</alias><description>диалектный тип словоизменения</description><example>купелю принесут (вм. купель). Ленин сделал жизню правильную (вм. жизнь)</example></grammeme>
-	<grammeme extends="CAse" trimco='True'><name>dial.flextype</name><label>Dial. Flex. Type</label><alias>диал.типоконч</alias><description>выбор между пометами type и flex неоднозначен</description><example>(на) обех ‘(на) обеих’</example></grammeme>
-	<grammeme extends="CAse" trimco='True'><name>dial.case</name><label>Dial. Case</label><alias>диал.падеж</alias><description>описывает употребление (с точки зрения литературного языка) одной падежной формы вместо другой</description><example>ходила по ягодам (вм. по ягоды)</example></grammeme>
-	<grammeme extends="ADJF" trimco='True'><name>dial.contr</name><label>Dial. Contraction</label><alias>диал.стяж</alias><description>стяжённая форма прилагательного</description><example>хорошу</example></grammeme>
-	<grammeme extends="ADVB" trimco='True'><name>dial.pref</name><label>Dial. Prefix</label><alias>диал.преф</alias><description>наличие префикса</description><example>взамуж 'замуж'</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.flex</name><label>Dial. Flex.</label><alias>диал.оконч</alias><description>диалектное окончание</description><example>пойдё, будё</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.type</name><label>Dial. Type</label><alias>диал.тип</alias><description>диалектный тип словоизменения</description><example>купелю принесут (вм. купель). Ленин сделал жизню правильную (вм. жизнь)</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.flextype</name><label>Dial. Flex. Type</label><alias>диал.типоконч</alias><description>выбор между пометами type и flex неоднозначен</description><example>(на) обех ‘(на) обеих’</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.case</name><label>Dial. Case</label><alias>диал.падеж</alias><description>описывает употребление (с точки зрения литературного языка) одной падежной формы вместо другой</description><example>ходила по ягодам (вм. по ягоды)</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.contr</name><label>Dial. Contraction</label><alias>диал.стяж</alias><description>стяжённая форма прилагательного</description><example>хорошу</example></grammeme>
+	<grammeme extends="ALLFORMS" trimco='True'><name>dial.pref</name><label>Dial. Prefix</label><alias>диал.преф</alias><description>наличие префикса</description><example>взамуж 'замуж'</example></grammeme>
 	<grammeme extends="VERB,PRTF,PRTS" trimco='True'><name>2PVB</name><label>Double Prefix</label><alias>дв.преф</alias><description>двойной префик</description><example>понаехали</example></grammeme>
 	<grammeme extends="NPRO" trimco='True'><name>short</name><label>Short Form</label><alias></alias><description>краткая форма</description></grammeme>
 </grammemes>
