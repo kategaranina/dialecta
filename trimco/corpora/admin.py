@@ -133,7 +133,6 @@ class RecordingAdmin(VersionAdmin):
     
     self.standartizator = standartizator(self.recording_obj.to_dialect)
     self.standartizator.start_standartizator()
-    self.standartizator.update_model(self.elan_converter.get_examples_from_page())
 
     annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
     
