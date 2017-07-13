@@ -150,4 +150,4 @@ else:
 
 GRAPPELLI_ADMIN_TITLE = 'BaltSlavDialects 0.1'
 
-NORMALIZER_PATH = '/home/luxx/trimcocorp/csmtiser/'
+NORMALIZER_PATH = '/data/csmtiser/'

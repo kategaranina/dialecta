@@ -66,7 +66,7 @@ class Recording(models.Model):
 ##      raise ValidationError({'string_id': _('Recording with this ID already exists.')})
 
   def __str__(self):
-    return self.string_id
+    return '{}: {status}checked'.format(self.string_id, status='' if self.checked else 'not ')
 
   def participants(self):
     from corpora.elan_tools import ElanObject
