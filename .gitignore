@@ -8,4 +8,5 @@
 __pycache__
 
 trimco/secrets.json
-#trimco/db.sqlite3
+trimco/db.sqlite3
+trimco/data/media/*
