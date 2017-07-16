@@ -649,7 +649,7 @@ class ElanObject:
 
 class elan_to_html:
 
-  def __init__(self, file_obj, mode='', _format=''): 
+  def __init__(self, file_obj, mode='', _format=''): #file_obj is a Recording
 
     self.file_obj = file_obj
     self.elan_obj = ElanObject(self.file_obj.data.path)
@@ -668,6 +668,7 @@ class elan_to_html:
       self.make_backup()
       self.reannotate_elan()
       #self.elan_obj.save()
+      self.change_status() # change 'auto_annotated' status of recording to True after performing automatic annotation
       self.build_html()
 
   def make_backup(self):
@@ -681,6 +682,10 @@ class elan_to_html:
     os.system('mkdir -p {}/backups'.format(settings.MEDIA_ROOT))
     os.system('cp {} {}/backups/{}'.format(self.path, settings.MEDIA_ROOT, new_file))
 
+  def change_status(self):
+
+    self.file_obj.auto_annotated = True
+    self.file_obj.save()
 
   def reannotate_elan(self):
 
@@ -706,7 +711,7 @@ class elan_to_html:
     #print(annotations)
 
     for tier_name, start, end, transcript, annotation in zip(tier_names, starts, ends, transcripts, annotations):
-     t_counter = 0
+      t_counter = 0
       annot_value_lst = []
       nrm_value_lst = []
       for token in annotation:

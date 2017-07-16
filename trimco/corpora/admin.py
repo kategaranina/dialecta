@@ -32,7 +32,7 @@ from reversion.admin import VersionAdmin
 @admin.register(Recording)
 class RecordingAdmin(VersionAdmin):
 
-  list_display = ('string_id', 'audio','speakerlist', 'title', 'checked')
+  list_display = ('string_id', 'audio','speakerlist', 'title', 'auto_annotated', 'checked')
   search_fields = ('to_speakers__string_id',)
   list_max_show_all = 500
   list_per_page = 200
@@ -44,7 +44,7 @@ class RecordingAdmin(VersionAdmin):
             ('string_id'),
             ('audio','data'),
             ('edit_transcription', 'annotate_transcription'),
-            ('checked'),
+            ('auto_annotated', 'checked'),
             ('recording_date', 'recording_time', 'recording_place'),
             ('file_check'),
             ('audio_data', 'participants'),

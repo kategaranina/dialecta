@@ -64,6 +64,7 @@ class Recording(models.Model):
 ##
 ##    if list(similar_id_queryset)!=[]:
 ##      raise ValidationError({'string_id': _('Recording with this ID already exists.')})
+  auto_annotated = models.BooleanField(verbose_name='Automatically annotated', default=False)
 
   def __str__(self):
     return '{}: {status}checked'.format(self.string_id, status='' if self.checked else 'not ')
