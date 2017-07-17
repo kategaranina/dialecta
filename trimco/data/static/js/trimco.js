@@ -26,7 +26,7 @@
 			} else {
 				if (req_type == 'trt_annot_req') {
 					if (req_data['mode'] == 'manual') {
-						list_normlz_suggestions(result.result)
+						list_normlz_suggestions($('trt.focused').parent().find('nrm').text())
 					}
 					if (req_data['mode'] == 'auto') {
 						//console.log(result.result);
@@ -101,16 +101,20 @@
 		//var morph_tag = $('<morph>'+$('#annotation_suggestions_lst li.selected .morph_suggestion' ).text()+'</morph></info>');
 	};
 	
-	function list_normlz_suggestions(suggestions_lst) {
+	function list_normlz_suggestions(suggestions_lst) { //actually suggestions_lst now is one word from <nrm> tag
 		lst_container_tag = $('#normalization_suggestions_lst');
-		for (var i in suggestions_lst){
-			var tag = $('<li>'+suggestions_lst[i][0]+'</li>')
-			lst_container_tag.append(tag);
-			if (i == 0) {
-				tag.addClass("selected");
-				$('#normalization_input').val(suggestions_lst[i][0]);
-			};
-		};
+		//for (var i in suggestions_lst){
+		//	var tag = $('<li>'+suggestions_lst[i][0]+'</li>')
+		//	lst_container_tag.append(tag);
+		//	if (i == 0) {
+		//		tag.addClass("selected");
+		//		$('#normalization_input').val(suggestions_lst[i][0]);
+		//	};
+		//};
+		var tag = $('<li>'+suggestions_lst+'</li>')
+		lst_container_tag.append(tag);
+		tag.addClass("selected");
+		$('#normalization_input').val(suggestions_lst);
 		$('#normalization_suggestions_lst li').click(function(e) {
 			$(this).addClass("selected").siblings().removeClass("selected");
 			$('#normalization_input').val($(this).text())
