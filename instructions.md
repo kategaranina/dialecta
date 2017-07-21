@@ -1,17 +1,19 @@
 # Automatic annotation
-###### Normalization model
+## Normalization model
 Before applying automatic annotation make sure that the appropriate normalization model is chosen. 
 Go to `Normalization > Models` (from the main menu). You will see the list of currently available models. Each model is linked to the specific `Dialect`:
+
 ![alt text][model-dialect]
 
 [model-dialect]: img/trimco-model-dialect-line.png "Dialect"
 
-Make sure that for the recording you want to annotate you have chosen the same `Dialect` (at the bottom of the recording's moderation page `Corpora > Recordings > recording_name`) as the normalization model you want to use has:
+Make sure that for the recording you want to annotate you have chosen the same `Dialect` at the bottom of the recording's moderation page (`Corpora > Recordings > recording_name`) as the normalization model you want to use has:
+
 ![alt text][rec-dialect]
 
-[model-dialect]: img/trimco-rec-dialect-line.png "Dialect"
+[model-dialect]: img/trimco-rec-dialect-line.png "Recording's dialect"
 
-###### Auto-annotation
+## Auto-annotation
 To perform automatic noramlization and morphological annotation of the whole elan file go to the recording's moderation page (`Corpora > Recordings > recording_name`) and click `Perform automatic annotation`:
 
 ![alt text][auto-annotation]
@@ -30,10 +32,7 @@ To apply manual annotation click the button to the left of `Select annotation` i
 
 [manual-annotation-2]: img/trimco-manual-annotation-2-line.png "Manual annotation 2"
 
-When you are satisfied with the result, click `save` in the upper right corner to save changes to the elan-file:
-![alt text][save]
-
-[save]: img/trimco-save-line.png "Manual annotation 2"
+When you are satisfied with the result, click `save` in the upper right corner to save changes to the elan-file.
 
 Note that **elan-files are not saved automatically after this operation!** (This mean that if you don't like the result of automatic annotation for some reason, you can just go back to the menu and these changes would not be saved)
 
