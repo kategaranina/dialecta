@@ -11,10 +11,10 @@ Make sure that for the recording you want to annotate you have chosen the same `
 
 ![alt text][rec-dialect]
 
-[model-dialect]: img/trimco-rec-dialect-line.png "Recording's dialect"
+[rec-dialect]: img/trimco-rec-dialect-line.png "Recording's dialect"
 
 ## Auto-annotation
-To perform automatic noramlization and morphological annotation of the whole elan file go to the recording's moderation page (`Corpora > Recordings > recording_name`) and click `Perform automatic annotation`:
+To perform automatic normalization and morphological annotation of the whole elan file go to the recording's moderation page (`Corpora > Recordings > recording_name`) and click `Perform automatic annotation`:
 
 ![alt text][auto-annotation]
 
