@@ -127,6 +127,7 @@ class RecordingAdmin(VersionAdmin):
 
     self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
     self.elan_converter = elan_to_html(self.recording_obj) #, mode='auto-annotation')
+    self.elan_converter.build_page()
 
     #print(self.recording_obj.model_to_normalize)
     #self.annotation = Standartizator(self.recording_obj.model_to_normalize)
@@ -149,6 +150,7 @@ class RecordingAdmin(VersionAdmin):
 
     self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
     self.elan_converter = elan_to_html(self.recording_obj, mode='auto-annotation')
+    self.elan_converter.build_page()
 
     annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
 

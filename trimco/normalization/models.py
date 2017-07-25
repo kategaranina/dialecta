@@ -2,6 +2,7 @@ from django.db import models
 from morphology.models import Dialect
 from corpora.models import Recording
 #from morphology.models import *
+from django.utils.safestring import mark_safe
 
 
 class Model(models.Model):
@@ -13,3 +14,10 @@ class Model(models.Model):
 
   def __str__(self):
     return self.name
+
+  def retrain_model(self):
+    print(self.recordings_to_retrain.all())
+    print(getattr(self, 'recordings_to_retrain').exists())
+    if self.pk!=None and getattr(self, 'recordings_to_retrain').exists():
+    	return mark_safe('<a href="/admin/normalization/model/%s/retrain" class="grp-button">Retrain</a>' %(self.pk))
+    return '(add recordings to retrain and save to enable retraining)'

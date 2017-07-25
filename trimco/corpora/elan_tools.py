@@ -539,7 +539,7 @@ class Standartizator(): #takes model's name
     except IndexError:
       return None  
 
-  def get_annotation_options_list(self, token):
+  def get_annotation_options_list(self, token): #this function is taken from the old version of standartizator (above)
     
     result_lst = []
     for annot in self.morph_rus.parse(token):
@@ -547,6 +547,39 @@ class Standartizator(): #takes model's name
         tag = self.annotation_menu.override_abbreviations(str(annot.tag))
         result_lst.append([annot.normal_form, tag, annot.score])
     return result_lst
+
+  def make_backup(self): #creates backups of .norm and .orig files (needed to train the model)
+                         # files should has the same name as the model !!
+                         # e.g.: rus.norm and rus.orig for rus model
+    self.orig = '{}.orig'.format(self.model)
+    self.norm = '{}.norm'.format(self.model)
+    self.path_to_model = self.path + str(self.model) #the full path = path_to_normalizer + model_name
+
+    import datetime
+    now = datetime.datetime.now()
+    cur = now.strftime("%Y-%m-%d_%H%M")
+    new_orig = '{}_{}'.format(self.orig, cur)
+    new_norm = '{}_{}'.format(self.norm, cur)
+
+    os.system('mkdir -p {}/backups'.format(self.path_to_model))
+    os.system('cp {0}/{1} {0}/backups/{2}'.format(self.path_to_model, self.orig, new_orig))
+    os.system('cp {0}/{1} {0}/backups/{2}'.format(self.path_to_model, self.norm, new_norm))
+
+  def rewrite_files(self, examples): #creates new .orig and .norm files for training (rewrites them with examples from annotated elans)
+                                     # examples is a list of pairs: ('transcription', 'normalization')
+    
+    trns = '\n'.join([example[0].strip() for example in examples])
+    nrms = '\n'.join([example[1].strip() for example in examples])
+
+    with open('{}/{}'.format(self.path_to_model, self.orig), 'w') as orig:
+      orig.write(trns)
+    with open('{}/{}'.format(self.path_to_model, self.norm), 'w') as norm:
+      norm.write(nrms)
+
+  def retrain_model(self):
+
+    os.system('python2 ' + self.path + 'preprocess.py')
+    os.system('python2 ' + self.path + 'train.py')
 
 
 
@@ -647,6 +680,18 @@ class ElanObject:
 		Elan.to_eaf(self.path, self.Eaf, pretty=True)
 		os.remove(self.path+'.bak')
 
+#  def collect_examples(self): #this function collects pairs (<transcribed sentence> - <normalized sentence>) from elan
+#                              #it's needed to retrain normalization models
+#    for annot_data in self.annot_data_lst:
+#      tier_name = annot_data[3]
+#      tier_obj = self.get_tier_obj_by_name(tier_name)
+#      if tier_obj.attributes['TIER_ID']!='comment':
+#        transcript = annot_data[2]
+#        #нет такой функции !
+#        normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
+
+
+
 class elan_to_html:
 
   def __init__(self, file_obj, mode='', _format=''): #file_obj is a Recording
@@ -659,12 +704,17 @@ class elan_to_html:
     self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
     self.mode = mode
     self.dialect = self.file_obj.to_dialect #gets 'Dialect' field of recording
+
+  def build_page(self):
+
+    self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+
     print(self.dialect)
     print(self.mode)
     if not self.mode:
       self.build_html()
     elif self.mode == 'auto-annotation': #first auto-annotation of the whole elan is performed, 
-                                         #then elan is saved and then html is build
+                                         #then html is build
       self.make_backup()
       self.reannotate_elan()
       #self.elan_obj.save()
@@ -762,6 +812,23 @@ class elan_to_html:
         i += 1
 
     self.html = '<div class="eaf_display">%s</div>' %(html)
+
+  def collect_examples(self):#this function collects pairs <transcribed sentence> - <normalized sentence> from elan-file 
+                              #it's needed to retrain normalization models
+    import collections    
+    examples = []                      
+    for annot_data in self.elan_obj.annot_data_lst:
+      tier_name = annot_data[3]
+      tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
+      if tier_obj.attributes['TIER_ID']!='comment':
+        transcription = annot_data[2]
+        normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
+        #this is done in such a strange way because it was like this before i came here.....
+        normz_sorted = collections.OrderedDict(sorted(normz_tokens_dict.items()))
+        normalization = ' '.join([val[0] for val in normz_sorted.values()])
+        examples.append((transcription, normalization))
+
+    return(examples) #returns list of ('transcription', 'normalization')
     
   def get_additional_tags_dict(self, tier_name, start, end):
 
