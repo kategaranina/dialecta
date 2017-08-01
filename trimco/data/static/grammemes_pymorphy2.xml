@@ -112,6 +112,7 @@
 	<grammeme extends="CONJ" trimco='True'><name>COMPL</name><label>Complementizer</label><alias>компл</alias><description>союз-комплементайзер (подчинительный союз)</description></grammeme>
 	<grammeme extends="NOUN,ADJF" trimco='True'><name>dim</name><label>Deminutive</label><alias>дим</alias><description>деминутив</description></grammeme>
 	<grammeme extends="ADJF,VERB,PRCL,PRED,PRTF,PRTS" trimco='True'><label>Negative</label><name>neg</name><alias>отр</alias><description>отрицание</description></grammeme>
+	<grammeme extends="PRCL" trimco='True'><label>Interrogative</label><name>Q</name><alias>впрс</alias><description>вопросительная частица</description></grammeme>
 	<grammeme extends="NPRO" trimco='True'><name>rel</name><label>Relative</label><alias>отн</alias><description>относительнoе местоимениe</description></grammeme>
 	<grammeme extends="ADJF" trimco='True'><name>suber</name><label>Superlative</label><alias>превсх</alias><description>превосходная степень</description></grammeme>
 	<grammeme extends="ALLFORMS" trimco='True'><name>dial.stem</name><label>Dial. Stem</label><alias>диал.черед</alias><description>в литературнм языке не наблюдается чередования, характерного для данной основы</description><example>пекёт-печёт</example></grammeme>
