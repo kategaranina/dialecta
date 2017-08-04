@@ -42,12 +42,13 @@ class ModelAdmin(VersionAdmin):
     	for rec in self.recordings:
     		elan_converter = elan_to_html(rec)
     		self.examples += elan_converter.collect_examples()
-    	self.result = self.examples #'Retraining sucsessfully done'
+    	self.result = 'Retraining done'
 
 
     self.standartizator = Standartizator(self.to_dialect)
     self.standartizator.make_backup()
     self.standartizator.rewrite_files(self.examples)
+    self.standartizator.retrain_model()
 
     context = {'result': self.result}
 
