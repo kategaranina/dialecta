@@ -35,7 +35,7 @@ class Language(models.Model):
 class Dialect(models.Model):
   
   name = models.CharField(max_length=50)
-  abbreviation = models.CharField(max_length=5)
+  abbreviation = models.CharField(max_length=10)
   to_language = models.ForeignKey('Language')
   description = models.TextField(blank=True)
   #model_to_normalize = models.ForeignKey(Model, blank=True, null=True)
@@ -77,13 +77,13 @@ class Token(models.Model):
 
 class NormalizationModel(models.Model):
 
-  to_dialect = models.ForeignKey('Dialect')
+  to_dialect = models.ManyToManyField('Dialect')
   to_additional_language = models.ForeignKey('Language', blank=True, null=True)
   examples = models.TextField(blank=True)
   exceptions = models.TextField(blank=True)
 
   def __str__(self):
-    return self.to_dialect.abbreviation
+    return ', '.join([x.abbreviation for x in self.to_dialect.all()])
 
 #class NormModel(models.Model):
 

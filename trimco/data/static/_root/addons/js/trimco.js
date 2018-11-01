@@ -26,7 +26,7 @@
 			} else {
 				if (req_type == 'trt_annot_req') {
 					if (req_data['mode'] == 'manual') {
-						list_normlz_suggestions($('trt.focused').parent().find('nrm').text())
+						list_normlz_suggestions(result.result)
 					}
 					if (req_data['mode'] == 'auto') {
 						//console.log(result.result);
@@ -79,7 +79,7 @@
 		trt_tag.addClass('focused');
 		if (mode=='manual') {
 			$('#examined_transcript').text(trt_tag.text());
-			ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'mode' : 'manual',});
+			ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'nrm': trt_tag.parent().find('nrm').text(), 'mode' : 'manual',});
 		};
 		if (mode=='auto') {
 			auto_annotation_request(trt_tag) 
@@ -90,10 +90,15 @@
 
 		console.log($.now(), token, normalization, annotation);
 		
+        var full_ann = annotation.map(x => x[0]+'-'+x[1]).join('/');
+        var full_lemma = Array.from(new Set(annotation.map(x => x[0]))).join('/');
+		
 		var norm_tag = $('<nrm>'+normalization+'</nrm>');
-		var lemma_tag = $('<lemma>'+annotation[0]+'</lemma>');
-		var morph_tag = $('<morph>'+annotation[1]+'</morph></info>');
-		set_annotation(norm_tag, lemma_tag, morph_tag, 'auto')
+        var lemma_full_tag = $('<lemma_full style="display:none">'+full_lemma+'</lemma_full>');
+		var lemma_tag = $('<lemma>'+annotation[0][0]+'</lemma>');
+        var morph_full_tag = $('<morph_full style="display:none">'+full_ann+'</morph_full>');
+		var morph_tag = $('<morph>'+annotation[0][1]+'</morph></info>');
+		set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'auto')
 			
 		/* FROM TAG */
 		//var norm_tag = $('<nrm>'+$('#normalization_input').val()+'</nrm>');
@@ -101,20 +106,20 @@
 		//var morph_tag = $('<morph>'+$('#annotation_suggestions_lst li.selected .morph_suggestion' ).text()+'</morph></info>');
 	};
 	
-	function list_normlz_suggestions(suggestions_lst) { //actually suggestions_lst now is one word from <nrm> tag
+	function list_normlz_suggestions(suggestions_lst) { //actually suggestions_lst now is one word from <nrm> tag except for normalizations from manual list
 		lst_container_tag = $('#normalization_suggestions_lst');
-		//for (var i in suggestions_lst){
-		//	var tag = $('<li>'+suggestions_lst[i][0]+'</li>')
-		//	lst_container_tag.append(tag);
-		//	if (i == 0) {
-		//		tag.addClass("selected");
-		//		$('#normalization_input').val(suggestions_lst[i][0]);
-		//	};
-		//};
-		var tag = $('<li>'+suggestions_lst+'</li>')
-		lst_container_tag.append(tag);
-		tag.addClass("selected");
-		$('#normalization_input').val(suggestions_lst);
+		for (var i in suggestions_lst){
+			var tag = $('<li>'+suggestions_lst[i]+'</li>')
+			lst_container_tag.append(tag);
+			if (i == 0) {
+				tag.addClass("selected");
+				$('#normalization_input').val(suggestions_lst[i]);
+			};
+		};
+		//var tag = $('<li>'+suggestions_lst+'</li>')
+		//lst_container_tag.append(tag);
+		//tag.addClass("selected");
+		//$('#normalization_input').val(suggestions_lst);
 		$('#normalization_suggestions_lst li').click(function(e) {
 			$(this).addClass("selected").siblings().removeClass("selected");
 			$('#normalization_input').val($(this).text())
@@ -129,10 +134,10 @@
 		for (var i in suggestions_lst){
 			var tag = $('<li><span class="lemma_suggestion">'+suggestions_lst[i][0]+'</span> <span class="morph_suggestion">'+suggestions_lst[i][1]+'</span></li>')
 			lst_container_tag.append(tag);
-			populate_annotation_form(tag);
 			wb_annotation_mode(); // manual annotation mode in all  cases
 			if (i == 0) {
 				tag.addClass("selected");
+				populate_annotation_form(tag);
 			}
 			else if (i > 0) {
 				// Manual annotation mode when more then one option
@@ -157,7 +162,7 @@
 		$('option').removeAttr('selected');
 		$("input.manualAnnotation[type='checkbox']").prop('checked', false);
 		
-		$('.manualAnnotation#lemma_input').val(annot_tag.text().split(' ')[0]).parent().addClass('active');
+		$('.manualAnnotation#lemma_input').val(annot_tag.text().split(' ').slice(0,-1).join(' ')).parent().addClass('active');
 		$('.manualAnnotation#form_input').val($('#normalization_input').val()).parent().addClass('active');
 		var this_annot_info = annot_tag.text().split(' ');
 		var annot_lst = this_annot_info[this_annot_info.length - 1].split('-');
@@ -288,25 +293,31 @@
 	
 	/* ANNOTATION TO DOM: FINAL */
 	
-	function set_annotation (norm_tag, lemma_tag, morph_tag, mode) {
+	function set_annotation (norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, mode) {
 	
 		/* adding normalization, lemma and morphology tags to DOM */
 		
-		$('trt.focused').parent().children('nrm, lemma, morph').remove();
+		$('trt.focused').parent().children('nrm, lemma_full, lemma, morph_full, morph').remove();
 		
 		$('trt.focused').parent().prepend(morph_tag);
+        $('trt.focused').parent().prepend(morph_full_tag);
 		$('trt.focused').parent().prepend(lemma_tag);
+        $('trt.focused').parent().prepend(lemma_full_tag);
 		$('trt.focused').parent().prepend(norm_tag);
 
 		/* adjusting spacing*/
 		var len_transcript = getTextWidth($('.focused'));
 		var len_morph = getTextWidth(morph_tag);
 		var len_norm = getTextWidth(norm_tag);
-		if (len_morph > len_transcript && len_morph > len_norm) { 
+		var len_lemma = getTextWidth(lemma_tag);
+		if (len_morph > len_transcript && len_morph > len_norm && len_morph > len_lemma) { 
 			$('trt.focused').css('margin-right', len_morph - len_transcript);
 		}
-		else if (len_norm > len_morph && len_norm > len_transcript) {
+		else if (len_norm > len_morph && len_norm > len_transcript && len_norm > len_lemma) {
 			$('.focused').css('margin-right', len_norm - len_transcript)
+		}
+		else if (len_lemma > len_morph && len_lemma > len_transcript && len_lemma > len_norm) {
+			$('.focused').css('margin-right', len_lemma - len_transcript)
 		}
 		else {
 			$('trt.focused').removeAttr('style');
@@ -322,11 +333,15 @@
 				var len_transcript = getTextWidth( $(this).children('trt') );
 				var len_morph = getTextWidth( $(this).children('morph') );
 				var len_norm = getTextWidth( $(this).children('nrm') );
-				if (len_morph > len_transcript && len_morph > len_norm) { 
+				var len_lemma = getTextWidth( $(this).children('lemma') );
+				if (len_morph > len_transcript && len_morph > len_norm && len_morph > len_lemma) { 
 					$(this).css('margin-right', len_morph - len_transcript);
 				}
-				else if (len_norm > len_morph && len_norm > len_transcript) {
+				else if (len_norm > len_morph && len_norm > len_transcript && len_norm > len_lemma) {
 					$(this).children('trt').eq(0).css('margin-right', len_norm - len_transcript)
+				}
+				else if (len_lemma > len_morph && len_lemma > len_transcript && len_lemma > len_norm) {
+					$(this).children('trt').eq(0).css('margin-right', len_lemma - len_transcript)
 				}
 			}
 		});
@@ -453,15 +468,17 @@
 		
 		$('#add_normalization').click(function(e) {
 			/* looking for annotation variants */
-			ajax_request('annot_suggest_req', {'nrm' : $('#normalization_input').val(),});	
+			ajax_request('annot_suggest_req', {'trt':$('#examined_transcript').text(),'nrm' : $('#normalization_input').val(),});	
 		});
 		
 		$('#add_annotation').click(function(e) {
-			/* confirming choosen annotation */
+			/* confirming chosen annotation */
 			var norm_tag = $('<nrm>'+$('[title="Form"]').val()+'</nrm>');
+            var lemma_full_tag = $('<lemma_full style="display:none">'+$('[title="Lemma"]').val()+'</lemma_full>');
 			var lemma_tag = $('<lemma>'+$('[title="Lemma"]').val()+'</lemma>');
+            var morph_full_tag = $('<morph_full style="display:none">'+$('[title="Lemma"]').val()+'-'+annot_to_str()+'</morph_full>');
 			var morph_tag = $('<morph>'+annot_to_str()+'</morph></info>');			
-			set_annotation(norm_tag, lemma_tag, morph_tag, 'manual');
+			set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
 		});
 	});
 })(django.jQuery);

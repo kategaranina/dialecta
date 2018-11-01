@@ -17,7 +17,8 @@
 		<grammeme propertyOf="POST"><name>PREP</name><alias>ПР</alias><description>предлог</description></grammeme>
 		<grammeme propertyOf="POST"><name>CONJ</name><alias>СОЮЗ</alias><description>союз</description></grammeme>
 		<grammeme propertyOf="POST"><name>PRCL</name><alias>ЧАСТ</alias><description>частица</description><example>бы, же, лишь</example></grammeme>
-		<grammeme propertyOf="POST"><name>INTJ</name><alias>МЕЖД</alias><description>междометие</description></grammeme>    
+		<grammeme propertyOf="POST"><name>INTJ</name><alias>МЕЖД</alias><description>междометие</description></grammeme>  
+		<grammeme propertyOf="POST"><name>ANTP</name><alias>АНТП</alias><description>anteriority participle</description></grammeme>
     
 	
 	<grammeme toForms="NOUN:1,ADJF.sing:1,ADJS.sing:1,COMP:1,VERB.past.sing:6,PRTF.sing:2,PRTS.sing:2,NPRO:1"><name>GNdr</name><label>Gender</label><alias>хр</alias><description>род / род не выражен</description></grammeme>

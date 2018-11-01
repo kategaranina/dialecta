@@ -199,11 +199,15 @@ class RecordingAdmin(VersionAdmin):
       elif request.POST['request_type'] == 'trt_annot_req':
         #print(request.POST)
         if request.POST['request_data[mode]'] == 'manual':
-          response['result'] = self.standartizator.generate_dict_for_translit_token(request.POST['request_data[trt]'])
+          #response['result'] = self.standartizator.generate_dict_for_translit_token(request.POST['request_data[trt]'])
+          if request.POST['request_data[trt]'].lower() in self.standartizator.manual_words:
+            response['result'] = [x[0] for x in self.standartizator.manual_words[request.POST['request_data[trt]'].lower()]]
+          else:
+            response['result'] = [request.POST['request_data[nrm]']]
         elif request.POST['request_data[mode]'] == 'auto':
           response['result'] = self.standartizator.auto_annotation(request.POST['request_data[trt]'])
       elif request.POST['request_type'] == 'annot_suggest_req':
-        response['result'] = self.standartizator.get_annotation_options_list(request.POST['request_data[nrm]'])
+        response['result'] = self.standartizator.get_annotation_options_list([request.POST['request_data[trt]'],request.POST['request_data[nrm]']])
       elif request.POST['request_type'] == 'save_elan_req':
         self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])
 ##      elif request.POST['request_type'] == 'string_id_update':

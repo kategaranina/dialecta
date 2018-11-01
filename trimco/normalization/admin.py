@@ -9,12 +9,22 @@ from corpora.models import Recording
 #from django.template.context import RequestContext
 
 
+class WordTableInline(admin.TabularInline):
+  model = Word
+  ordering = ('transcription',)
+  extra = 1
+  verbose_name = 'Word'
+  verbose_name_plural = 'Words normalized manually'
+
+
 @admin.register(Model)
 class ModelAdmin(VersionAdmin):
 
-  filter_horizontal = ('recordings_to_retrain', )
+  filter_horizontal = ('recordings_to_retrain', 'to_dialect')
 
   readonly_fields = ('retrain_model',)
+
+  inlines = (WordTableInline,)
 
   nrm_template = 'nrm.html'
 
@@ -30,7 +40,7 @@ class ModelAdmin(VersionAdmin):
   @transaction.atomic
   def retrain(self, request):
 
-    self.to_dialect = get_object_or_404(Model, id=request.path.split('/')[-3]).to_dialect
+    self.to_dialect = get_object_or_404(Model, id=request.path.split('/')[-3]).to_dialect.all()[0]
     self.recordings = get_object_or_404(Model, id=request.path.split('/')[-3]).recordings_to_retrain.all()
     print('Retraining')
     print(self.recordings)

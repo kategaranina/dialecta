@@ -1,0 +1,566 @@
+[
+  {
+    "pk": 1,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "як",
+      "to_model_id": 2,
+      "normalization": "як",
+      "transcription": "ják",
+      "translation": "как",
+      "annotation": "CONJ; ADV-Q"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "яки",
+      "transcription": "jak'í",
+      "translation": "какой",
+      "annotation": "ADJF-m-nom-sg; ADJF-m-acc-sg"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якой",
+      "transcription": "jakój",
+      "translation": "какой",
+      "annotation": "ADJF-m-nom-sg; ADJF-m-acc-sg"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якога",
+      "transcription": "jakóga",
+      "translation": "какого",
+      "annotation": "ADJF-m-gen-sg; ADJF-m-acc-sg;  ADJF-n-gen-sg"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якога",
+      "transcription": "jakóɣa",
+      "translation": "какого",
+      "annotation": "ADJF-m-gen-sg; ADJF-m-acc-sg;  ADJF-n-gen-sg"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якому",
+      "transcription": "jakómu",
+      "translation": "какому",
+      "annotation": "ADJF-m-dat-sg; ADJF-n-dat-sg"
+    }
+  },
+  {
+    "pk": 7,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "яким",
+      "transcription": "jak'ím",
+      "translation": "каким",
+      "annotation": "ADJF-m-ins-sg; ADJF-n-ins-sg; ADJF-dat-pl; ADJF-m-loc-sg; ADJF-n-loc-sg"
+    }
+  },
+  {
+    "pk": 8,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "яком",
+      "transcription": "jakóm",
+      "translation": "каком",
+      "annotation": "ADJF-m-ins-sg; ADJF-n-ins-sg; ADJF-dat-pl; ADJF-m-loc-sg; ADJF-n-loc-sg"
+    }
+  },
+  {
+    "pk": 9,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якую",
+      "transcription": "jakúju",
+      "translation": "какую",
+      "annotation": "ADJF-f-acc-sg"
+    }
+  },
+  {
+    "pk": 10,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якая",
+      "transcription": "jakája",
+      "translation": "какая",
+      "annotation": "ADJF-f-nom-sg"
+    }
+  },
+  {
+    "pk": 11,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якой",
+      "transcription": "jakój",
+      "translation": "какой",
+      "annotation": "ADJF-f-gen-sg; ADJF-f-loc-sg; ADJF-f-ins-sg; ADJF-f-dat-sg"
+    }
+  },
+  {
+    "pk": 12,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якое",
+      "transcription": "jakóe",
+      "translation": "какое",
+      "annotation": "ADJF-n-nom-sg; ADJF-n-acc-sg"
+    }
+  },
+  {
+    "pk": 13,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якия",
+      "transcription": "jak'íja",
+      "translation": "какие",
+      "annotation": "ADJF-nom-pl; ADJF-acc-pl"
+    }
+  },
+  {
+    "pk": 14,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якия",
+      "transcription": "jak'íje",
+      "translation": "какие",
+      "annotation": "ADJF-nom-pl; ADJF-acc-pl"
+    }
+  },
+  {
+    "pk": 15,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "яких",
+      "transcription": "jak'íx",
+      "translation": "каких",
+      "annotation": "ADJF-loc-pl; ADJF-gen-pl; ADJF-acc-pl"
+    }
+  },
+  {
+    "pk": 16,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "яки",
+      "to_model_id": 2,
+      "normalization": "якими",
+      "transcription": "jak'ím'i",
+      "translation": "какими",
+      "annotation": "ADJF-ins-pl"
+    }
+  },
+  {
+    "pk": 17,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "вот",
+      "to_model_id": 2,
+      "normalization": "о",
+      "transcription": "o",
+      "translation": "вот",
+      "annotation": "PRCL"
+    }
+  },
+  {
+    "pk": 18,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "вот",
+      "to_model_id": 2,
+      "normalization": "во",
+      "transcription": "vo",
+      "translation": "вот",
+      "annotation": "PRCL"
+    }
+  },
+  {
+    "pk": 19,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "трэбо",
+      "to_model_id": 2,
+      "normalization": "трэбо",
+      "transcription": "trébo",
+      "translation": "надо",
+      "annotation": "PRED"
+    }
+  },
+  {
+    "pk": 20,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "трэбо",
+      "to_model_id": 2,
+      "normalization": "трэбо",
+      "transcription": "tréba",
+      "translation": "надо",
+      "annotation": "PRED"
+    }
+  },
+  {
+    "pk": 21,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "але",
+      "to_model_id": 2,
+      "normalization": "але",
+      "transcription": "al'é",
+      "translation": "но",
+      "annotation": "CONJ"
+    }
+  },
+  {
+    "pk": 22,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "каб",
+      "to_model_id": 2,
+      "normalization": "каб",
+      "transcription": "kab",
+      "translation": "чтобы",
+      "annotation": "CONJ"
+    }
+  },
+  {
+    "pk": 23,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "нет",
+      "to_model_id": 2,
+      "normalization": "нема",
+      "transcription": "n'emá",
+      "translation": "нет",
+      "annotation": "PRED"
+    }
+  },
+  {
+    "pk": 24,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "тогда",
+      "to_model_id": 2,
+      "normalization": "тады",
+      "transcription": "tadý",
+      "translation": "тогда",
+      "annotation": "ADV"
+    }
+  },
+  {
+    "pk": 25,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "это",
+      "to_model_id": 2,
+      "normalization": "гэто",
+      "transcription": "ɣéto",
+      "translation": "это",
+      "annotation": "NPRO-n-nom-sg; NPRO-n-acc-sg; ADJF-n-acc-sg-Apro-Subx; ADJF-n-nom-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 26,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "это",
+      "to_model_id": 2,
+      "normalization": "гэто",
+      "transcription": "ɣéta",
+      "translation": "это",
+      "annotation": "NPRO-n-nom-sg; NPRO-n-acc-sg; ADJF-n-acc-sg-Apro-Subx; ADJF-n-nom-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 27,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэты",
+      "transcription": "ɣéty",
+      "translation": "этот",
+      "annotation": "ADJF-m-nom-sg-Apro-Subx; ADJF-m-acc-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 28,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтот",
+      "transcription": "ɣétat",
+      "translation": "этот",
+      "annotation": "ADJF-m-nom-sg-Apro-Subx; ADJF-m-acc-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 29,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэта",
+      "transcription": "ɣéta",
+      "translation": "эта",
+      "annotation": "ADJF-f-nom-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 30,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтая",
+      "transcription": "ɣétaja",
+      "translation": "эта",
+      "annotation": "ADJF-f-nom-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 31,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэту",
+      "transcription": "ɣétu",
+      "translation": "эту",
+      "annotation": "ADJF-f-acc-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 32,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтую",
+      "transcription": "ɣétuju",
+      "translation": "эту",
+      "annotation": "ADJF-f-acc-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 33,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтой",
+      "transcription": "ɣétaj",
+      "translation": "этой",
+      "annotation": "ADJF-f-gen-sg-Apro-Subx; ADJF-f-loc-sg-Apro-Subx; ADJF-f-ins-sg-Apro-Subx; ADJF-f-dat-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 34,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтому",
+      "transcription": "ɣétamu",
+      "translation": "этому",
+      "annotation": "NPRO-n-dat-sg; ADJF-m-dat-sg-Apro-Subx; ADJF-n-dat-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 35,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтым",
+      "transcription": "ɣétym",
+      "translation": "этим",
+      "annotation": "NPRO-n-ins-sg; ADJF-m-ins-sg-Apro-Subx; ADJF-dat-pl-Apro-Subx; ADJF-n-ins-sg-Apro-Subx"
+    }
+  },
+  {
+    "pk": 36,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтыя",
+      "transcription": "ɣétyja",
+      "translation": "эти",
+      "annotation": "ADJF-nom-pl-Apro-Subx; ADJF-acc-pl-Apro-Subx"
+    }
+  },
+  {
+    "pk": 37,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтыя",
+      "transcription": "ɣétyje",
+      "translation": "эти",
+      "annotation": "ADJF-nom-pl-Apro-Subx; ADJF-acc-pl-Apro-Subx"
+    }
+  },
+  {
+    "pk": 38,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтых",
+      "transcription": "ɣétyx",
+      "translation": "этих",
+      "annotation": "ADJF-gen-pl-Apro-Subx; ADJF-loc-pl-Apro-Subx; ADJF-acc-pl-Apro-Subx"
+    }
+  },
+  {
+    "pk": 39,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "этот",
+      "to_model_id": 2,
+      "normalization": "гэтыми",
+      "transcription": "ɣétymi",
+      "translation": "этими",
+      "annotation": "ADJF-ins-pl-Apro-Subx"
+    }
+  },
+  {
+    "pk": 40,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "меть",
+      "transcription": "m'éc'",
+      "translation": "",
+      "annotation": "INFN-ipfv"
+    }
+  },
+  {
+    "pk": 41,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "маю",
+      "transcription": "máju",
+      "translation": "имею",
+      "annotation": "VERB-prs-ipfv-ind-1-sg"
+    }
+  },
+  {
+    "pk": 42,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "маешь",
+      "transcription": "máješ",
+      "translation": "имеешь",
+      "annotation": "VERB-prs-ipfv-ind-2-sg"
+    }
+  },
+  {
+    "pk": 43,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "мае",
+      "transcription": "máje",
+      "translation": "имеет",
+      "annotation": "VERB-prs-ipfv-ind-3-sg"
+    }
+  },
+  {
+    "pk": 44,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "маем",
+      "transcription": "májem",
+      "translation": "имеет",
+      "annotation": "VERB-prs-ipfv-ind-1-pl"
+    }
+  },
+  {
+    "pk": 45,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "мают",
+      "transcription": "májuc'",
+      "translation": "имеют",
+      "annotation": "VERB-prs-ipfv-ind-3-pl"
+    }
+  },
+  {
+    "pk": 46,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "мают",
+      "transcription": "májut",
+      "translation": "имеют",
+      "annotation": "VERB-prs-ipfv-ind-3-pl"
+    }
+  },
+  {
+    "pk": 47,
+    "model": "normalization.word",
+    "fields": {
+      "lemma": "иметь",
+      "to_model_id": 2,
+      "normalization": "маете",
+      "transcription": "majec'e",
+      "translation": "имеете",
+      "annotation": "VERB-prs-ipfv-ind-2-pl"
+    }
+  }
+]

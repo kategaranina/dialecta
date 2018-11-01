@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pymorphy2, re, codecs, os, sys, json, difflib
+from collections import defaultdict
 from pympi import Eaf, Elan
 from lxml import etree
 from urllib.request import urlopen, URLError
@@ -10,7 +11,7 @@ from decimal import *
 from django.conf import settings
 from django.conf.urls.static import static
 from corpora.models import *
-from normalization.models import Model
+from normalization.models import Model, Word
 #import trimco.config as config
 
 #import enchant # replace with something installable (see occur. below)
@@ -146,10 +147,16 @@ class standartizator(orthographic_data):
   def __init__(self, dialect=''):
 
     self.dialect = dialect
+    self.path = settings.NORMALIZER_PATH #specified in the last line of trimco.settings.py
     self.model = NormalizationModel.objects.get(to_dialect = self.dialect)
+    self.another_model = Model.objects.get(to_dialect = self.dialect)
     self.morph_rus = pymorphy2.MorphAnalyzer()
     self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
     #self.be_spellchecker = enchant.Dict("be_BY")
+    
+    self.manual_words = defaultdict(list)
+    for x in Word.objects.filter(to_model = self.another_model):
+        self.manual_words[x.transcription].append([x.normalization, x.lemma, x.annotation, 1])
 
   def update_model(self, examples_dict, exceptions_lst):
 
@@ -450,7 +457,8 @@ class standartizator(orthographic_data):
     return vars_lst
   
   def generate_dict_for_translit_token(self, token):
-
+    if token.lower() in self.manual_words:
+      return [x[0] for x in self.manual_words[token.lower()]]
     token = self.preprocess_trans(token)
     vars_lst = self.generate_variants(token)[:20]
     if self.spellchecker_option == True:
@@ -461,10 +469,25 @@ class standartizator(orthographic_data):
   def get_annotation_options_list(self, token):
     
     result_lst = []
-    for annot in self.morph_rus.parse(token):
-      if annot.score > 0.001:
-        tag = self.annotation_menu.override_abbreviations(str(annot.tag))
-        result_lst.append([annot.normal_form, tag, annot.score])
+    if token[0].lower() in self.manual_words:
+        variants = self.manual_words[token[0].lower()]
+        for corr in variants:
+            if corr[0] == token[1]:
+                annots = corr[2].split(';')
+                for annot in annots:
+                    result_lst.append([corr[1],annot.strip(),1])
+                break
+    else:
+        for annot in self.morph_rus.parse(token[1]):
+            if annot.score > 0.001:
+                methods = {str(x[0]) for x in annot.methods_stack}
+                tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+                if self.another_model.name == 'be' and (token[0].endswith('ṷšy') or token[0].endswith('ṷši')) and tag.startswith('GER-'):
+                    tag = 'ANTP-' + tag[4:]
+                if methods != {'<DictionaryAnalyzer>'}: #pymorphy2 specific
+                    result_lst.append(['(unkn)_'+annot.normal_form, tag, annot.score])
+                else:
+                    result_lst.append([annot.normal_form, tag, annot.score])
     return result_lst
 
   def auto_annotation(self, token):
@@ -472,16 +495,16 @@ class standartizator(orthographic_data):
     with open('token.tmp', 'w') as f:
     	f.write(token)
     #os.system('echo ' + token + '> token.tmp')
-    model = self.models_dict[str(self.dialect)]
+    #model = self.models_dict[str(self.dialect)]
     #print(model)
-    os.system('python2 ' + self.path + 'normalise.py token.tmp ' + model)
+    os.system('python2 ' + self.path + 'normalise.py token.tmp ' + str(self.another_model))
     #os.system('cat token.tmp.norm')
     try:
       normalization = open('token.tmp.norm').read().split('\t')[1].lower().strip()
       os.system('rm token.tmp.*')
       #normalization = self.generate_dict_for_translit_token(token)[0][0]
       print(token, normalization)
-      return (token, normalization, self.get_annotation_options_list(normalization)[0])
+      return (token, normalization, self.get_annotation_options_list((token, normalization)))
     except IndexError:
       return None    
 
@@ -500,16 +523,32 @@ class Standartizator(): #takes model's name
     self.dialect = dialect
     self.model = Model.objects.get(to_dialect = self.dialect)  #gets appropriate model by dialect's name
                                                                #this corresponds to the name of model's directory inside csmtiser
+    self.manual_words = defaultdict(list)
+    for x in Word.objects.filter(to_model = self.model):
+        self.manual_words[x.transcription].append([x.normalization, x.lemma, x.annotation, 1])
     self.path = settings.NORMALIZER_PATH #specified in the last line of trimco.settings.py
     self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
     self.morph_rus = pymorphy2.MorphAnalyzer() #this should be replaced by some context-dependent analyser, i.e. mystem
 
+  def correct_reflexive(self,norm):
+      vowels = set('аеёиоуыэюя')
+      if len(norm) > 2 and norm[-3] in vowels:
+          if len(norm) > 3 and norm[-4] not in vowels: # participles
+              new_norm = norm[:-1]+'ь'
+              ann = self.morph_rus.parse(new_norm)[0]
+              ann_methods  ={str(x[0]) for x in ann.methods_stack}
+              if ann.tag.POS == 'VERB' or ann_methods != {'<DictionaryAnalyzer>'}:
+                return new_norm
+      return norm    
+  
   def get_annotation(self, text): 
 
     annotations = []
     nrm_list = self.normalize(text)
     for nrm in nrm_list:
-      annotation = [(word, self.get_annotation_options_list(word)[0]) for word in nrm] #we take only first (=most likely) variant
+      annotation = []
+      for word in nrm:
+          annotation.append((word[1],self.get_annotation_options_list(word))) #we take only first (=most likely) variant UPD: not anymore
       annotations.append(annotation) 
     return(annotations)
 
@@ -528,7 +567,16 @@ class Standartizator(): #takes model's name
       #['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
       normalization_list = []
       for line in lines:
-        words = [word.split('\t')[1].lower() for word in line]
+        words = []
+        for word in line:
+          pair = word.split('\t')
+          if pair[0].lower() in self.manual_words:
+            pair[1] = self.manual_words[pair[0].lower()][0][0].lower()
+          elif pair[1].lower().endswith('ся'):
+            pair[1] = self.correct_reflexive(pair[1].lower())
+          else:
+            pair[1] = pair[1].lower()
+          words.append(pair)
         normalization_list.append(words)
       #normalization = ' '.join([line.split('\t')[1].lower() for line in output if line])
       #normalization_list = [word.split('\t')[1].lower() for word in words if word]
@@ -542,10 +590,25 @@ class Standartizator(): #takes model's name
   def get_annotation_options_list(self, token): #this function is taken from the old version of standartizator (above)
     
     result_lst = []
-    for annot in self.morph_rus.parse(token):
-      if annot.score > 0.001:
-        tag = self.annotation_menu.override_abbreviations(str(annot.tag))
-        result_lst.append([annot.normal_form, tag, annot.score])
+    if token[0].lower() in self.manual_words:
+        variants = self.manual_words[token[0].lower()]
+        for corr in variants:
+            if corr[0] == token[1]:
+                annots = corr[2].split(';')
+                for annot in annots:
+                    result_lst.append([corr[1],annot.strip(),1])
+                break
+    else:
+        for annot in self.morph_rus.parse(token[1]):
+            if annot.score > 0.001:
+                methods = {str(x[0]) for x in annot.methods_stack}
+                tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+                if self.model.name == 'be' and (token[0].endswith('ṷšy') or token[0].endswith('ṷši')) and tag.startswith('GER-'):
+                    tag = 'ANTP-' + tag[4:]
+                if methods != {'<DictionaryAnalyzer>'}: #pymorphy2 specific
+                    result_lst.append(['(unkn)_'+annot.normal_form, tag, annot.score])
+                else:
+                    result_lst.append([annot.normal_form, tag, annot.score])
     return result_lst
 
   def make_backup(self): #creates backups of .norm and .orig files (needed to train the model)
@@ -578,8 +641,8 @@ class Standartizator(): #takes model's name
 
   def retrain_model(self):
 
-    os.system('python2 ' + self.path + 'preprocess.py')
-    os.system('python2 ' + self.path + 'train.py')
+    os.system('python2 ' + self.path + 'preprocess.py ' + str(self.model))
+    os.system('python2 ' + self.path + 'train.py ' + str(self.model))
 
 
 
@@ -687,7 +750,7 @@ class ElanObject:
 #      tier_obj = self.get_tier_obj_by_name(tier_name)
 #      if tier_obj.attributes['TIER_ID']!='comment':
 #        transcript = annot_data[2]
-#        #нет такой функции !
+#        #no such function !
 #        normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
 
 
@@ -766,8 +829,9 @@ class elan_to_html:
       nrm_value_lst = []
       for token in annotation:
         nrm = token[0]
-        lemma = token[1][0]
-        morph = token[1][1]
+        anns = token[1]
+        lemma = '/'.join(set([x[0] for x in anns]))
+        morph = '/'.join([x[0]+'-'+x[1] for x in anns])
         try:
           if lemma+morph != '':
             annot_value_lst.append('%s:%s:%s' %(t_counter, lemma, morph))
@@ -802,14 +866,14 @@ class elan_to_html:
       tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
       if tier_obj.attributes['TIER_ID']!='comment':
         transcript = annot_data[2]
-
-        normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
-        annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
-        [participant, tier_status] = self.get_participant_tag_and_status(tier_obj)
-        audio_div = self.get_audio_annot_div(annot_data[0], annot_data[1])
-        annot_div = self.get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
-        html += '<div class="annot_wrapper %s">%s%s</div>' %(tier_status, audio_div, annot_div)
-        i += 1
+        if transcript:
+          normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
+          annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
+          [participant, tier_status] = self.get_participant_tag_and_status(tier_obj)
+          audio_div = self.get_audio_annot_div(annot_data[0], annot_data[1])
+          annot_div = self.get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
+          html += '<div class="annot_wrapper %s">%s%s</div>' %(tier_status, audio_div, annot_div)
+          i += 1
 
     self.html = '<div class="eaf_display">%s</div>' %(html)
 
@@ -908,9 +972,14 @@ class elan_to_html:
     for tag in transcript_obj.iterchildren():
       if tag.tag == 'token':
         if i in annot_tokens_dict.keys():
-          morph_tags = self.annotation_menu.override_abbreviations(annot_tokens_dict[i][1]) #DB
+          morph_tags = self.annotation_menu.override_abbreviations(annot_tokens_dict[i][1].split('/')[0].split('-',1)[1]) #DB
+          morph_tags_full = '/'.join([self.annotation_menu.override_abbreviations(x,is_lemma=True) for x in annot_tokens_dict[i][1].split('/')]) #DB
           tag.insert(0, etree.fromstring('<morph>'+morph_tags+'</morph>'))
-          tag.insert(0, etree.fromstring('<lemma>'+annot_tokens_dict[i][0]+'</lemma>'))
+          tag.insert(0, etree.fromstring('<morph_full style="display:none">'+morph_tags_full+'</morph_full>'))
+          lemma = annot_tokens_dict[i][0].split('/')[0]
+          lemma_full = annot_tokens_dict[i][0]
+          tag.insert(0, etree.fromstring('<lemma>'+lemma+'</lemma>'))
+          tag.insert(0, etree.fromstring('<lemma_full style="display:none">'+lemma_full+'</lemma_full>'))
         if i in normz_tokens_dict.keys():
           tag.insert(0, etree.fromstring('<nrm>'+normz_tokens_dict[i][0]+'</nrm>'))
         i += 1
@@ -930,8 +999,8 @@ class elan_to_html:
       nrm_value_lst = []
       for token in el.xpath('*//token'):  
         nrm_lst = token.xpath('nrm/text()')
-        lemma_lst = token.xpath('lemma/text()')
-        morph_lst = token.xpath('morph/text()')
+        lemma_lst = token.xpath('lemma_full/text()')
+        morph_lst = token.xpath('morph_full/text()')
         try:
           if lemma_lst+morph_lst != []:
             annot_value_lst.append('%s:%s:%s' %(t_counter, lemma_lst[0], morph_lst[0]))
@@ -1072,9 +1141,11 @@ class annotation_menu_from_xml:
 		return '-'.join(tags_lst)
 	'''
 
-	def override_abbreviations(self, tag_str):
+	def override_abbreviations(self, tag_str, is_lemma=False):
 
 		tags_lst = [t for t in re.split('[, -]', tag_str) if t != '']
+		if is_lemma:
+			lemma, tags_lst = tags_lst[0], tags_lst[1:]
 		for i in range(len(tags_lst)):
 			try:
 				tags_lst[i] = self.terms_dict[tags_lst[i]]['newID']
@@ -1110,5 +1181,7 @@ class annotation_menu_from_xml:
 				new_tags.append(tag)
 		new_tags = [t for t in new_tags if t != '']
 		#print('-'.join(new_tags))
-		
-		return '-'.join(new_tags)
+		if is_lemma:
+			new_tags = [lemma] + new_tags
+		new_tags = '-'.join(new_tags).replace(';-','; ')
+		return new_tags
