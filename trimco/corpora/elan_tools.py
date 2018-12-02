@@ -492,18 +492,18 @@ class standartizator(orthographic_data):
 
   def auto_annotation(self, token):
     
-    with open('token.tmp', 'w') as f:
+    with open(os.path.join(settings.BASE_DIR, 'token.tmp'), 'w') as f:
     	f.write(token)
     #os.system('echo ' + token + '> token.tmp')
     #model = self.models_dict[str(self.dialect)]
     #print(model)
-    os.system('python2 ' + self.path + 'normalise.py token.tmp ' + str(self.another_model))
+    os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'token.tmp') + ' ' + str(self.another_model))
     #os.system('cat token.tmp.norm')
     try:
-      normalization = open('token.tmp.norm').read().split('\t')[1].lower().strip()
-      os.system('rm token.tmp.*')
+      normalization = open(os.path.join(settings.BASE_DIR, 'token.tmp.norm')).read().split('\t')[1].lower().strip()
+      os.system('rm ' + os.path.join(settings.BASE_DIR, 'token.tmp.*'))
       #normalization = self.generate_dict_for_translit_token(token)[0][0]
-      print(token, normalization)
+      #print(token, normalization)
       return (token, normalization, self.get_annotation_options_list((token, normalization)))
     except IndexError:
       return None    
@@ -554,14 +554,14 @@ class Standartizator(): #takes model's name
 
   def normalize(self, text_to_normalize): #clauses are separated by '\n\n', words inside clause are separeted by '\n'
 
-    with open('tmp', 'w') as f:
+    with open(os.path.join(settings.BASE_DIR, 'tmp'), 'w') as f:
       f.write(text_to_normalize)
     #os.system('echo ' + token + '> token.tmp')
     #print(model)
-    os.system('python2 ' + self.path + 'normalise.py tmp ' + str(self.model))
+    os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'tmp') + ' ' + str(self.model))
     #os.system('cat tmp.norm')
     try:
-      clauses = open('tmp.norm').read().split('\n\n')
+      clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm')).read().split('\n\n')
       lines = [clause.split('\n') for clause in clauses if clause]
       #an element of lines looks like:
       #['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
@@ -582,7 +582,7 @@ class Standartizator(): #takes model's name
       #normalization_list = [word.split('\t')[1].lower() for word in words if word]
       #os.system('rm tmp.*')
       #normalization = self.generate_dict_for_translit_token(token)[0][0]
-      print(len(normalization_list))
+      #print(len(normalization_list))
       return (normalization_list) #returns a list of lists 
     except IndexError:
       return None  
@@ -1100,11 +1100,12 @@ class annotation_menu_from_xml:
 			id_final = self.terms_dict[id_raw]['newID']
 			dep_lst = grammeme_tag.xpath('@toForms')[0].split(',')
 			label_tag_str = '<label for="%s">%s</label>' %(id_final, label)
-			select_tag_str = "<select class='manualAnnotation' id='%s' title='%s' data-dep='%s'>%s</select>" %(id_final,
-																																																				 label,
-																																																				 json.dumps(self.get_dependences(dep_lst)),
-																																																				 self.get_options_for_id(id_raw),
-																																																				 )
+			select_tag_str = "<select class='manualAnnotation' id='%s' title='%s' data-dep='%s'>%s</select>" %(
+				id_final,
+				label,
+				json.dumps(self.get_dependences(dep_lst)),
+				self.get_options_for_id(id_raw)
+			)
 			main_options_tag_str = '%s<div class="manualAnnotationContainer">%s%s</div>' %(main_options_tag_str, label_tag_str, select_tag_str)
 		return main_options_tag_str
 		#return '<div id="basic_params">%s</div>' %(main_options_tag_str)
@@ -1118,11 +1119,12 @@ class annotation_menu_from_xml:
 			id_final = self.terms_dict[id_raw]['newID']
 			to_forms = grammeme_tag.xpath('@extends')[0].split(',')
 			#print(label, to_forms)
-			select_tag_str = "<label><input type='checkbox' class='manualAnnotation' name='%s' value='%s' data-dep='%s'>%s</label>" %(id_final,
-																																																																id_final,
-																																																																json.dumps(to_forms),
-																																																																label,
-																																																																)
+			select_tag_str = "<label><input type='checkbox' class='manualAnnotation' name='%s' value='%s' data-dep='%s'>%s</label>" %(
+				id_final,
+				id_final,
+				json.dumps(to_forms),
+				label
+            )
 			main_options_tag_str = '%s<div class="manualAnnotationContainer">%s</div>' %(main_options_tag_str, select_tag_str)
 		return main_options_tag_str
 		#return '<div id="extends">%s</div>' %(main_options_tag_str)
