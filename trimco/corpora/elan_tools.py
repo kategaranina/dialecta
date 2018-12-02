@@ -492,7 +492,7 @@ class standartizator(orthographic_data):
 
   def auto_annotation(self, token):
     
-    with open(os.path.join(settings.BASE_DIR, 'token.tmp'), 'w') as f:
+    with open(os.path.join(settings.BASE_DIR, 'token.tmp'), 'w', encoding='utf-8') as f:
     	f.write(token)
     #os.system('echo ' + token + '> token.tmp')
     #model = self.models_dict[str(self.dialect)]
@@ -500,7 +500,7 @@ class standartizator(orthographic_data):
     os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'token.tmp') + ' ' + str(self.another_model))
     #os.system('cat token.tmp.norm')
     try:
-      normalization = open(os.path.join(settings.BASE_DIR, 'token.tmp.norm')).read().split('\t')[1].lower().strip()
+      normalization = open(os.path.join(settings.BASE_DIR, 'token.tmp.norm'), encoding='utf-8').read().split('\t')[1].lower().strip()
       os.system('rm ' + os.path.join(settings.BASE_DIR, 'token.tmp.*'))
       #normalization = self.generate_dict_for_translit_token(token)[0][0]
       #print(token, normalization)
@@ -554,14 +554,14 @@ class Standartizator(): #takes model's name
 
   def normalize(self, text_to_normalize): #clauses are separated by '\n\n', words inside clause are separeted by '\n'
 
-    with open(os.path.join(settings.BASE_DIR, 'tmp'), 'w') as f:
+    with open(os.path.join(settings.BASE_DIR, 'tmp'), 'w', encoding='utf-8') as f:
       f.write(text_to_normalize)
     #os.system('echo ' + token + '> token.tmp')
     #print(model)
     os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'tmp') + ' ' + str(self.model))
     #os.system('cat tmp.norm')
     try:
-      clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm')).read().split('\n\n')
+      clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm'), encoding='utf-8').read().split('\n\n')
       lines = [clause.split('\n') for clause in clauses if clause]
       #an element of lines looks like:
       #['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
@@ -634,9 +634,9 @@ class Standartizator(): #takes model's name
     trns = '\n'.join([example[0].strip() for example in examples])
     nrms = '\n'.join([example[1].strip() for example in examples])
 
-    with open('{}/{}'.format(self.path_to_model, self.orig), 'w') as orig:
+    with open('{}/{}'.format(self.path_to_model, self.orig), 'w', encoding='utf-8') as orig:
       orig.write(trns)
-    with open('{}/{}'.format(self.path_to_model, self.norm), 'w') as norm:
+    with open('{}/{}'.format(self.path_to_model, self.norm), 'w', encoding='utf-8') as norm:
       norm.write(nrms)
 
   def retrain_model(self):
