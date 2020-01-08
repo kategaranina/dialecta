@@ -7,9 +7,11 @@ django-grappelli==2.8.1
 django-reversion==2.0.3
 djangoajax==2.3.6
 docopt==0.6.2
-lxml==3.6.0
-Pillow==3.2.0
+lxml==4.4.2
+Pillow==7.0.0
+pyenchant==2.0.0
 pymorphy2==0.8
 pymorphy2-dicts==2.4.393442.3710985
-pympi-ling==git+git://github.com/khoidt/pympi
+pympi-ling==1.69
 six==1.10.0
+uWSGI==2.0.18
