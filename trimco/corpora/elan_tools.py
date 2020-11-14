@@ -19,127 +19,127 @@ from normalization.models import Model, Word
 
 class glyph_equation:
 
-	def __init__(self, key, value, context):
+    def __init__(self, key, value, context):
 
-		self.contexts_lst = []
-		self.key = key
-		self.value = value
-		self.add_context(context)
+        self.contexts_lst = []
+        self.key = key
+        self.value = value
+        self.add_context(context)
 
-	def add_context(self, context):
-		
-		new_context_dict = self.context_to_dict(context)
-		context_in_lst = False
-		i = 0
-		for context_dict, times in self.contexts_lst:
-			if new_context_dict == context_dict:
-				self.contexts_lst[i][1] += 1
-				context_in_lst = True
-				break
-			i += 1
-		if context_in_lst == False:
-			self.contexts_lst.append([new_context_dict, 1])
-			
-	def context_to_dict(self, context):
-		
-		[b2, b1, a1, a2] = context
-		return {'b2': b2, 'b1' : b1, 'a1' : a1, 'a2' : a2}
-		
-	def calculate_points_for_context(self, context):
+    def add_context(self, context):
+        
+        new_context_dict = self.context_to_dict(context)
+        context_in_lst = False
+        i = 0
+        for context_dict, times in self.contexts_lst:
+            if new_context_dict == context_dict:
+                self.contexts_lst[i][1] += 1
+                context_in_lst = True
+                break
+            i += 1
+        if context_in_lst == False:
+            self.contexts_lst.append([new_context_dict, 1])
+            
+    def context_to_dict(self, context):
+        
+        [b2, b1, a1, a2] = context
+        return {'b2': b2, 'b1' : b1, 'a1' : a1, 'a2' : a2}
+        
+    def calculate_points_for_context(self, context):
 
-		points = 1
-		extras = 1
-		_context_dict = self.context_to_dict(context)
-		for context_dict, times in self.contexts_lst:
-			if _context_dict == context_dict:
-				extras += 100 * times
-			if _context_dict['a1'] == context_dict['a1'] and _context_dict['b1'] == context_dict['b1']:
-				extras += 50 * times
-			if _context_dict['a2'] == context_dict['a2'] and _context_dict['a1'] == context_dict['a1']:
-				extras += 10 * times
-			if _context_dict['b2'] == context_dict['b2'] and _context_dict['b1'] == context_dict['b1']:
-				extras += 10 * times
-			if _context_dict['b1'] == context_dict['b1']:
-				points += 2 * times
-			if _context_dict['a1'] == context_dict['a1']:
-				points += 2 * times
-			if _context_dict['b2'] == context_dict['b2']:
-				points += 1 * times
-			if _context_dict['a2'] == context_dict['a2']:
-				points += 1 * times				
-		return points * extras
+        points = 1
+        extras = 1
+        _context_dict = self.context_to_dict(context)
+        for context_dict, times in self.contexts_lst:
+            if _context_dict == context_dict:
+                extras += 100 * times
+            if _context_dict['a1'] == context_dict['a1'] and _context_dict['b1'] == context_dict['b1']:
+                extras += 50 * times
+            if _context_dict['a2'] == context_dict['a2'] and _context_dict['a1'] == context_dict['a1']:
+                extras += 10 * times
+            if _context_dict['b2'] == context_dict['b2'] and _context_dict['b1'] == context_dict['b1']:
+                extras += 10 * times
+            if _context_dict['b1'] == context_dict['b1']:
+                points += 2 * times
+            if _context_dict['a1'] == context_dict['a1']:
+                points += 2 * times
+            if _context_dict['b2'] == context_dict['b2']:
+                points += 1 * times
+            if _context_dict['a2'] == context_dict['a2']:
+                points += 1 * times                
+        return points * extras
 
 class orthographic_data:
 
-	glyphs_dict = {}
+    glyphs_dict = {}
 
-	def update_g_eq(self, glyph, equation, context):
+    def update_g_eq(self, glyph, equation, context):
 
-		if glyph not in self.glyphs_dict.keys():
-			self.glyphs_dict[glyph] = {equation : glyph_equation(glyph, equation, context)}
-		else:
-			if equation not in self.glyphs_dict[glyph].keys():
-				self.glyphs_dict[glyph][equation] = glyph_equation(glyph, equation, context)
-			else:
-				self.glyphs_dict[glyph][equation].add_context(context)
+        if glyph not in self.glyphs_dict.keys():
+            self.glyphs_dict[glyph] = {equation : glyph_equation(glyph, equation, context)}
+        else:
+            if equation not in self.glyphs_dict[glyph].keys():
+                self.glyphs_dict[glyph][equation] = glyph_equation(glyph, equation, context)
+            else:
+                self.glyphs_dict[glyph][equation].add_context(context)
 
-	def get_context(self, string, i):
+    def get_context(self, string, i):
 
-		a1 = a2 = b1 = b2 = None
-		if i > 0:
-			b1 = string[i-1]
-			if i > 1:
-				b2 = string[i-2]
-		if i+1 < len(string):
-			a1 = string[i+1]
-			if i+2 < len(string):
-				a2 = string[i+2]
-		return [b2, b1, a1, a2]
+        a1 = a2 = b1 = b2 = None
+        if i > 0:
+            b1 = string[i-1]
+            if i > 1:
+                b2 = string[i-2]
+        if i+1 < len(string):
+            a1 = string[i+1]
+            if i+2 < len(string):
+                a2 = string[i+2]
+        return [b2, b1, a1, a2]
 
-	def match(self, glyph, context):
+    def match(self, glyph, context):
 
-		if glyph not in self.glyphs_dict.keys():
-			return None
-		eq_lst = []
-		points_total = 0
-		for equation in self.glyphs_dict[glyph].keys():
-			points = self.glyphs_dict[glyph][equation].calculate_points_for_context(context)
-			eq_lst.append([equation, points])
-			points_total += points
-		return self.filter_match(eq_lst, points_total, 10)
+        if glyph not in self.glyphs_dict.keys():
+            return None
+        eq_lst = []
+        points_total = 0
+        for equation in self.glyphs_dict[glyph].keys():
+            points = self.glyphs_dict[glyph][equation].calculate_points_for_context(context)
+            eq_lst.append([equation, points])
+            points_total += points
+        return self.filter_match(eq_lst, points_total, 10)
 
-	def filter_match(self, items_lst, points_total, percent):
-		
-		items_lst = filter(lambda item: item[1] > ((points_total / 100) * percent), items_lst)
-		return sorted(items_lst, key = lambda item: -item[1])
+    def filter_match(self, items_lst, points_total, percent):
+        
+        items_lst = filter(lambda item: item[1] > ((points_total / 100) * percent), items_lst)
+        return sorted(items_lst, key = lambda item: -item[1])
 
-	def get_all_glyphs(self):
-		
-		return self.glyphs_dict.keys().sorted()
+    def get_all_glyphs(self):
+        
+        return self.glyphs_dict.keys().sorted()
 
-	def generate_variants(self, trans):
+    def generate_variants(self, trans):
 
-		var_lst = []
-		i = 0
-		while i < len(trans):
-			match_lst = self.match(trans[i], self.get_context(trans, i))
-			#print(trans, match_lst)
-			if match_lst == None:
-				return []
-			var_lst = self.update_var_lst(var_lst, match_lst)
-			i += 1
-		return sorted(var_lst, key = lambda item: -item[1])
+        var_lst = []
+        i = 0
+        while i < len(trans):
+            match_lst = self.match(trans[i], self.get_context(trans, i))
+            #print(trans, match_lst)
+            if match_lst == None:
+                return []
+            var_lst = self.update_var_lst(var_lst, match_lst)
+            i += 1
+        return sorted(var_lst, key = lambda item: -item[1])
 
-	def update_var_lst(self, var_lst, match_lst):
-		
-			var_lst_temp = []
-			for eq_str, eq_points in match_lst:
-				if var_lst != []:
-					for var_str, var_points in var_lst:
-						var_lst_temp.append([var_str+eq_str, var_points+eq_points])
-				else:
-					var_lst_temp.append([eq_str, eq_points])
-			return var_lst_temp
+    def update_var_lst(self, var_lst, match_lst):
+        
+            var_lst_temp = []
+            for eq_str, eq_points in match_lst:
+                if var_lst != []:
+                    for var_str, var_points in var_lst:
+                        var_lst_temp.append([var_str+eq_str, var_points+eq_points])
+                else:
+                    var_lst_temp.append([eq_str, eq_points])
+            return var_lst_temp
 
 
 class standartizator(orthographic_data):
@@ -493,7 +493,7 @@ class standartizator(orthographic_data):
   def auto_annotation(self, token):
     
     with open(os.path.join(settings.BASE_DIR, 'token.tmp'), 'w', encoding='utf-8') as f:
-    	f.write(token)
+        f.write(token)
     #os.system('echo ' + token + '> token.tmp')
     #model = self.models_dict[str(self.dialect)]
     #print(model)
@@ -511,10 +511,10 @@ class standartizator(orthographic_data):
 '''
 def pack_tags_to_dict(tags_lst, p):
 
-	for tag in ['POS', 'animacy', 'aspect', 'case', 'gender', 'involvement',
-						'mood', 'number', 'person', 'tense', 'transitivity', 'voice']:
-		if getattr(p.tag, tag)!=None:
-			tags_dict[tag] = getattr(p.tag, tag)
+    for tag in ['POS', 'animacy', 'aspect', 'case', 'gender', 'involvement',
+                        'mood', 'number', 'person', 'tense', 'transitivity', 'voice']:
+        if getattr(p.tag, tag)!=None:
+            tags_dict[tag] = getattr(p.tag, tag)
 '''
 class Standartizator(): #takes model's name
 
@@ -648,100 +648,100 @@ class Standartizator(): #takes model's name
 
 class Tier:
 
-	def __init__(self, name, info):
+    def __init__(self, name, info):
 
-		self.name = name
-		self.aligned_annotations = info[0]
-		self.reference_annotations = info[1]
-		self.attributes = info[2]
-		self.ordinal = info[3]
-		
-		self.top_level = False
-		if 'PARENT_REF' not in self.attributes.keys():
-			self.top_level = True
+        self.name = name
+        self.aligned_annotations = info[0]
+        self.reference_annotations = info[1]
+        self.attributes = info[2]
+        self.ordinal = info[3]
+        
+        self.top_level = False
+        if 'PARENT_REF' not in self.attributes.keys():
+            self.top_level = True
 
-		self.side = None
-		if '_i_' in self.name:
-			self.side = 'interviewer'
-		elif '_n_' in self.name:
-			self.side = 'speaker'
-			
+        self.side = None
+        if '_i_' in self.name:
+            self.side = 'interviewer'
+        elif '_n_' in self.name:
+            self.side = 'speaker'
+            
 
 class ElanObject:
 
-	def __init__(self, path_to_file):
-		
-		self.path = path_to_file
-		self.Eaf = Eaf(path_to_file)
-		self.Eaf.clean_time_slots()
-		self.load_tiers()
-		self.load_annotation_data()
-		self.load_participants()
+    def __init__(self, path_to_file):
+        
+        self.path = path_to_file
+        self.Eaf = Eaf(path_to_file)
+        self.Eaf.clean_time_slots()
+        self.load_tiers()
+        self.load_annotation_data()
+        self.load_participants()
 
-	def load_participants(self):
+    def load_participants(self):
 
-		participants_lst = []
-		for tier_obj in self.tiers_lst:
-			try:
-				p_title = tier_obj.attributes['PARTICIPANT'].title()
-				if p_title not in participants_lst:
-					participants_lst.append(p_title)
-			except KeyError:
-				pass
-		self.participants_lst = participants_lst
+        participants_lst = []
+        for tier_obj in self.tiers_lst:
+            try:
+                p_title = tier_obj.attributes['PARTICIPANT'].title()
+                if p_title not in participants_lst:
+                    participants_lst.append(p_title)
+            except KeyError:
+                pass
+        self.participants_lst = participants_lst
 
-	def load_tiers(self):
+    def load_tiers(self):
 
-		tiers_lst = []
-		for tier_name in self.Eaf.tiers.keys():
-			tiers_lst.append(Tier(tier_name, self.Eaf.tiers[tier_name]))
-		self.tiers_lst = sorted(tiers_lst, key=lambda data: data.ordinal)
-		
-	def load_annotation_data(self):
+        tiers_lst = []
+        for tier_name in self.Eaf.tiers.keys():
+            tiers_lst.append(Tier(tier_name, self.Eaf.tiers[tier_name]))
+        self.tiers_lst = sorted(tiers_lst, key=lambda data: data.ordinal)
+        
+    def load_annotation_data(self):
 
-		annot_data_lst = []
-		for tier_obj in self.tiers_lst:
-			if tier_obj.top_level == True:
-				for annot_data in self.Eaf.get_annotation_data_for_tier(tier_obj.name):
-					annot_data_lst.append(annot_data+(tier_obj.name,))
-		self.annot_data_lst = sorted(annot_data_lst, key=lambda data: data[0])
+        annot_data_lst = []
+        for tier_obj in self.tiers_lst:
+            if tier_obj.top_level == True:
+                for annot_data in self.Eaf.get_annotation_data_for_tier(tier_obj.name):
+                    annot_data_lst.append(annot_data+(tier_obj.name,))
+        self.annot_data_lst = sorted(annot_data_lst, key=lambda data: data[0])
 
-	def get_tier_obj_by_name(self, tier_name):
+    def get_tier_obj_by_name(self, tier_name):
 
-		for tier_obj in self.tiers_lst:
-			if tier_obj.name == tier_name:
-				return tier_obj
-		return None
-	
-	def add_extra_tags(self, parent_tier_name, start, end, value, typ):
+        for tier_obj in self.tiers_lst:
+            if tier_obj.name == tier_name:
+                return tier_obj
+        return None
+    
+    def add_extra_tags(self, parent_tier_name, start, end, value, typ):
 
-		if typ == 'annotation':
-			tier_name = parent_tier_name+'_annotation'
-			ling = 'tokenz_and_annot'
-		elif typ == 'standartization':
-			tier_name = parent_tier_name+'_standartization'
-			ling = 'stndz_clause'
-		else:
-			return None
-			
-		if self.get_tier_obj_by_name(tier_name) == None:
-			self.Eaf.add_tier(tier_name, ling=ling, parent=parent_tier_name, locale=None, part=None, ann=None, language=None, tier_dict=None)
-			self.load_tiers()
-		try:
-			self.Eaf.remove_annotation(tier_name, (start+end) / 2, clean=True)
-		except KeyError:
-			pass
-		self.Eaf.add_annotation(tier_name, start, end, value, svg_ref=None)
-	
-	def save(self):
+        if typ == 'annotation':
+            tier_name = parent_tier_name+'_annotation'
+            ling = 'tokenz_and_annot'
+        elif typ == 'standartization':
+            tier_name = parent_tier_name+'_standartization'
+            ling = 'stndz_clause'
+        else:
+            return None
+            
+        if self.get_tier_obj_by_name(tier_name) == None:
+            self.Eaf.add_tier(tier_name, ling=ling, parent=parent_tier_name, locale=None, part=None, ann=None, language=None, tier_dict=None)
+            self.load_tiers()
+        try:
+            self.Eaf.remove_annotation(tier_name, (start+end) / 2, clean=True)
+        except KeyError:
+            pass
+        self.Eaf.add_annotation(tier_name, start, end, value, svg_ref=None)
+    
+    def save(self):
 
-		self.Eaf.clean_time_slots()
-		try:
-			os.remove(self.path+'.bak')
-		except OSError:
-			pass
-		Elan.to_eaf(self.path, self.Eaf, pretty=True)
-		os.remove(self.path+'.bak')
+        self.Eaf.clean_time_slots()
+        try:
+            os.remove(self.path+'.bak')
+        except OSError:
+            pass
+        Elan.to_eaf(self.path, self.Eaf, pretty=True)
+        os.remove(self.path+'.bak')
 
 #  def collect_examples(self): #this function collects pairs (<transcribed sentence> - <normalized sentence>) from elan
 #                              #it's needed to retrain normalization models
@@ -1029,161 +1029,161 @@ from morphology.models import GlossingRule
 
 class annotation_menu_from_xml:
 
-	def __init__(self, xml_name):
+    def __init__(self, xml_name):
 
-		path = os.path.join(settings.STATIC_ROOT, '%s' %(xml_name))
-		self.tree = etree.parse(path)
-		self.build_terms_dict()
-		self.build_dep_dict()
-		lemma_input_str = '<div class="manualAnnotationContainer"><label id="lemma_input">Lemma</label><input class="manualAnnotation" id="lemma_input" title="Lemma"></div>'
-		form_input_str = '<div class="manualAnnotationContainer"><label id="form_input">Form</label><input class="manualAnnotation" id="form_input" title="Form"></div>'
-		self.menu_html_str_1 = '<form style="display: table;">%s%s%s</form>' %(lemma_input_str, form_input_str, self.get_main_options())
-		self.menu_html_str_2 = '<form>%s</form>' %(self.get_extending_options())
-		
-	def build_terms_dict(self):
+        path = os.path.join(settings.STATIC_ROOT, '%s' %(xml_name))
+        self.tree = etree.parse(path)
+        self.build_terms_dict()
+        self.build_dep_dict()
+        lemma_input_str = '<div class="manualAnnotationContainer"><label id="lemma_input">Lemma</label><input class="manualAnnotation" id="lemma_input" title="Lemma"></div>'
+        form_input_str = '<div class="manualAnnotationContainer"><label id="form_input">Form</label><input class="manualAnnotation" id="form_input" title="Form"></div>'
+        self.menu_html_str_1 = '<form style="display: table;">%s%s%s</form>' %(lemma_input_str, form_input_str, self.get_main_options())
+        self.menu_html_str_2 = '<form>%s</form>' %(self.get_extending_options())
+        
+    def build_terms_dict(self):
 
-		self.terms_dict = {'ALLFORMS': {'newID':'ALLFORMS', 'propertyOf':'', 'extends':''}}
-		for grammeme_tag in self.tree.xpath("grammeme"):
-			name = grammeme_tag.xpath('name/text()')[0]
-			try:
-				newID = grammeme_tag.xpath('override/text()')[0]
-			except IndexError:
-				newID = name
-			propertyOf = ''
-			extends = ''
-			if grammeme_tag.xpath('@propertyOf')!=[]:
-				propertyOf = grammeme_tag.xpath('@propertyOf')[0]
-			if grammeme_tag.xpath('@extends')!=[]:
-				propertyOf = grammeme_tag.xpath('@extends')[0]
-			self.terms_dict[name] = {'newID': newID, 'propertyOf': propertyOf, 'extends': extends}
+        self.terms_dict = {'ALLFORMS': {'newID':'ALLFORMS', 'propertyOf':'', 'extends':''}}
+        for grammeme_tag in self.tree.xpath("grammeme"):
+            name = grammeme_tag.xpath('name/text()')[0]
+            try:
+                newID = grammeme_tag.xpath('override/text()')[0]
+            except IndexError:
+                newID = name
+            propertyOf = ''
+            extends = ''
+            if grammeme_tag.xpath('@propertyOf')!=[]:
+                propertyOf = grammeme_tag.xpath('@propertyOf')[0]
+            if grammeme_tag.xpath('@extends')!=[]:
+                propertyOf = grammeme_tag.xpath('@extends')[0]
+            self.terms_dict[name] = {'newID': newID, 'propertyOf': propertyOf, 'extends': extends}
 
-	def build_dep_dict(self):
+    def build_dep_dict(self):
 
-		self.dep_dict = {}
-		for grammeme_tag in self.tree.xpath('grammeme[@toForms and not(@propertyOf)]'):
-			label = grammeme_tag.xpath('label/text()')[0]
-			id_raw = grammeme_tag.xpath('name/text()')[0]
-			id_final = self.terms_dict[id_raw]['newID']
-			dep_lst = grammeme_tag.xpath('@toForms')[0].split(',')
-			option_tags = self.tree.xpath("grammeme[contains(@propertyOf,'%s')]" %(id_raw))
-			options = [self.terms_dict[option_tag.xpath('name/text()')[0]]['newID'] for option_tag in option_tags]
-			#print(id_final, label, options) 
-			#print(annot_menu.get_dependences(dep_lst), '\n')
-			self.dep_dict[tuple(options)] = {'ID': id_final, 'label': label, 'dep_lst': self.get_dependences(dep_lst)}
-		
-			
-	def get_dependences(self, dep_lst_raw):
+        self.dep_dict = {}
+        for grammeme_tag in self.tree.xpath('grammeme[@toForms and not(@propertyOf)]'):
+            label = grammeme_tag.xpath('label/text()')[0]
+            id_raw = grammeme_tag.xpath('name/text()')[0]
+            id_final = self.terms_dict[id_raw]['newID']
+            dep_lst = grammeme_tag.xpath('@toForms')[0].split(',')
+            option_tags = self.tree.xpath("grammeme[contains(@propertyOf,'%s')]" %(id_raw))
+            options = [self.terms_dict[option_tag.xpath('name/text()')[0]]['newID'] for option_tag in option_tags]
+            #print(id_final, label, options) 
+            #print(annot_menu.get_dependences(dep_lst), '\n')
+            self.dep_dict[tuple(options)] = {'ID': id_final, 'label': label, 'dep_lst': self.get_dependences(dep_lst)}
+        
+            
+    def get_dependences(self, dep_lst_raw):
 
-		dep_lst_final = []
-		for item in dep_lst_raw:
-			tags, index = item.split(':')
-			index = int(index)
-			tags_lst = list(map(lambda tag: self.terms_dict[tag]['newID'], tags.split('.')))
-			dep_lst_final.append({'tags':tags_lst, 'index':index})
-		return dep_lst_final
+        dep_lst_final = []
+        for item in dep_lst_raw:
+            tags, index = item.split(':')
+            index = int(index)
+            tags_lst = list(map(lambda tag: self.terms_dict[tag]['newID'], tags.split('.')))
+            dep_lst_final.append({'tags':tags_lst, 'index':index})
+        return dep_lst_final
 
-	def get_options_for_id(self, id_raw):
-		
-		options_str = '<option id="blank"></option>'
-		for option_tag in self.tree.xpath("grammeme[contains(@propertyOf,'%s')]" %(id_raw)):
-			option_id = self.terms_dict[option_tag.xpath('name/text()')[0]]['newID']
-			options_str = "%s<option id='%s'>%s</option>" %(options_str, option_id, option_id)
-		return options_str
+    def get_options_for_id(self, id_raw):
+        
+        options_str = '<option id="blank"></option>'
+        for option_tag in self.tree.xpath("grammeme[contains(@propertyOf,'%s')]" %(id_raw)):
+            option_id = self.terms_dict[option_tag.xpath('name/text()')[0]]['newID']
+            options_str = "%s<option id='%s'>%s</option>" %(options_str, option_id, option_id)
+        return options_str
 
-	def get_main_options(self):
+    def get_main_options(self):
 
-		main_options_tag_str = ''
-		
-		for grammeme_tag in self.tree.xpath('grammeme[@toForms and not(@propertyOf)]'):
-			label = grammeme_tag.xpath('label/text()')[0]
-			id_raw = grammeme_tag.xpath('name/text()')[0]
-			id_final = self.terms_dict[id_raw]['newID']
-			dep_lst = grammeme_tag.xpath('@toForms')[0].split(',')
-			label_tag_str = '<label for="%s">%s</label>' %(id_final, label)
-			select_tag_str = "<select class='manualAnnotation' id='%s' title='%s' data-dep='%s'>%s</select>" %(
-				id_final,
-				label,
-				json.dumps(self.get_dependences(dep_lst)),
-				self.get_options_for_id(id_raw)
-			)
-			main_options_tag_str = '%s<div class="manualAnnotationContainer">%s%s</div>' %(main_options_tag_str, label_tag_str, select_tag_str)
-		return main_options_tag_str
-		#return '<div id="basic_params">%s</div>' %(main_options_tag_str)
-
-	def get_extending_options(self):
-
-		main_options_tag_str = ''
-		for grammeme_tag in self.tree.xpath('grammeme[@extends and not(@propertyOf)]'):
-			label = grammeme_tag.xpath('label/text()')[0]
-			id_raw = grammeme_tag.xpath('name/text()')[0]
-			id_final = self.terms_dict[id_raw]['newID']
-			to_forms = grammeme_tag.xpath('@extends')[0].split(',')
-			#print(label, to_forms)
-			select_tag_str = "<label><input type='checkbox' class='manualAnnotation' name='%s' value='%s' data-dep='%s'>%s</label>" %(
-				id_final,
-				id_final,
-				json.dumps(to_forms),
-				label
+        main_options_tag_str = ''
+        
+        for grammeme_tag in self.tree.xpath('grammeme[@toForms and not(@propertyOf)]'):
+            label = grammeme_tag.xpath('label/text()')[0]
+            id_raw = grammeme_tag.xpath('name/text()')[0]
+            id_final = self.terms_dict[id_raw]['newID']
+            dep_lst = grammeme_tag.xpath('@toForms')[0].split(',')
+            label_tag_str = '<label for="%s">%s</label>' %(id_final, label)
+            select_tag_str = "<select class='manualAnnotation' id='%s' title='%s' data-dep='%s'>%s</select>" %(
+                id_final,
+                label,
+                json.dumps(self.get_dependences(dep_lst)),
+                self.get_options_for_id(id_raw)
             )
-			main_options_tag_str = '%s<div class="manualAnnotationContainer">%s</div>' %(main_options_tag_str, select_tag_str)
-		return main_options_tag_str
-		#return '<div id="extends">%s</div>' %(main_options_tag_str)
+            main_options_tag_str = '%s<div class="manualAnnotationContainer">%s%s</div>' %(main_options_tag_str, label_tag_str, select_tag_str)
+        return main_options_tag_str
+        #return '<div id="basic_params">%s</div>' %(main_options_tag_str)
 
-	'''	
-	def override_abbreviations(self, tag):
+    def get_extending_options(self):
 
-		tags_lst = [t for t in re.split('[, -]', tag) if t != '']
-		i = 0
-		while i < len(tags_lst):
-			try:
-				tags_lst[i] = self.terms_dict[tags_lst[i]]['newID']
-			except KeyError:
-				pass
-			i += 1
-		return '-'.join(tags_lst)
-	'''
+        main_options_tag_str = ''
+        for grammeme_tag in self.tree.xpath('grammeme[@extends and not(@propertyOf)]'):
+            label = grammeme_tag.xpath('label/text()')[0]
+            id_raw = grammeme_tag.xpath('name/text()')[0]
+            id_final = self.terms_dict[id_raw]['newID']
+            to_forms = grammeme_tag.xpath('@extends')[0].split(',')
+            #print(label, to_forms)
+            select_tag_str = "<label><input type='checkbox' class='manualAnnotation' name='%s' value='%s' data-dep='%s'>%s</label>" %(
+                id_final,
+                id_final,
+                json.dumps(to_forms),
+                label
+            )
+            main_options_tag_str = '%s<div class="manualAnnotationContainer">%s</div>' %(main_options_tag_str, select_tag_str)
+        return main_options_tag_str
+        #return '<div id="extends">%s</div>' %(main_options_tag_str)
 
-	def override_abbreviations(self, tag_str, is_lemma=False):
+    '''    
+    def override_abbreviations(self, tag):
 
-		tags_lst = [t for t in re.split('[, -]', tag_str) if t != '']
-		if is_lemma:
-			lemma, tags_lst = tags_lst[0], tags_lst[1:]
-		for i in range(len(tags_lst)):
-			try:
-				tags_lst[i] = self.terms_dict[tags_lst[i]]['newID']
-			except KeyError:
-				pass
+        tags_lst = [t for t in re.split('[, -]', tag) if t != '']
+        i = 0
+        while i < len(tags_lst):
+            try:
+                tags_lst[i] = self.terms_dict[tags_lst[i]]['newID']
+            except KeyError:
+                pass
+            i += 1
+        return '-'.join(tags_lst)
+    '''
 
-		new_tags = ['' for t in range(6)]
-		# in fact this value in range should be replaced 
-		# with the actual maximum number of main tags for a particular category 
+    def override_abbreviations(self, tag_str, is_lemma=False):
 
-		for tag in tags_lst:
-			checked = False
-			for options in self.dep_dict.keys():
-				if tag in options:
-					if self.dep_dict[options]['ID'] == 'POS':
-						pos = tag
-						new_tags[0] = tag
-						checked = True
-						break
-					try:
-						dep_lst = self.dep_dict[options]['dep_lst']
-						for dep in dep_lst:
-							if pos in dep['tags']:
-								try:
-									new_tags[dep['index']] = tag
-								except IndexError:
-									new_tags.append(tag)
-								checked = True
-								break
-					except NameError:
-						pass
-			if checked is False:
-				new_tags.append(tag)
-		new_tags = [t for t in new_tags if t != '']
-		#print('-'.join(new_tags))
-		if is_lemma:
-			new_tags = [lemma] + new_tags
-		new_tags = '-'.join(new_tags).replace(';-','; ')
-		return new_tags
+        tags_lst = [t for t in re.split('[, -]', tag_str) if t != '']
+        if is_lemma:
+            lemma, tags_lst = tags_lst[0], tags_lst[1:]
+        for i in range(len(tags_lst)):
+            try:
+                tags_lst[i] = self.terms_dict[tags_lst[i]]['newID']
+            except KeyError:
+                pass
+
+        new_tags = ['' for t in range(6)]
+        # in fact this value in range should be replaced 
+        # with the actual maximum number of main tags for a particular category 
+
+        for tag in tags_lst:
+            checked = False
+            for options in self.dep_dict.keys():
+                if tag in options:
+                    if self.dep_dict[options]['ID'] == 'POS':
+                        pos = tag
+                        new_tags[0] = tag
+                        checked = True
+                        break
+                    try:
+                        dep_lst = self.dep_dict[options]['dep_lst']
+                        for dep in dep_lst:
+                            if pos in dep['tags']:
+                                try:
+                                    new_tags[dep['index']] = tag
+                                except IndexError:
+                                    new_tags.append(tag)
+                                checked = True
+                                break
+                    except NameError:
+                        pass
+            if checked is False:
+                new_tags.append(tag)
+        new_tags = [t for t in new_tags if t != '']
+        #print('-'.join(new_tags))
+        if is_lemma:
+            new_tags = [lemma] + new_tags
+        new_tags = '-'.join(new_tags).replace(';-','; ')
+        return new_tags
