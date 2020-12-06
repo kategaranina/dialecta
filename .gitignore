@@ -10,3 +10,6 @@ __pycache__
 trimco/secrets.json
 trimco/db.sqlite3
 trimco/data/media/*
+local_*
+tmp*
+.idea

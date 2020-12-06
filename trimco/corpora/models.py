@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from django.db import models
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import os, sndhdr
@@ -70,7 +69,7 @@ class Recording(models.Model):
     return '{}: {status}checked'.format(self.string_id, status='' if self.checked else 'not ')
 
   def participants(self):
-    from corpora.elan_tools import ElanObject
+    from corpora.utils.elan_tools import ElanObject
     if self.data.path:
       try:
         elan_obj = ElanObject(self.data.path)

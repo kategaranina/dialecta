@@ -1,17 +1,14 @@
 from django.contrib import admin
-from django import forms
 
 from django.db import transaction
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.template.context import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 
 from corpora.models import *
-from info.models import *
-from corpora.elan_tools import standartizator, elan_to_html
+from corpora.utils.elan_tools import standartizator, elan_to_html
 
 import json
-from django_ajax.decorators import ajax
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from reversion.admin import VersionAdmin

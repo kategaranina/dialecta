@@ -1,15 +1,10 @@
 import json, re, csv
 
-from morphology.models import *
 from corpora.models import *
-from corpora.elan_tools import ElanObject
-from info.models import *
+from corpora.utils.elan_tools import ElanObject
 
-from django_ajax.decorators import ajax
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
 
 
 @csrf_exempt

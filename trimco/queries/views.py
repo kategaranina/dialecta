@@ -1,10 +1,7 @@
 from django.template.context import RequestContext
 from django.shortcuts import render_to_response
 
-from morphology.models import *
-from info.models import *
-from corpora.models import *
-from corpora.elan_tools import *
+from corpora.utils.elan_tools import *
 
 a = annotation_menu_from_xml('grammemes_pymorphy2.xml')
 #print(a.terms_dict)

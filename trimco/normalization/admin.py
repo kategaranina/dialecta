@@ -1,11 +1,12 @@
 from django.contrib import admin
 from normalization.models import *
 from reversion.admin import VersionAdmin
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.db import transaction
 from django.shortcuts import render_to_response, get_object_or_404
-from corpora.elan_tools import elan_to_html, Standartizator
-from corpora.models import Recording
+from corpora.utils.elan_tools import elan_to_html, Standartizator
+
+
 #from django.template.context import RequestContext
 
 

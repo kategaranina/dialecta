@@ -12,6 +12,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from corpora.models import *
 from normalization.models import Model, Word
+from .misc import clean_transcription
 #import trimco.config as config
 
 #import enchant # replace with something installable (see occur. below)
@@ -813,7 +814,7 @@ class elan_to_html:
       tier_name = annot_data[3]
       tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
       if tier_obj.attributes['TIER_ID']!='comment':
-        start, end, transcript = annot_data[0], annot_data[1], self.clean_transcription(annot_data[2].strip())
+        start, end, transcript = annot_data[0], annot_data[1], clean_transcription(annot_data[2].strip())
         tier_names.append(tier_name)
         starts.append(start)
         ends.append(end)
@@ -847,11 +848,6 @@ class elan_to_html:
       if nrm_value_lst != []:
         self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
       #self.elan_obj.save()
-
-  def clean_transcription(self, transcription):
-    reg = re.compile('(\.\.\.|\?|\[|\]|\.|!|unint)')
-    reg_spaces = re.compile('\ +')
-    return(reg.sub('', transcription))
 
 
   def build_html(self):
