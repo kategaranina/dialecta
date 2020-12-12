@@ -5,7 +5,8 @@ from pympi import Eaf
 
 from .misc import (
     ANNOTATION_WORD_SEP, ANNOTATION_OPTION_SEP,
-    WORD_COLLECTION, clean_transcription
+    WORD_COLLECTION, STANDARTIZATION_COLLECTION,
+    clean_transcription
 )
 
 
@@ -33,32 +34,28 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
             std = standartization_num_regex.sub('', std)
             anns = annotation_filtering_regex.sub('', anns)
             anns = anns.split(ANNOTATION_OPTION_SEP)
+
+            words['words'][word].add(std)
             for ann in anns:
-                words[word][std].add(ann)
+                words['standartizations'][std].append(ann)
 
     return words
 
 
 def reformat_words_for_db(words):
-    new_words = [
-        {
-            'word': word,
-            'standartization': [
-                {
-                    'word': standartization,
-                    'annotation': list(annotation)
-                }
-                for standartization, annotation in word_info.items()
-            ]
-        }
-        for word, word_info in words.items()
-    ]
+    new_words = {
+        'words': [{'word': k, 'standartizations': list(v)} for k, v in words['words'].items()],
+        'standartizations': [{'word': k, 'annotations': v} for k, v in words['standartizations'].items()],
+    }
     return new_words
 
 
 def process_one_elan(eaf_filename):
     eaf_obj = Eaf(eaf_filename)
-    words = defaultdict(lambda: defaultdict(set))
+    words = {
+        'words': defaultdict(set),
+        'standartizations': defaultdict(list)
+    }
 
     for tier_name, tier in eaf_obj.tiers.items():
         standartization_tier_name = standartization_regex.search(tier_name)
@@ -76,26 +73,23 @@ def process_one_elan(eaf_filename):
 
 
 def insert_words_in_mongo(words):
-    for word_info in words:
-        word_in_db = WORD_COLLECTION.find_one({'word': word_info['word']}, {'_id': 1})
-        if word_in_db is None:
-            WORD_COLLECTION.insert_one(word_info)
-            continue
+    for word_info in words['words']:
+        WORD_COLLECTION.find_one_and_update(
+            {'word': word_info['word']},
+            {'$addToSet': {'standartizations': {'$each': word_info['standartizations']}}},
+            upsert=True
+        )
 
-        word_id = word_in_db['_id']
-        for standartization in word_info['standartization']:
-            standartization_in_word = WORD_COLLECTION.find_one({
-                '_id': word_id,
-                'standartization.word': standartization['word']
-            })
-            if standartization_in_word is None:
-                WORD_COLLECTION.update_one(
-                    {'_id': word_id},
-                    {'$push': {'standartization': standartization}}
-                )
-                continue
+    for st_info in words['standartizations']:
+        STANDARTIZATION_COLLECTION.find_one_and_update(
+            {'word': st_info['word']},
+            {'$push': {'annotations': {'$each': st_info['annotations']}}},
+            upsert=True
+        )
 
-            WORD_COLLECTION.update_one(
-                {'_id': word_id, 'standartization.word': standartization['word']},
-                {'$addToSet': {'standartization.$.annotation': {'$each': standartization['annotation']}}}
-            )
+def find_word(word):
+    return WORD_COLLECTION.find_one({'word': word})
+
+
+def find_standartization(word):
+    return STANDARTIZATION_COLLECTION.find_one({'word': word})

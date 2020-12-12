@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pymorphy2, re, codecs, os, sys, json, difflib
-from collections import defaultdict
+from collections import defaultdict, Counter
 from pympi import Eaf, Elan
 from lxml import etree
 from urllib.request import urlopen, URLError
@@ -13,6 +13,7 @@ from django.conf.urls.static import static
 from corpora.models import *
 from normalization.models import Model, Word
 from .misc import clean_transcription
+from .word_list import find_word, find_standartization
 #import trimco.config as config
 
 #import enchant # replace with something installable (see occur. below)
@@ -517,133 +518,175 @@ def pack_tags_to_dict(tags_lst, p):
         if getattr(p.tag, tag)!=None:
             tags_dict[tag] = getattr(p.tag, tag)
 '''
-class Standartizator(): #takes model's name
 
-  def __init__(self, dialect=''): 
 
-    self.dialect = dialect
-    self.model = Model.objects.get(to_dialect = self.dialect)  #gets appropriate model by dialect's name
-                                                               #this corresponds to the name of model's directory inside csmtiser
-    self.manual_words = defaultdict(list)
-    for x in Word.objects.filter(to_model = self.model):
-        self.manual_words[x.transcription].append([x.normalization, x.lemma, x.annotation, 1])
-    self.path = settings.NORMALIZER_PATH #specified in the last line of trimco.settings.py
-    self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
-    self.morph_rus = pymorphy2.MorphAnalyzer() #this should be replaced by some context-dependent analyser, i.e. mystem
+class Standartizator: # takes model's name
+    def __init__(self, dialect=''): 
 
-  def correct_reflexive(self,norm):
-      vowels = set('аеёиоуыэюя')
-      if len(norm) > 2 and norm[-3] in vowels:
-          if len(norm) > 3 and norm[-4] not in vowels: # participles
-              new_norm = norm[:-1]+'ь'
-              ann = self.morph_rus.parse(new_norm)[0]
-              ann_methods  ={str(x[0]) for x in ann.methods_stack}
-              if ann.tag.POS == 'VERB' or ann_methods != {'<DictionaryAnalyzer>'}:
-                return new_norm
-      return norm    
+        self.dialect = dialect
+        self.model = Model.objects.get(to_dialect = self.dialect)    # gets appropriate model by dialect's name
+                                                                     # this corresponds to the name of model's directory inside csmtiser
+        self.manual_words = defaultdict(list)
+        for x in Word.objects.filter(to_model = self.model):
+            self.manual_words[x.transcription].append([x.normalization, x.lemma, x.annotation, 1])
+
+        self.path = settings.NORMALIZER_PATH  # specified in the last line of trimco.settings.py
+        self.annotation_menu = annotation_menu_from_xml("grammemes_pymorphy2.xml")
+        self.morph_rus = pymorphy2.MorphAnalyzer()  # this should be replaced by some context-dependent analyser, i.e. mystem
+
+    def correct_reflexive(self, norm):
+        vowels = set('аеёиоуыэюя')
+        if len(norm) > 2 and norm[-3] in vowels:
+            if len(norm) > 3 and norm[-4] not in vowels: # participles
+                new_norm = norm[:-1]+'ь'
+                ann = self.morph_rus.parse(new_norm)[0]
+                ann_methods = {str(x[0]) for x in ann.methods_stack}
+                if ann.tag.POS == 'VERB' or ann_methods != {'<DictionaryAnalyzer>'}:
+                    return new_norm
+        return norm
   
-  def get_annotation(self, text): 
+    def get_annotation(self, text):
+        annotations = []
+        nrm_list = self.normalize(text)
+        for nrm in nrm_list:
+            annotation = []
+            for word in nrm:
+                annotation.append((word[1], self.get_annotation_options_list(word))) #we take only first (=most likely) variant UPD: not anymore
+            annotations.append(annotation) 
+        return annotations
 
-    annotations = []
-    nrm_list = self.normalize(text)
-    for nrm in nrm_list:
-      annotation = []
-      for word in nrm:
-          annotation.append((word[1],self.get_annotation_options_list(word))) #we take only first (=most likely) variant UPD: not anymore
-      annotations.append(annotation) 
-    return(annotations)
+    def normalize(self, text_to_normalize):  # clauses are separated by '\n\n', words inside clause are separeted by '\n'
+        with open(os.path.join(settings.BASE_DIR, 'tmp'), 'w', encoding='utf-8') as f:
+            f.write(text_to_normalize)
+        #os.system('echo ' + token + '> token.tmp')
+        #print(model)
+        os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'tmp') + ' ' + str(self.model))
+        #os.system('cat tmp.norm')
 
-  def normalize(self, text_to_normalize): #clauses are separated by '\n\n', words inside clause are separeted by '\n'
+        try:
+            clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm'), encoding='utf-8').read().split('\n\n')
+            lines = [clause.split('\n') for clause in clauses if clause]
+            # an element of lines looks like:
+            # ['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
 
-    with open(os.path.join(settings.BASE_DIR, 'tmp'), 'w', encoding='utf-8') as f:
-      f.write(text_to_normalize)
-    #os.system('echo ' + token + '> token.tmp')
-    #print(model)
-    os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'tmp') + ' ' + str(self.model))
-    #os.system('cat tmp.norm')
-    try:
-      clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm'), encoding='utf-8').read().split('\n\n')
-      lines = [clause.split('\n') for clause in clauses if clause]
-      #an element of lines looks like:
-      #['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
-      normalization_list = []
-      for line in lines:
-        words = []
-        for word in line:
-          pair = word.split('\t')
-          if pair[0].lower() in self.manual_words:
-            pair[1] = self.manual_words[pair[0].lower()][0][0].lower()
-          elif pair[1].lower().endswith('ся'):
-            pair[1] = self.correct_reflexive(pair[1].lower())
-          else:
-            pair[1] = pair[1].lower()
-          words.append(pair)
-        normalization_list.append(words)
-      #normalization = ' '.join([line.split('\t')[1].lower() for line in output if line])
-      #normalization_list = [word.split('\t')[1].lower() for word in words if word]
-      #os.system('rm tmp.*')
-      #normalization = self.generate_dict_for_translit_token(token)[0][0]
-      #print(len(normalization_list))
-      return (normalization_list) #returns a list of lists 
-    except IndexError:
-      return None  
+            normalization_list = []
+            for line in lines:
+                words = []
+                for word in line:
+                    orig, standartization = word.split('\t')
+                    manual_standartization = self.manual_words.get(orig.lower())
+                    saved_word = find_word(orig)
 
-  def get_annotation_options_list(self, token): #this function is taken from the old version of standartizator (above)
-    
-    result_lst = []
-    if token[0].lower() in self.manual_words:
-        variants = self.manual_words[token[0].lower()]
-        for corr in variants:
-            if corr[0] == token[1]:
-                annots = corr[2].split(';')
-                for annot in annots:
-                    result_lst.append([corr[1],annot.strip(),1])
-                break
-    else:
-        for annot in self.morph_rus.parse(token[1]):
-            if annot.score > 0.001:
-                methods = {str(x[0]) for x in annot.methods_stack}
-                tag = self.annotation_menu.override_abbreviations(str(annot.tag))
-                if self.model.name == 'be' and (token[0].endswith('ṷšy') or token[0].endswith('ṷši')) and tag.startswith('GER-'):
-                    tag = 'ANTP-' + tag[4:]
-                if methods != {'<DictionaryAnalyzer>'}: #pymorphy2 specific
-                    result_lst.append(['(unkn)_'+annot.normal_form, tag, annot.score])
-                else:
-                    result_lst.append([annot.normal_form, tag, annot.score])
-    return result_lst
+                    if manual_standartization is not None:
+                        standartization = manual_standartization[0][0]
 
-  def make_backup(self): #creates backups of .norm and .orig files (needed to train the model)
-                         # files should has the same name as the model !!
-                         # e.g.: rus.norm and rus.orig for rus model
-    self.orig = '{}.orig'.format(self.model)
-    self.norm = '{}.norm'.format(self.model)
-    self.path_to_model = self.path + str(self.model) #the full path = path_to_normalizer + model_name
+                    elif saved_word is not None:
+                        standartization = saved_word['standartizations'][0]  # TODO: multiple standartizations
 
-    import datetime
-    now = datetime.datetime.now()
-    cur = now.strftime("%Y-%m-%d_%H%M")
-    new_orig = '{}_{}'.format(self.orig, cur)
-    new_norm = '{}_{}'.format(self.norm, cur)
+                    elif standartization.lower().endswith('ся'):
+                        standartization = self.correct_reflexive(standartization.lower())
 
-    os.system('mkdir -p {}/backups'.format(self.path_to_model))
-    os.system('cp {0}/{1} {0}/backups/{2}'.format(self.path_to_model, self.orig, new_orig))
-    os.system('cp {0}/{1} {0}/backups/{2}'.format(self.path_to_model, self.norm, new_norm))
+                    words.append((orig, standartization.lower()))
 
-  def rewrite_files(self, examples): #creates new .orig and .norm files for training (rewrites them with examples from annotated elans)
-                                     # examples is a list of pairs: ('transcription', 'normalization')
-    
-    trns = '\n'.join([example[0].strip() for example in examples])
-    nrms = '\n'.join([example[1].strip() for example in examples])
+                normalization_list.append(words)
+            #normalization = ' '.join([line.split('\t')[1].lower() for line in output if line])
+            #normalization_list = [word.split('\t')[1].lower() for word in words if word]
+            #os.system('rm tmp.*')
+            #normalization = self.generate_dict_for_translit_token(token)[0][0]
+            #print(len(normalization_list))
+            return normalization_list  # returns a list of lists
 
-    with open('{}/{}'.format(self.path_to_model, self.orig), 'w', encoding='utf-8') as orig:
-      orig.write(trns)
-    with open('{}/{}'.format(self.path_to_model, self.norm), 'w', encoding='utf-8') as norm:
-      norm.write(nrms)
+        except IndexError:
+            return
 
-  def retrain_model(self):
+    @staticmethod
+    def get_annotation_options_list_from_manual_words(standartization, manual_corr):
+        for corr in manual_corr:
+            correct_standartization, lemma, tags, transl = corr
+            if correct_standartization == standartization:
+                result_list = [[lemma, annot.strip(), 1] for annot in tags.split(';')]
+                return result_list
+        return []
 
-    os.system('python2 ' + self.path + 'preprocess.py ' + str(self.model))
-    os.system('python2 ' + self.path + 'train.py ' + str(self.model))
+    @staticmethod
+    def get_annotaton_options_list_from_db(annots_from_db):
+        total_anns = len(annots_from_db)
+        unique_anns = Counter(annots_from_db)
+        result_list = []
+
+        for full_tag, count in unique_anns.most_common():
+            lemma, tag = full_tag.split('-', 1)
+            score = count / total_anns
+            result_list.append([lemma, tag, score])
+
+        return result_list
+
+    def get_annotation_options_list_by_parsing(self, orig, standartization):
+        result_list = []
+
+        for annot in self.morph_rus.parse(standartization):
+            if annot.score <= 0.001:
+                continue
+
+            tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+
+            # TODO: move somewhere
+            if self.model.name == 'be' and (orig.endswith('ṷšy') or orig.endswith('ṷši')) and tag.startswith('GER-'):
+                tag = 'ANTP-' + tag[4:]
+
+            # pymorphy2 specific
+            methods = {str(x[0]) for x in annot.methods_stack}
+            lemma = annot.normal_form if methods == {'<DictionaryAnalyzer>'} else '(unkn)_' + annot.normal_form
+
+            result_list.append([lemma, tag, annot.score])
+
+        return result_list
+
+    def get_annotation_options_list(self, token):  # this function is taken from the old version of standartizator (above)
+        orig, standartization = token
+
+        manual_corr = self.manual_words.get(orig.lower())
+        if manual_corr is not None:
+            return self.get_annotation_options_list_from_manual_words(standartization, manual_corr)
+
+        standartization_from_db = find_standartization(standartization)
+        if standartization_from_db is not None:
+            return self.get_annotaton_options_list_from_db(standartization_from_db['annotations'])
+
+        return self.get_annotation_options_list_by_parsing(orig, standartization)
+
+    def make_backup(self): #creates backups of .norm and .orig files (needed to train the model)
+                           # files should has the same name as the model !!
+                           # e.g.: rus.norm and rus.orig for rus model
+        self.orig = '{}.orig'.format(self.model)
+        self.norm = '{}.norm'.format(self.model)
+        self.path_to_model = self.path + str(self.model) #the full path = path_to_normalizer + model_name
+
+        import datetime
+        now = datetime.datetime.now()
+        cur = now.strftime("%Y-%m-%d_%H%M")
+        new_orig = '{}_{}'.format(self.orig, cur)
+        new_norm = '{}_{}'.format(self.norm, cur)
+
+        os.system('mkdir -p {}/backups'.format(self.path_to_model))
+        os.system('cp {0}/{1} {0}/backups/{2}'.format(self.path_to_model, self.orig, new_orig))
+        os.system('cp {0}/{1} {0}/backups/{2}'.format(self.path_to_model, self.norm, new_norm))
+
+    def rewrite_files(self, examples): #creates new .orig and .norm files for training (rewrites them with examples from annotated elans)
+                                                                         # examples is a list of pairs: ('transcription', 'normalization')
+        
+        trns = '\n'.join([example[0].strip() for example in examples])
+        nrms = '\n'.join([example[1].strip() for example in examples])
+
+        with open('{}/{}'.format(self.path_to_model, self.orig), 'w', encoding='utf-8') as orig:
+            orig.write(trns)
+        with open('{}/{}'.format(self.path_to_model, self.norm), 'w', encoding='utf-8') as norm:
+            norm.write(nrms)
+
+    def retrain_model(self):
+
+        os.system('python2 ' + self.path + 'preprocess.py ' + str(self.model))
+        os.system('python2 ' + self.path + 'train.py ' + str(self.model))
 
 
 
@@ -813,7 +856,7 @@ class elan_to_html:
     for annot_data in self.elan_obj.annot_data_lst:
       tier_name = annot_data[3]
       tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
-      if tier_obj.attributes['TIER_ID']!='comment':
+      if tier_obj.attributes['TIER_ID'] != 'comment':
         start, end, transcript = annot_data[0], annot_data[1], clean_transcription(annot_data[2].strip())
         tier_names.append(tier_name)
         starts.append(start)
