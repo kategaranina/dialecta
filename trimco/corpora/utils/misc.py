@@ -8,6 +8,7 @@ from trimco.settings import MONGO_URL, MONGO_DB_NAME
 MONGO_CLIENT = pymongo.MongoClient(MONGO_URL)
 MONGO_DB = MONGO_CLIENT[MONGO_DB_NAME]
 WORD_COLLECTION = MONGO_DB['words']
+WORD_COLLECTION.create_index('word')
 
 ANNOTATION_WORD_SEP = '|'
 ANNOTATION_OPTION_SEP = '/'
