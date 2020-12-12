@@ -1,5 +1,5 @@
 import re
-from collections import defaultdict, Counter
+from collections import defaultdict
 
 from pympi import Eaf
 
@@ -34,7 +34,7 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
             anns = annotation_filtering_regex.sub('', anns)
             anns = anns.split(ANNOTATION_OPTION_SEP)
             for ann in anns:
-                words[word][std].append(ann)
+                words[word][std].add(ann)
 
     return words
 
@@ -46,13 +46,7 @@ def reformat_words_for_db(words):
             'standartization': [
                 {
                     'word': standartization,
-                    'annotations': [
-                        {
-                            'annotation': k,
-                            'freq': v
-                        }
-                        for k, v in Counter(annotation).items()
-                    ]
+                    'annotation': list(annotation)
                 }
                 for standartization, annotation in word_info.items()
             ]
@@ -64,7 +58,7 @@ def reformat_words_for_db(words):
 
 def process_one_elan(eaf_filename):
     eaf_obj = Eaf(eaf_filename)
-    words = defaultdict(lambda: defaultdict(list))
+    words = defaultdict(lambda: defaultdict(set))
 
     for tier_name, tier in eaf_obj.tiers.items():
         standartization_tier_name = standartization_regex.search(tier_name)
@@ -81,40 +75,6 @@ def process_one_elan(eaf_filename):
     return reformat_words_for_db(words)
 
 
-def insert_one_annotation(word_id, standartization, annotation):
-    annotation_in_word = WORD_COLLECTION.find_one_and_update(
-        {
-            '_id': word_id,
-            'standartization.word': standartization['word'],
-            'standartization.annotations.annotation': annotation['annotation']
-        },
-        {'$inc': {'standartization.$.annotations.$.freq': annotation['freq']}}
-    )
-    if annotation_in_word is None:
-        WORD_COLLECTION.update_one(
-            {'_id': word_id, 'standartization.word': standartization['word']},
-            {'$push': {'standartization.$.annotations': annotation}}
-        )
-        return
-
-
-def insert_one_standartization(word_id, standartization):
-    standartization_in_word = WORD_COLLECTION.find_one({
-        '_id': word_id,
-        'standartization.word': standartization['word']
-    })
-    if standartization_in_word is None:
-        WORD_COLLECTION.update_one(
-            {'_id': word_id},
-            {'$push': {'standartization': standartization}}
-        )
-        return
-
-    annotations = standartization['annotations']
-    for annotation in annotations:
-        insert_one_annotation(word_id, standartization, annotation)
-
-
 def insert_words_in_mongo(words):
     for word_info in words:
         word_in_db = WORD_COLLECTION.find_one({'word': word_info['word']}, {'_id': 1})
@@ -124,4 +84,18 @@ def insert_words_in_mongo(words):
 
         word_id = word_in_db['_id']
         for standartization in word_info['standartization']:
-            insert_one_standartization(word_id, standartization)
+            standartization_in_word = WORD_COLLECTION.find_one({
+                '_id': word_id,
+                'standartization.word': standartization['word']
+            })
+            if standartization_in_word is None:
+                WORD_COLLECTION.update_one(
+                    {'_id': word_id},
+                    {'$push': {'standartization': standartization}}
+                )
+                continue
+
+            WORD_COLLECTION.update_one(
+                {'_id': word_id, 'standartization.word': standartization['word']},
+                {'$addToSet': {'standartization.$.annotation': {'$each': standartization['annotation']}}}
+            )
