@@ -35,7 +35,7 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
             anns = annotation_filtering_regex.sub('', anns)
             anns = anns.split(ANNOTATION_OPTION_SEP)
 
-            words['words'][word].add(std)
+            words['words'][word].append(std)
             for ann in anns:
                 words['standartizations'][std].append(ann)
 
@@ -53,7 +53,7 @@ def reformat_words_for_db(words):
 def process_one_elan(eaf_filename):
     eaf_obj = Eaf(eaf_filename)
     words = {
-        'words': defaultdict(set),
+        'words': defaultdict(list),
         'standartizations': defaultdict(list)
     }
 
@@ -75,7 +75,7 @@ def process_one_elan(eaf_filename):
 def insert_one_word_in_mongo(word, standartizations):
     WORD_COLLECTION.find_one_and_update(
         {'word': word},
-        {'$addToSet': {'standartizations': {'$each': standartizations}}},
+        {'$push': {'standartizations': {'$each': standartizations}}},
         upsert=True
     )
 

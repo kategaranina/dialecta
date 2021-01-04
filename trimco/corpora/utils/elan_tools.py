@@ -553,7 +553,10 @@ class Standartizator: # takes model's name
 
         saved_word = find_word(orig)
         if saved_word is not None:
-            return saved_word['standartizations']
+            standartization_counts = Counter(saved_word['standartizations'])
+            print(standartization_counts)
+            standartizations_by_freq = [s[0] for s in standartization_counts.most_common()]
+            return standartizations_by_freq
 
     def get_auto_standartization(self, word):
         orig, standartization = word.split('\t')
