@@ -554,7 +554,6 @@ class Standartizator: # takes model's name
         saved_word = find_word(orig)
         if saved_word is not None:
             standartization_counts = Counter(saved_word['standartizations'])
-            print(standartization_counts)
             standartizations_by_freq = [s[0] for s in standartization_counts.most_common()]
             return standartizations_by_freq
 
