@@ -473,11 +473,17 @@
 		
 		$('#add_annotation').click(function(e) {
 			/* confirming chosen annotation */
-			var norm_tag = $('<nrm>'+$('[title="Form"]').val()+'</nrm>');
-            var lemma_full_tag = $('<lemma_full style="display:none">'+$('[title="Lemma"]').val()+'</lemma_full>');
-			var lemma_tag = $('<lemma>'+$('[title="Lemma"]').val()+'</lemma>');
-            var morph_full_tag = $('<morph_full style="display:none">'+$('[title="Lemma"]').val()+'-'+annot_to_str()+'</morph_full>');
-			var morph_tag = $('<morph>'+annot_to_str()+'</morph></info>');			
+			var norm = $('[title="Form"]').val();
+			var lemma = $('[title="Lemma"]').val();
+			var morph = annot_to_str();
+
+			var norm_tag = $('<nrm>' + norm + '</nrm>');
+            var lemma_full_tag = $('<lemma_full style="display:none">' + lemma + '</lemma_full>');
+			var lemma_tag = $('<lemma>' + lemma + '</lemma>');
+            var morph_full_tag = $('<morph_full style="display:none">' + lemma + '-' + morph + '</morph_full>');
+			var morph_tag = $('<morph>' + morph + '</morph></info>');
+
+			ajax_request('save_annotation', {'trt': $('#examined_transcript').text(), 'nrm': norm, 'lemma': lemma, 'annot': morph});
 			set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
 		});
 	});

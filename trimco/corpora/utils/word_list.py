@@ -72,20 +72,36 @@ def process_one_elan(eaf_filename):
     return reformat_words_for_db(words)
 
 
+def insert_one_word_in_mongo(word, standartizations):
+    WORD_COLLECTION.find_one_and_update(
+        {'word': word},
+        {'$addToSet': {'standartizations': {'$each': standartizations}}},
+        upsert=True
+    )
+
+
+def insert_one_standartization_in_mongo(standartization, annotations):
+    STANDARTIZATION_COLLECTION.find_one_and_update(
+        {'word': standartization},
+        {'$push': {'annotations': {'$each': annotations}}},
+        upsert=True
+    )
+
+
 def insert_words_in_mongo(words):
     for word_info in words['words']:
-        WORD_COLLECTION.find_one_and_update(
-            {'word': word_info['word']},
-            {'$addToSet': {'standartizations': {'$each': word_info['standartizations']}}},
-            upsert=True
-        )
+        insert_one_word_in_mongo(word_info['word'], word_info['standartizations'])
 
     for st_info in words['standartizations']:
-        STANDARTIZATION_COLLECTION.find_one_and_update(
-            {'word': st_info['word']},
-            {'$push': {'annotations': {'$each': st_info['annotations']}}},
-            upsert=True
-        )
+        insert_one_standartization_in_mongo(st_info['word'], st_info['annotations'])
+
+
+def insert_manual_annotation_in_mongo(word, standartization, lemma, grammar):
+    standartization = standartization.lower()
+    annotation = lemma.lower() + '-' + grammar
+    insert_one_word_in_mongo(word.lower(), [standartization])
+    insert_one_standartization_in_mongo(standartization, [annotation])
+
 
 def find_word(word):
     return WORD_COLLECTION.find_one({'word': word})
