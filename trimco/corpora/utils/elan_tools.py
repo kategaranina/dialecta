@@ -544,24 +544,33 @@ class Standartizator: # takes model's name
                 if ann.tag.POS == 'VERB' or ann_methods != {'<DictionaryAnalyzer>'}:
                     return new_norm
         return norm
-  
-    def get_annotation(self, text):
-        annotations = []
-        nrm_list = self.normalize(text)
-        for nrm in nrm_list:
-            annotation = []
-            for word in nrm:
-                annotation.append((word[1], self.get_annotation_options_list(word))) #we take only first (=most likely) variant UPD: not anymore
-            annotations.append(annotation) 
-        return annotations
+
+    def get_manual_standartizations(self, orig):
+        orig = orig.lower()
+        manual_standartization = self.manual_words.get(orig)
+        if manual_standartization is not None:
+            return [manual_standartization[0][0]]
+
+        saved_word = find_word(orig)
+        if saved_word is not None:
+            return saved_word['standartizations']
+
+    def get_auto_standartization(self, word):
+        orig, standartization = word.split('\t')
+        manual_standartizations = self.get_manual_standartizations(orig)
+        if manual_standartizations is not None:
+            standartization = manual_standartizations[0]
+
+        elif standartization.lower().endswith('ся'):
+            standartization = self.correct_reflexive(standartization.lower())
+
+        return orig, standartization.lower()
 
     def normalize(self, text_to_normalize):  # clauses are separated by '\n\n', words inside clause are separeted by '\n'
         with open(os.path.join(settings.BASE_DIR, 'tmp'), 'w', encoding='utf-8') as f:
             f.write(text_to_normalize)
-        #os.system('echo ' + token + '> token.tmp')
-        #print(model)
+
         os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'tmp') + ' ' + str(self.model))
-        #os.system('cat tmp.norm')
 
         try:
             clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm'), encoding='utf-8').read().split('\n\n')
@@ -571,29 +580,9 @@ class Standartizator: # takes model's name
 
             normalization_list = []
             for line in lines:
-                words = []
-                for word in line:
-                    orig, standartization = word.split('\t')
-                    manual_standartization = self.manual_words.get(orig.lower())
-                    saved_word = find_word(orig)
-
-                    if manual_standartization is not None:
-                        standartization = manual_standartization[0][0]
-
-                    elif saved_word is not None:
-                        standartization = saved_word['standartizations'][0]  # TODO: multiple standartizations
-
-                    elif standartization.lower().endswith('ся'):
-                        standartization = self.correct_reflexive(standartization.lower())
-
-                    words.append((orig, standartization.lower()))
-
+                words = [self.get_auto_standartization(word) for word in line]
                 normalization_list.append(words)
-            #normalization = ' '.join([line.split('\t')[1].lower() for line in output if line])
-            #normalization_list = [word.split('\t')[1].lower() for word in words if word]
-            #os.system('rm tmp.*')
-            #normalization = self.generate_dict_for_translit_token(token)[0][0]
-            #print(len(normalization_list))
+
             return normalization_list  # returns a list of lists
 
         except IndexError:
@@ -654,6 +643,16 @@ class Standartizator: # takes model's name
             return self.get_annotaton_options_list_from_db(standartization_from_db['annotations'])
 
         return self.get_annotation_options_list_by_parsing(orig, standartization)
+
+    def get_annotation(self, text):
+        annotations = []
+        nrm_list = self.normalize(text)
+        for nrm in nrm_list:
+            annotation = []
+            for word in nrm:
+                annotation.append((word[1], self.get_annotation_options_list(word))) #we take only first (=most likely) variant UPD: not anymore
+            annotations.append(annotation)
+        return annotations
 
     def make_backup(self): #creates backups of .norm and .orig files (needed to train the model)
                            # files should has the same name as the model !!
@@ -835,7 +834,7 @@ class elan_to_html:
     import datetime
     now = datetime.datetime.now()
     cur = now.strftime("%Y-%m-%d_%H%M")
-    new_file =  '{}_backup_{}.eaf'.format(str(self.path).split('/')[-1][:-4], cur)
+    new_file = '{}_backup_{}.eaf'.format(str(self.path).split('/')[-1][:-4], cur)
     os.system('mkdir -p {}/backups'.format(settings.MEDIA_ROOT))
     os.system('cp {} {}/backups/{}'.format(self.path, settings.MEDIA_ROOT, new_file))
 

@@ -6,7 +6,7 @@ from django.template.context import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 
 from corpora.models import *
-from corpora.utils.elan_tools import standartizator, elan_to_html
+from corpora.utils.elan_tools import standartizator, Standartizator, elan_to_html
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
 
 import json
@@ -80,8 +80,7 @@ class RecordingAdmin(VersionAdmin):
         self.elan_converter.build_page()
 
         # print(self.recording_obj.model_to_normalize)
-        # self.annotation = Standartizator(self.recording_obj.model_to_normalize)
-        
+        self.new_standartizator = Standartizator(self.recording_obj.to_dialect)
         self.standartizator = standartizator(self.recording_obj.to_dialect)
         self.standartizator.start_standartizator()
 
@@ -146,15 +145,15 @@ class RecordingAdmin(VersionAdmin):
 
         elif request.POST['request_type'] == 'trt_annot_req':
             if request.POST['request_data[mode]'] == 'manual':
-                manual_words = self.standartizator.manual_words.get(request.POST['request_data[trt]'].lower(), [])
-                response['result'] = [x[0] for x in manual_words] or [request.POST['request_data[nrm]']]
+                manual_words = self.new_standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
+                response['result'] = manual_words or [request.POST['request_data[nrm]']]
 
-            elif request.POST['request_data[mode]'] == 'auto':
+            elif request.POST['request_data[mode]'] == 'auto':  # TODO: move this to new standartizator
                 response['result'] = self.standartizator.auto_annotation(request.POST['request_data[trt]'])
 
         elif request.POST['request_type'] == 'annot_suggest_req':
             ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
-            response['result'] = self.standartizator.get_annotation_options_list(ann)
+            response['result'] = self.new_standartizator.get_annotation_options_list(ann)
 
         elif request.POST['request_type'] == 'save_elan_req':
             self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])
