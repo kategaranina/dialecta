@@ -48,14 +48,14 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
         for i, word in enumerate(clean_transcription(orig).split()):
             std = standartizations.get(i)
             if std is None:
-                print(eaf_filename, 'no std for word ' + str(i), orig, standartization, '', sep='\n')
+                print('WARNING: ' + eaf_filename, 'no std for word ' + str(i), orig, standartization, '', sep='\n')
                 continue
 
             words['words'][word].append(std)
 
             anns = annotations.get(i)
             if anns is None:
-                print(eaf_filename, 'no ann for word ' + str(i), orig, annotation, '', sep='\n')
+                print('WARNING: ' + eaf_filename, 'no ann for word ' + str(i), orig, annotation, '', sep='\n')
                 continue
 
             anns = anns.split(ANNOTATION_OPTION_SEP)
@@ -97,7 +97,7 @@ def process_one_elan(eaf_filename, model_name):
             standartization_tier = sorted(eaf_obj.get_annotation_data_for_tier(tier_name), key=lambda x: x[0])
             annotation_tier = sorted(eaf_obj.get_annotation_data_for_tier(speaker + '_annotation'), key=lambda x: x[0])
         except KeyError:
-            print('ERROR: no tier, ' + eaf_filename)  # TODO: write log or solve problem
+            print('ERROR: ' + eaf_filename + ': lacking tiers for ' + speaker)
             continue
 
         words = process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annotation_tier)
