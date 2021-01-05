@@ -65,15 +65,21 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
     return words
 
 
-def reformat_words_for_db(words):
+def reformat_words_for_db(words, model_name):
     new_words = {
-        'words': [{'word': k, 'standartizations': list(v)} for k, v in words['words'].items()],
-        'standartizations': [{'word': k, 'annotations': v} for k, v in words['standartizations'].items()],
+        'words': [
+            {'word': k, 'model': model_name, 'standartizations': list(v)}
+            for k, v in words['words'].items()
+        ],
+        'standartizations': [
+            {'word': k, 'model': model_name, 'annotations': v}
+            for k, v in words['standartizations'].items()
+        ]
     }
     return new_words
 
 
-def process_one_elan(eaf_filename):
+def process_one_elan(eaf_filename, model_name):
     eaf_obj = Eaf(eaf_filename)
     words = {
         'words': defaultdict(list),
@@ -96,20 +102,20 @@ def process_one_elan(eaf_filename):
 
         words = process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annotation_tier)
 
-    return reformat_words_for_db(words)
+    return reformat_words_for_db(words, model_name)
 
 
-def insert_one_word_in_mongo(word, standartizations):
+def insert_one_word_in_mongo(word, model, standartizations):
     WORD_COLLECTION.find_one_and_update(
-        {'word': word},
+        {'word': word, 'model': model},
         {'$push': {'standartizations': {'$each': standartizations}}},
         upsert=True
     )
 
 
-def insert_one_standartization_in_mongo(standartization, annotations):
+def insert_one_standartization_in_mongo(standartization, model, annotations):
     STANDARTIZATION_COLLECTION.find_one_and_update(
-        {'word': standartization},
+        {'word': standartization, 'model': model},
         {'$push': {'annotations': {'$each': annotations}}},
         upsert=True
     )
@@ -117,22 +123,30 @@ def insert_one_standartization_in_mongo(standartization, annotations):
 
 def insert_words_in_mongo(words):
     for word_info in words['words']:
-        insert_one_word_in_mongo(word_info['word'], word_info['standartizations'])
+        insert_one_word_in_mongo(
+            word_info['word'],
+            word_info['model'],
+            word_info['standartizations']
+        )
 
     for st_info in words['standartizations']:
-        insert_one_standartization_in_mongo(st_info['word'], st_info['annotations'])
+        insert_one_standartization_in_mongo(
+            st_info['word'],
+            st_info['model'],
+            st_info['annotations']
+        )
 
 
-def insert_manual_annotation_in_mongo(word, standartization, lemma, grammar):
+def insert_manual_annotation_in_mongo(model, word, standartization, lemma, grammar):
     standartization = standartization.lower()
     annotation = lemma.lower() + '-' + grammar
-    insert_one_word_in_mongo(word.lower(), [standartization])
-    insert_one_standartization_in_mongo(standartization, [annotation])
+    insert_one_word_in_mongo(word.lower(), model, [standartization])
+    insert_one_standartization_in_mongo(standartization, model, [annotation])
 
 
-def find_word(word):
-    return WORD_COLLECTION.find_one({'word': word})
+def find_word(word, model):
+    return WORD_COLLECTION.find_one({'word': word, 'model': model})
 
 
-def find_standartization(word):
-    return STANDARTIZATION_COLLECTION.find_one({'word': word})
+def find_standartization(word, model):
+    return STANDARTIZATION_COLLECTION.find_one({'word': word, 'model': model})

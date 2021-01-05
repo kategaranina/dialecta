@@ -160,6 +160,7 @@ class RecordingAdmin(VersionAdmin):
 
         elif request.POST['request_type'] == 'save_annotation':
             insert_manual_annotation_in_mongo(
+                model=str(self.new_standartizator.model),
                 word=request.POST['request_data[trt]'],
                 standartization=request.POST['request_data[nrm]'],
                 lemma=request.POST['request_data[lemma]'],

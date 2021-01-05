@@ -551,7 +551,7 @@ class Standartizator: # takes model's name
         if manual_standartization is not None:
             return [manual_standartization[0][0]]
 
-        saved_word = find_word(orig)
+        saved_word = find_word(orig, model=str(self.model))
         if saved_word is not None:
             standartization_counts = Counter(saved_word['standartizations'])
             standartizations_by_freq = [s[0] for s in standartization_counts.most_common()]
@@ -640,7 +640,7 @@ class Standartizator: # takes model's name
         if manual_corr is not None:
             return self.get_annotation_options_list_from_manual_words(standartization, manual_corr)
 
-        standartization_from_db = find_standartization(standartization)
+        standartization_from_db = find_standartization(standartization, model=str(self.model))
         if standartization_from_db is not None:
             return self.get_annotaton_options_list_from_db(standartization_from_db['annotations'])
 
