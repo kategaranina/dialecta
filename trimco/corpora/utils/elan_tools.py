@@ -280,7 +280,7 @@ class ElanToHTML:
     @staticmethod
     def prettify_transcript(transcript):
         if not transcript[-1].strip():
-            transcript.pop()
+            transcript = transcript[:-1]
 
         new_transcript = ''
         tokens_lst = re.split('([ ])', transcript)
@@ -324,14 +324,14 @@ class ElanToHTML:
                 continue
 
             if i in annot_tokens_dict.keys():
-                morph_tags_full = annot_tokens_dict[i][1].split('/')
+                raw_morph_tags_full = annot_tokens_dict[i][1].split('/')
                 morph_tags_full = '/'.join(
                     self.annotation_menu.override_abbreviations(x, is_lemma=True)
-                    for x in morph_tags_full
+                    for x in raw_morph_tags_full
                 )  # DB
                 tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
 
-                moprh_tags = morph_tags_full[0].split('-', 1)[1]
+                moprh_tags = raw_morph_tags_full[0].split('-', 1)[1]
                 morph_tags = self.annotation_menu.override_abbreviations(moprh_tags)  # DB
                 tag.insert(0, etree.fromstring('<morph>' + morph_tags + '</morph>'))
 

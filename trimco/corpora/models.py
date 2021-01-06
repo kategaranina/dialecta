@@ -7,7 +7,6 @@ from info.models import Location, Speaker, Interviewer
 from morphology.models import Dialect
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from corpora.utils.elan_tools import ElanObject
 
 
 class OverwriteStorage(FileSystemStorage):
@@ -58,6 +57,7 @@ class Recording(models.Model):
         return '{}: {status}checked'.format(self.string_id, status='' if self.checked else 'not ')
 
     def participants(self):
+        from corpora.utils.elan_tools import ElanObject  # TODO: tackle circular imports in another way
         if self.data.path:
             try:
                 elan_obj = ElanObject(self.data.path)
