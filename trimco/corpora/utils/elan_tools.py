@@ -1,9 +1,10 @@
 import datetime
 import re
+import os
 from pympi import Eaf, Elan
 from lxml import etree
-from decimal import *
-from corpora.models import *
+from decimal import Decimal
+from django.conf import settings
 from .misc import clean_transcription
 from .annotation_menu import AnnotationMenuFromXML
 from .standartizator import Standartizator

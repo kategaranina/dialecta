@@ -1,7 +1,8 @@
+import os
 import pymorphy2
 import datetime
 from collections import defaultdict, Counter
-from corpora.models import *
+from django.conf import settings
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
 from .annotation_menu import AnnotationMenuFromXML

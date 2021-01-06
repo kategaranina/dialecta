@@ -2,36 +2,42 @@ from django.contrib import admin
 from morphology.models import *
 from reversion.admin import VersionAdmin
 
+
 @admin.register(Language)
 class LanguageAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(Dialect)
 class DialectAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(Lemma)
 class LemmaAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(Form)
 class FormAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(TokenToForm)
 class TokenToFormAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(Token)
 class TokenAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(NormalizationModel)
 class NormalizationModelAdmin(VersionAdmin):
-  pass
+    pass
+
 
 @admin.register(GlossingRule)
 class GlossingRuleAdmin(VersionAdmin):
-  pass
-
-
+    pass

@@ -1,7 +1,8 @@
 import re
+import os
 import json
 from lxml import etree
-from corpora.models import *
+from django.conf import settings
 
 
 class AnnotationMenuFromXML:
@@ -13,7 +14,8 @@ class AnnotationMenuFromXML:
         lemma_input_str = '<div class="manualAnnotationContainer"><label id="lemma_input">Lemma</label><input class="manualAnnotation" id="lemma_input" title="Lemma"></div>'
         form_input_str = '<div class="manualAnnotationContainer"><label id="form_input">Form</label><input class="manualAnnotation" id="form_input" title="Form"></div>'
         self.menu_html_str_1 = '<form style="display: table;">%s%s%s</form>' % (
-        lemma_input_str, form_input_str, self.get_main_options())
+            lemma_input_str, form_input_str, self.get_main_options()
+        )
         self.menu_html_str_2 = '<form>%s</form>' % self.get_extending_options()
 
     def build_terms_dict(self):
