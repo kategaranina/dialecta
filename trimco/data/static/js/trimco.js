@@ -86,9 +86,9 @@
 		}
 	};
 	
-	function apply_auto_annotation(token, normalization, annotation) {
+	function apply_auto_annotation(normalization, annotation) {
 
-		console.log($.now(), token, normalization, annotation);
+		console.log($.now(), normalization, annotation);
 		
         var full_ann = annotation.map(x => x[0]+'-'+x[1]).join('/');
         var full_lemma = Array.from(new Set(annotation.map(x => x[0]))).join('/');
