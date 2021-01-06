@@ -1,10 +1,10 @@
 from django.template.context import RequestContext
 from django.shortcuts import render_to_response
 
-from corpora.utils.elan_tools import *
+from corpora.utils.annotation_menu import AnnotationMenuFromXML
+from corpora.models import *
 
-a = annotation_menu_from_xml('grammemes_pymorphy2.xml')
-#print(a.terms_dict)
+a = AnnotationMenuFromXML('grammemes_pymorphy2.xml')
 
 def queries(request):
   context = {'language': get_choices('language', [(l.name, l.pk) for l in Language.objects.all()]),
