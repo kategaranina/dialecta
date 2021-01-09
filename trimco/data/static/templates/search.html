@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls admin_static admin_modify %}
+
+<!--
+FIX BREADCRUMPS, SEE BASE.HTML:
+  <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+-->
+
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/trimco.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome-4.4.0/css/font-awesome.min.css' %}" />
+<script type="text/javascript" src="{% static 'js/howler/howler.min.js' %}" ></script> <!--AUDIO -->
+<script type="text/javascript" src="{% static 'js/trimco.js' %}" ></script>
+
+{{ media }}
+{% endblock %}
+
+{% block content %}
+
+{% include "annotation_menu.html" %}
+
+<div id="search_form">
+<form id="search" name="search">
+    <div id="search_col_1">
+        <div class="label">Dialect</div>
+        <select>
+            <option selected>Any</option>
+            {% for dialect in dialects %}
+            <option value="{{ dialect }}">{{ dialect }}</option>
+            {% endfor %}
+        </select>
+        <div class="label">Transcription</div><input name="transcription">
+        <div class="label">Standartization</div><input name="standartization">
+    </div>
+    <div id="search_col_2">
+        <div class="label">Lemma</div><input name="lemma">
+        <div class="label">Annotation tags</div><input name="annotations">
+        <button id="search_button">Search</button>
+    </div>
+</form>
+</div>
+
+{{ ctext|safe }}
+
+{% endblock %}

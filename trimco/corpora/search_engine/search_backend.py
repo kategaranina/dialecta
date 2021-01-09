@@ -1,8 +1,11 @@
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 
 
-def compile_query(transcription, standartization, lemma, annotation):
+def compile_query(dialect, transcription, standartization, lemma, annotation):
     query_parts = {}
+
+    if dialect:
+        query_parts['dialect'] = dialect
 
     if transcription:
         query_parts['transcription'] = transcription

@@ -4,7 +4,7 @@ import os
 from lxml import etree
 from decimal import Decimal
 from django.conf import settings
-from .annotation_menu import AnnotationMenuFromXML
+from .annotation_menu import annotation_menu
 from .standartizator import Standartizator
 from .elan_utils import ElanObject, clean_transcription
 
@@ -16,7 +16,6 @@ class ElanToHTML:
         self.audio_file_path = self.file_obj.audio.name
         self.path = self.file_obj.data.path
         self.format = _format
-        self.annotation_menu = AnnotationMenuFromXML("grammemes_pymorphy2.xml")
         self.mode = mode
         self.dialect = self.file_obj.to_dialect  # gets 'Dialect' field of recording
 
@@ -232,13 +231,13 @@ class ElanToHTML:
             if i in annot_tokens_dict.keys():
                 raw_morph_tags_full = annot_tokens_dict[i][1].split('/')
                 morph_tags_full = '/'.join(
-                    self.annotation_menu.override_abbreviations(x, is_lemma=True)
+                    annotation_menu.override_abbreviations(x, is_lemma=True)
                     for x in raw_morph_tags_full
                 )  # DB
                 tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
 
                 moprh_tags = raw_morph_tags_full[0].split('-', 1)[1]
-                morph_tags = self.annotation_menu.override_abbreviations(moprh_tags)  # DB
+                morph_tags = annotation_menu.override_abbreviations(moprh_tags)  # DB
                 tag.insert(0, etree.fromstring('<morph>' + morph_tags + '</morph>'))
 
                 lemma_full = annot_tokens_dict[i][0]
@@ -293,9 +292,3 @@ class ElanToHTML:
                 self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
 
         self.elan_obj.save()
-
-    def build_annotation_menu(self):
-        return [
-            self.annotation_menu.menu_html_str_1,
-            self.annotation_menu.menu_html_str_2
-        ]

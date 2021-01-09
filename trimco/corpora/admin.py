@@ -8,6 +8,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from corpora.models import *
 from corpora.utils.elan_to_html import ElanToHTML
 from corpora.utils.standartizator import Standartizator
+from corpora.utils.annotation_menu import annotation_menu
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
 
 import json
@@ -26,7 +27,7 @@ class RecordingAdmin(VersionAdmin):
     filter_horizontal = ('to_speakers', 'to_interviewers')
 
     editor_template = 'editor.html'
-    trainer_template = 'trainer.html'
+    search_template = 'search.html'
     fields = (
         'string_id',
         ('audio','data'),
@@ -69,6 +70,7 @@ class RecordingAdmin(VersionAdmin):
         my_urls = [
             url(r'\d+/edit/$', self.admin_site.admin_view(self.edit)),
             url(r'\d+/auto/$', self.admin_site.admin_view(self.auto_annotate)),
+            url(r'^search/$', self.admin_site.admin_view(self.search)),
             url(r'^ajax/$', self.ajax_dispatcher, name='ajax'),
         ]
         return my_urls + urls
@@ -78,7 +80,7 @@ class RecordingAdmin(VersionAdmin):
         self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
         self.elan_converter = ElanToHTML(self.recording_obj)
         self.elan_converter.build_page()
-        annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
+        annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
 
         self.standartizator = Standartizator(self.recording_obj.to_dialect)
 
@@ -86,10 +88,24 @@ class RecordingAdmin(VersionAdmin):
             'ctext': self.elan_converter.html,
             'audio_path': self.recording_obj.audio.name,
             'media': self.media['js'],
-            'annot_menu_select' : annot_menu_select,
-            'annot_menu_checkboxes' : annot_menu_checkboxes,
+            'annot_menu_select': annot_menu_select,
+            'annot_menu_checkboxes': annot_menu_checkboxes,
         }
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
+
+    @transaction.atomic
+    def search(self, request):
+        annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
+
+        context = {
+            'ctext': '',
+            'audio_path': '',
+            'media': self.media['js'],
+            'annot_menu_select': annot_menu_select,
+            'annot_menu_checkboxes': annot_menu_checkboxes,
+            'dialects': []
+        }
+        return render_to_response(self.search_template, context_instance=RequestContext(request, context))
 
     @transaction.atomic
     def auto_annotate(self, request):
@@ -97,7 +113,7 @@ class RecordingAdmin(VersionAdmin):
         self.elan_converter = ElanToHTML(self.recording_obj, mode='auto-annotation')
         self.elan_converter.build_page()
 
-        annot_menu_select, annot_menu_checkboxes = self.elan_converter.build_annotation_menu()
+        annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
         
         context = {
             'ctext': self.elan_converter.html,

@@ -152,3 +152,12 @@ class AnnotationMenuFromXML:
 
         new_tags = '-'.join(new_tags).replace(';-', '; ')
         return new_tags
+
+    def build_annotation_menu(self):
+        return [
+            self.menu_html_str_1,
+            self.menu_html_str_2
+        ]
+
+
+annotation_menu = AnnotationMenuFromXML("grammemes_pymorphy2.xml")

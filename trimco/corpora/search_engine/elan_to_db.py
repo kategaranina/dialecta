@@ -35,12 +35,13 @@ def process_one_annotation(orig, standartization, annotation):
     return words
 
 
-def process_one_tier(eaf_filename, audio_filename, speaker, orig_tier, standartization_tier, annotation_tier):
+def process_one_tier(eaf_filename, audio_filename, dialect, speaker, orig_tier, standartization_tier, annotation_tier):
     sentences = []
     tier_alignment = get_tier_alignment(orig_tier, standartization_tier, annotation_tier)
     for (start, end), (orig, standartization, annotation) in tier_alignment.items():
         sentence = {
             'words': process_one_annotation(orig, standartization, annotation),
+            'dialect': dialect,
             'elan': eaf_filename,
             'speaker': speaker,
             'audio': {
@@ -54,7 +55,7 @@ def process_one_tier(eaf_filename, audio_filename, speaker, orig_tier, standarti
     return sentences
 
 
-def process_one_elan(eaf_filename, audio_filename):
+def process_one_elan(eaf_filename, audio_filename, dialect):
     eaf_obj = Eaf(eaf_filename)
     sentences = []
 
@@ -73,7 +74,7 @@ def process_one_elan(eaf_filename, audio_filename):
             continue
 
         speaker = eaf_obj.tiers[speaker][2]['PARTICIPANT'].title()
-        tier_sentences = process_one_tier(eaf_filename, audio_filename, speaker, orig_tier, standartization_tier, annotation_tier)
+        tier_sentences = process_one_tier(eaf_filename, audio_filename, dialect, speaker, orig_tier, standartization_tier, annotation_tier)
         sentences.extend(tier_sentences)
 
     return sentences

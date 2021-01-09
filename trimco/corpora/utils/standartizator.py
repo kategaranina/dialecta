@@ -5,7 +5,7 @@ from collections import defaultdict, Counter
 from django.conf import settings
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
-from .annotation_menu import AnnotationMenuFromXML
+from .annotation_menu import annotation_menu
 
 
 class Standartizator:
@@ -21,7 +21,6 @@ class Standartizator:
             self.manual_words[x.transcription].append([x.normalization, x.lemma, x.annotation, 1])
 
         self.path = settings.NORMALIZER_PATH  # specified in the last line of trimco.settings.py
-        self.annotation_menu = AnnotationMenuFromXML("grammemes_pymorphy2.xml")
         self.morph_rus = pymorphy2.MorphAnalyzer()  # TODO: replace with some context-dependent analyser, i.e. mystem
 
     # TODO: move somewhere else
@@ -111,7 +110,7 @@ class Standartizator:
             if annot.score <= 0.001:
                 continue
 
-            tag = self.annotation_menu.override_abbreviations(str(annot.tag))
+            tag = annotation_menu.override_abbreviations(str(annot.tag))
 
             # TODO: move somewhere
             if self.model.name == 'be' and (orig.endswith('ṷšy') or orig.endswith('ṷši')) and tag.startswith('GER-'):

@@ -7,51 +7,17 @@ FIX BREADCRUMPS, SEE BASE.HTML:
 -->
 
 {% block extrahead %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static "css/trimco.css" %}" />
-<link rel="stylesheet" type="text/css" href="{% static "css/font-awesome-4.4.0/css/font-awesome.min.css" %}" />
-<!-- <script type="text/javascript" id="typo" src="{% static "js/Typo.js-master/typo/typo.js" %}" ></script> <!--SPELLCHECKER -->
-<script type="text/javascript" src="{% static "js/howler/howler.min.js" %}" ></script> <!--AUDIO -->
-<script type="text/javascript" src="{% static "js/trimco.js" %}" ></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/trimco.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome-4.4.0/css/font-awesome.min.css' %}" />
+<!-- <script type="text/javascript" id="typo" src="{% static 'js/Typo.js-master/typo/typo.js' %}" ></script> <!--SPELLCHECKER -->
+<script type="text/javascript" src="{% static 'js/howler/howler.min.js' %}" ></script> <!--AUDIO -->
+<script type="text/javascript" src="{% static 'js/trimco.js' %}" ></script>
 
 {{ media }}
 {% endblock %}
-{% block content %}
 
-<div id="workbench" class="wb_reduced">
-<div id='workbench_title'>workbench</div>
-<div id="wb_col_1">
-	<div id='examined_token'>
-		 <button id="merge_left" class="fa fa-caret-left"></button>
-		 <span id='examined_transcript'></span>
-		 <button id="merge_right" class="fa fa-caret-right"></button>
-	</div>
-	<div id='normalization_controls'>
-		<input id="normalization_input" title="">
-		<button id="add_normalization" class='fa fa-clipboard'></button>
-	</div>
-	<div id='normalization_suggestions'>
-		<ol id="normalization_suggestions_lst"/>
-	</div>
-	<div id='annotation_controls'>
-		<input id="auto_annotation" type="checkbox" name="auto_annotation" value="on" />Auto annotation
-	</div>
-</div>
-<div id="wb_col_2">
-	<div id="annotation">
-		<button id="add_annotation" class="fa fa-tag"></button>
-		<span>Select annotation</span>
-	</div>
-	<div id='annotation_info'>
-		<ol id="annotation_suggestions_lst"/>
-	</div>
-	<div id='manual_annotation'>
-		<span>Manual annotation</span>
-		{{annot_menu_select|safe}}
-	</div>
-</div>
-<div id="wb_col_3">
-{{annot_menu_checkboxes|safe}}
-</div>
-</div>
+{% block content %}
+{% include "annotation_menu.html" %}
 {{ ctext|safe }}
 {% endblock %}
+
