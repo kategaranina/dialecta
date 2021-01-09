@@ -16,17 +16,19 @@ def process_one_annotation(orig, standartization, annotation):
     annotations = get_annotation_alignment(annotation, num_regex=ANNOTATION_NUM_REGEX)
 
     for i, word in enumerate(clean_transcription(orig).split()):
-        word_dict = {'transcription': word}
+        word_dict = {'transcription': word.lower()}
 
         std = standartizations.get(i)
         if std is not None:
-            word_dict['standartization'] = std
+            word_dict['standartization'] = std.lower()
 
         anns = annotations.get(i)
         if anns is not None:
-            anns = anns.split(ANNOTATION_OPTION_SEP)
+            anns = anns.lower().split(ANNOTATION_OPTION_SEP)
             word_dict['lemmata'] = list(set(a.split('-')[0] for a in anns))
-            word_dict['annotations'] = list(set(a.split('-', 1)[1] for a in anns))
+            unique_tags = set(tuple(a.split('-')[1:]) for a in anns)
+            # dict with `tags` key required for nested queries
+            word_dict['annotations'] = [{'tags': tags} for tags in unique_tags]
 
         words.append(word_dict)
 
