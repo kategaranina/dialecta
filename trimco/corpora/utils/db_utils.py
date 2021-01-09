@@ -1,5 +1,3 @@
-import re
-
 import pymongo
 
 from trimco.settings import MONGO_URL, MONGO_DB_NAME
@@ -7,16 +5,14 @@ from trimco.settings import MONGO_URL, MONGO_DB_NAME
 
 MONGO_CLIENT = pymongo.MongoClient(MONGO_URL)
 MONGO_DB = MONGO_CLIENT[MONGO_DB_NAME]
+
 WORD_COLLECTION = MONGO_DB['words']
 #WORD_COLLECTION.drop()
 WORD_COLLECTION.create_index('word')
+
 STANDARTIZATION_COLLECTION = MONGO_DB['standartizations']
 #STANDARTIZATION_COLLECTION.drop()
 STANDARTIZATION_COLLECTION.create_index('word')
 
-ANNOTATION_WORD_SEP = '|'
-ANNOTATION_OPTION_SEP = '/'
-
-
-def clean_transcription(transcription):
-    return re.sub(r'\.\.\.|\?|\[|\]|\.|!|un\'?int\.?', '', transcription).strip()
+SENTENCE_COLLECTION = MONGO_DB['sentences']
+#SENTENCE_COLLECTION.drop()

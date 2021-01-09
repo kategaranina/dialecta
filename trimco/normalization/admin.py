@@ -4,7 +4,7 @@ from reversion.admin import VersionAdmin
 from django.conf.urls import url
 from django.db import transaction
 from django.shortcuts import render_to_response, get_object_or_404
-from corpora.utils.elan_tools import ElanToHTML
+from corpora.utils.elan_to_html import ElanToHTML
 from corpora.utils.standartizator import Standartizator
 
 

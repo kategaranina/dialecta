@@ -6,7 +6,7 @@ from django.template.context import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 
 from corpora.models import *
-from corpora.utils.elan_tools import ElanToHTML
+from corpora.utils.elan_to_html import ElanToHTML
 from corpora.utils.standartizator import Standartizator
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
 

@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from corpora.models import Recording
-from corpora.utils.elan_tools import ElanObject
+from corpora.utils.elan_utils import ElanObject
 
 
 @csrf_exempt
@@ -139,7 +139,7 @@ class Query:
         }
 
     @staticmethod
-    def get_additional_tags_dict(elan_obj, tier_name, start, end):  # TODO: same func in elan_tools
+    def get_additional_tags_dict(elan_obj, tier_name, start, end):  # TODO: same func in elan_to_html
         tokens_dict = {}
 
         try:
