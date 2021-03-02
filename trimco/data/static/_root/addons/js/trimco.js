@@ -491,7 +491,7 @@
                 'annotations': $('input[name="annotations"]').val()
             }
             ajax_request('search', formdata, url="../ajax/");
-
+            adjust_DOM_spacing();
         });
 	});
 })(django.jQuery);

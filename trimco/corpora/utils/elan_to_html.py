@@ -1,12 +1,15 @@
 import datetime
-import re
 import os
 from lxml import etree
 from decimal import Decimal
 from django.conf import settings
-from .annotation_menu import annotation_menu
+
 from .standartizator import Standartizator
 from .elan_utils import ElanObject, clean_transcription
+from .format_utils import (
+    get_audio_link, get_audio_annot_div,
+    get_annot_div, get_participant_status
+)
 
 
 class ElanToHTML:
@@ -93,7 +96,7 @@ class ElanToHTML:
 
         i = 0
         self.participants_dict = {}
-        html = self.get_audio_link()
+        html = get_audio_link(self.audio_file_path)
 
         for annot_data in self.elan_obj.annot_data_lst:
             tier_name = annot_data[3]
@@ -103,9 +106,10 @@ class ElanToHTML:
                 if transcript:
                     normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
                     annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
+                    print(normz_tokens_dict, annot_tokens_dict)
                     participant, tier_status = self.get_participant_tag_and_status(tier_obj)
-                    audio_div = self.get_audio_annot_div(annot_data[0], annot_data[1])
-                    annot_div = self.get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
+                    audio_div = get_audio_annot_div(annot_data[0], annot_data[1])
+                    annot_div = get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
                     html += '<div class="annot_wrapper %s">%s%s</div>' % (tier_status, audio_div, annot_div)
                     i += 1
 
@@ -150,10 +154,8 @@ class ElanToHTML:
         return tokens_dict
 
     def get_participant_tag_and_status(self, tier_obj):
-        participant = ''
-        tier_status = ''
         if tier_obj is None:
-            return participant, tier_status
+            return '', ''
 
         participant = tier_obj.attributes['PARTICIPANT'].title()
         if participant not in self.participants_dict:
@@ -162,96 +164,8 @@ class ElanToHTML:
         else:
             participant = self.participants_dict[participant]
 
-        if '_i_' in tier_obj.attributes['TIER_ID']:
-            tier_status = ' inwr'
-        elif '_n_' in tier_obj.attributes['TIER_ID']:
-            tier_status = ' inwd'
-
+        tier_status = get_participant_status(tier_obj.attributes['TIER_ID'])
         return participant, tier_status
-
-    def get_annot_div(self, tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict):
-        transcript = self.prettify_transcript(transcript)
-        if annot_tokens_dict:
-            transcript = self.add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dict)
-        return '<div class="annot" tier_name="%s"><span class="participant">%s</span><span class="transcript">%s</span></div>' % (tier_name, participant, transcript,)
-
-    @staticmethod
-    def get_audio_annot_div(stttime, endtime):
-        return '<div class="audiofragment" starttime="%s" endtime="%s"><button class="fa fa-spinner off"></button></div>' %(stttime, endtime)
-
-    def get_audio_link(self):
-        return '<audio id="elan_audio" src="/media/%s" preload></audio>' % (self.audio_file_path,)
-
-    @staticmethod
-    def prettify_transcript(transcript):
-        if not transcript[-1].strip():
-            transcript = transcript[:-1]
-
-        new_transcript = ''
-        tokens_lst = re.split('([ ])', transcript)
-        
-        for el in tokens_lst:
-            el = el.strip()
-            if not el:
-                continue
-
-            if el in ['...', '?', '!']:
-                new_el = '<tech>%s</tech>' % el
-
-            elif el[-1] in ['?', '!']:
-                new_el = '<token><trt>%s</trt></token><tech>%s</tech>' % (el[:-1], el[-1])
-
-            elif '[' in el and ']' in el:
-                new_el = ''
-
-                for el_2 in re.split(r'[\[\]]', el):  # splitting [ ]
-                    if not re.match('[a-zA-Z]', el_2):
-                        continue  # removing non-alphabetic values
-
-                    if 'unint' in el_2 or '.' in el_2:
-                        new_el += '<note>%s.</note>' % el_2.strip('.')
-                    else:
-                        new_el += '<token><trt>%s</trt></token>' % el_2
-
-            else:
-                new_el = '<token><trt>%s</trt></token>' % el
-
-            new_transcript += new_el
-
-        return new_transcript
-
-    def add_annotation_to_transcript(self, transcript, normz_tokens_dict, annot_tokens_dict):
-        i = 0
-        transcript_obj = etree.fromstring('<c>'+transcript+'</c>')
-
-        for tag in transcript_obj.iterchildren():
-            if tag.tag != 'token':
-                continue
-
-            if i in annot_tokens_dict.keys():
-                raw_morph_tags_full = annot_tokens_dict[i][1].split('/')
-                morph_tags_full = '/'.join(
-                    annotation_menu.override_abbreviations(x, is_lemma=True)
-                    for x in raw_morph_tags_full
-                )  # DB
-                tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
-
-                moprh_tags = raw_morph_tags_full[0].split('-', 1)[1]
-                morph_tags = annotation_menu.override_abbreviations(moprh_tags)  # DB
-                tag.insert(0, etree.fromstring('<morph>' + morph_tags + '</morph>'))
-
-                lemma_full = annot_tokens_dict[i][0]
-                tag.insert(0, etree.fromstring('<lemma_full style="display:none">' + lemma_full + '</lemma_full>'))
-
-                lemma = lemma_full.split('/')[0]
-                tag.insert(0, etree.fromstring('<lemma>' + lemma + '</lemma>'))
-
-            if i in normz_tokens_dict.keys():
-                tag.insert(0, etree.fromstring('<nrm>' + normz_tokens_dict[i][0] + '</nrm>'))
-
-            i += 1
-
-        return etree.tostring(transcript_obj)[3:-4].decode('utf-8')
 
     def save_html_to_elan(self, html):
         html_obj = etree.fromstring(html)

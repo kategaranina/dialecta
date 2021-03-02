@@ -243,3 +243,6 @@ token::after {
     height: 25px;
 }
 
+#search_result {
+    clear: both;
+}

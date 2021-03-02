@@ -1,6 +1,7 @@
 from bson.json_util import dumps
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
+from .db_to_html import db_response_to_html
 
 
 def compile_query(dialect, transcription, standartization, lemma, annotation):
@@ -15,13 +16,15 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
     if standartization:
         query_parts['standartization'] = standartization
 
-    if lemma:
-        query_parts['lemmata'] = {'$in': [lemma]}
-
     if annotation:
         annotation = annotation.replace('-', ' ')
         ann_parts = annotation.split()
         query_parts['annotations'] = {'$elemMatch': {'tags': {'$all': ann_parts}}}
+
+    if lemma:
+        if 'annotations' not in query_parts:
+            query_parts['annotations'] = {'$elemMatch': {}}
+        query_parts['annotations']['$elemMatch']['lemma'] = lemma
 
     query = {'words': {'$elemMatch': query_parts}}
     return query
@@ -30,4 +33,5 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
 def search(dialect, transcription, standartization, lemma, annotation):
     query = compile_query(dialect, transcription, standartization, lemma, annotation)
     results = SENTENCE_COLLECTION.find(query)
-    return dumps(results)
+    result_html = db_response_to_html(results)
+    return result_html

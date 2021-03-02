@@ -25,17 +25,17 @@ def process_one_annotation(orig, standartization, annotation):
         anns = annotations.get(i)
         if anns is not None:
             anns = anns.lower().split(ANNOTATION_OPTION_SEP)
-            word_dict['lemmata'] = list(set(a.split('-')[0] for a in anns))
-            unique_tags = set(tuple(a.split('-')[1:]) for a in anns)
-            # dict with `tags` key required for nested queries
-            word_dict['annotations'] = [{'tags': tags} for tags in unique_tags]
+            word_dict['annotations'] = [
+                {'lemma': ann.split('-')[0], 'tags': ann.split('-')[1:]}
+                for ann in anns
+            ]
 
         words.append(word_dict)
 
     return words
 
 
-def process_one_tier(eaf_filename, audio_filename, dialect, speaker, orig_tier, standartization_tier, annotation_tier):
+def process_one_tier(eaf_filename, audio_filename, dialect, speaker, tier_name, orig_tier, standartization_tier, annotation_tier):
     sentences = []
     tier_alignment = get_tier_alignment(orig_tier, standartization_tier, annotation_tier)
     for (start, end), (orig, standartization, annotation) in tier_alignment.items():
@@ -44,6 +44,7 @@ def process_one_tier(eaf_filename, audio_filename, dialect, speaker, orig_tier, 
             'dialect': dialect,
             'elan': eaf_filename,
             'speaker': speaker,
+            'tier': tier_name,
             'audio': {
                 'file': audio_filename,
                 'start': start,
@@ -64,17 +65,19 @@ def process_one_elan(eaf_filename, audio_filename, dialect):
         if standartization_tier_name is None:
             continue
 
-        speaker = standartization_tier_name.group(1)
+        speaker_tier = standartization_tier_name.group(1)
         try:
-            orig_tier = sorted(eaf_obj.get_annotation_data_for_tier(speaker), key=lambda x: x[0])
+            orig_tier = sorted(eaf_obj.get_annotation_data_for_tier(speaker_tier), key=lambda x: x[0])
             standartization_tier = sorted(eaf_obj.get_annotation_data_for_tier(tier_name), key=lambda x: x[0])
-            annotation_tier = sorted(eaf_obj.get_annotation_data_for_tier(speaker + '_annotation'), key=lambda x: x[0])
+            annotation_tier = sorted(eaf_obj.get_annotation_data_for_tier(speaker_tier + '_annotation'), key=lambda x: x[0])
         except KeyError:
-            print('ERROR: ' + eaf_filename + ': lacking tiers for ' + speaker)
+            print('ERROR: ' + eaf_filename + ': lacking tiers for ' + speaker_tier)
             continue
 
-        speaker = eaf_obj.tiers[speaker][2]['PARTICIPANT'].title()
-        tier_sentences = process_one_tier(eaf_filename, audio_filename, dialect, speaker, orig_tier, standartization_tier, annotation_tier)
+        speaker = eaf_obj.tiers[speaker_tier][2]['PARTICIPANT'].title()
+        tier_sentences = process_one_tier(
+            eaf_filename, audio_filename, dialect, speaker, speaker_tier,
+            orig_tier, standartization_tier, annotation_tier)
         sentences.extend(tier_sentences)
 
     return sentences

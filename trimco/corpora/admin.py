@@ -162,7 +162,6 @@ class RecordingAdmin(VersionAdmin):
                 lemma=request.POST['request_data[lemma]'],
                 annotation=request.POST['request_data[annotations]']
             )
-            print(response['result'])
 
         return HttpResponse(json.dumps(response))
 
