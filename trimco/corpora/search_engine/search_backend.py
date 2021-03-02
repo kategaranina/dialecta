@@ -1,3 +1,5 @@
+from bson.json_util import dumps
+
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 
 
@@ -25,7 +27,7 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
     return query
 
 
-def search(transcription, standartization, lemma, annotation):
-    query = compile_query(transcription, standartization, lemma, annotation)
+def search(dialect, transcription, standartization, lemma, annotation):
+    query = compile_query(dialect, transcription, standartization, lemma, annotation)
     results = SENTENCE_COLLECTION.find(query)
-    return results
+    return dumps(results)

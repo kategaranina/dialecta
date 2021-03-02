@@ -10,6 +10,7 @@ from corpora.utils.elan_to_html import ElanToHTML
 from corpora.utils.standartizator import Standartizator
 from corpora.utils.annotation_menu import annotation_menu
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
+from corpora.search_engine.search_backend import search
 
 import json
 from django.http import HttpResponse
@@ -152,6 +153,16 @@ class RecordingAdmin(VersionAdmin):
                 lemma=request.POST['request_data[lemma]'],
                 grammar=request.POST['request_data[annot]']
             )
+
+        elif request.POST['request_type'] == 'search':
+            response['result'] = search(
+                dialect=request.POST['request_data[dialect]'],
+                transcription=request.POST['request_data[transcription]'],
+                standartization=request.POST['request_data[standartization]'],
+                lemma=request.POST['request_data[lemma]'],
+                annotation=request.POST['request_data[annotations]']
+            )
+            print(response['result'])
 
         return HttpResponse(json.dumps(response))
 

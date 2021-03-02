@@ -2,52 +2,52 @@
 	var processing_request = false;
 	function ajax_request(req_type, req_data){
 
-	if (processing_request == true) {
-		console.log('processing previous request, please wait'); // Error to log
-		return false;
-	};
-	processing_request = true;
-	
-	$.ajax({  //Call ajax function sending the option loaded
-		url: "../../ajax/",  //This is the url of the ajax view where you make the search 
-		//contentType: "application/json; charset=utf-8",
-		type: 'POST',
-		data: {'request_type' : req_type, 'request_data' : req_data},
-		timeout: 50000,
-		error: function(x, t, m) {
-			console.log(x, t, m);
-			processing_request = false;
-		},
-		success: function(response) {
-			result = $.parseJSON(response);  // Get the results sended from ajax to here
-			processing_request = false
-			if (result.error) { // If the function fails
-				console.log(result.error_text); // Error to log
-			} else {
-				if (req_type == 'trt_annot_req') {
-					if (req_data['mode'] == 'manual') {
-						list_normlz_suggestions(result.result)
-					}
-					if (req_data['mode'] == 'auto') {
-						//console.log(result.result);
-						if (result.result!=null) {
-							apply_auto_annotation(result.result[0],result.result[1],result.result[2])
-						}
-						else {
-							/* continuing to next token when empty*/
-							activate_trt(nextInDOM('trt', $('trt.focused')));
-						};
-					}
-				}
-				else if (req_type == 'annot_suggest_req') {
-					list_annot_suggestions(result.result);
-				}
-				else if (req_type == 'save_elan_req') {
-					$('#save_to_file').removeClass('fa-spinner off').addClass('fa-floppy-o');
-				}
-			}
-		}
-	});
+        if (processing_request == true) {
+            console.log('processing previous request, please wait'); // Error to log
+            return false;
+        };
+        processing_request = true;
+
+        $.ajax({  //Call ajax function sending the option loaded
+            url: "../../ajax/",  //This is the url of the ajax view where you make the search
+            //contentType: "application/json; charset=utf-8",
+            type: 'POST',
+            data: {'request_type' : req_type, 'request_data' : req_data},
+            timeout: 50000,
+            error: function(x, t, m) {
+                console.log(x, t, m);
+                processing_request = false;
+            },
+            success: function(response) {
+                result = $.parseJSON(response);  // Get the results sended from ajax to here
+                processing_request = false
+                if (result.error) { // If the function fails
+                    console.log(result.error_text); // Error to log
+                } else {
+                    if (req_type == 'trt_annot_req') {
+                        if (req_data['mode'] == 'manual') {
+                            list_normlz_suggestions(result.result)
+                        }
+                        if (req_data['mode'] == 'auto') {
+                            //console.log(result.result);
+                            if (result.result!=null) {
+                                apply_auto_annotation(result.result[0],result.result[1],result.result[2])
+                            }
+                            else {
+                                /* continuing to next token when empty*/
+                                activate_trt(nextInDOM('trt', $('trt.focused')));
+                            };
+                        }
+                    }
+                    else if (req_type == 'annot_suggest_req') {
+                        list_annot_suggestions(result.result);
+                    }
+                    else if (req_type == 'save_elan_req') {
+                        $('#save_to_file').removeClass('fa-spinner off').addClass('fa-floppy-o');
+                    }
+                }
+            }
+        });
 	};
 	
 	function auto_annotation_request(trt_tag) {
@@ -486,5 +486,10 @@
 			ajax_request('save_annotation', {'trt': $('#examined_transcript').text(), 'nrm': norm, 'lemma': lemma, 'annot': morph});
 			set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
 		});
+
+		$('#search_button').click(function(e) {
+            console.log('nya')
+            console.log($('#search').serialize())
+        });
 	});
 })(django.jQuery);

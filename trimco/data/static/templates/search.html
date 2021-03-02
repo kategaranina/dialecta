@@ -20,11 +20,11 @@ FIX BREADCRUMPS, SEE BASE.HTML:
 {% include "annotation_menu.html" %}
 
 <div id="search_form">
-<form id="search" name="search">
+<form id="search">
     <div id="search_col_1" class="search_col">
         <div class="field"><div class="label">Dialect</div>
-        <select>
-            <option selected>Any</option>
+        <select name="dialect">
+            <option selected value="">Any</option>
             {% for dialect in dialects %}
             <option value="{{ dialect }}">{{ dialect }}</option>
             {% endfor %}
@@ -35,11 +35,11 @@ FIX BREADCRUMPS, SEE BASE.HTML:
     <div id="search_col_2" class="search_col">
         <div class="field"><div class="label">Lemma</div><input name="lemma"></div>
         <div class="field"><div class="label">Annotation tags</div><input name="annotations"></div>
-        <button id="search_button">Search</button>
+        <button id="search_button" type="button">Search</button>
     </div>
 </form>
 </div>
 
-{{ ctext|safe }}
+<div id="search_result"></div>
 
 {% endblock %}
