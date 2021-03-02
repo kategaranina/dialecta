@@ -21,20 +21,20 @@ FIX BREADCRUMPS, SEE BASE.HTML:
 
 <div id="search_form">
 <form id="search" name="search">
-    <div id="search_col_1">
-        <div class="label">Dialect</div>
+    <div id="search_col_1" class="search_col">
+        <div class="field"><div class="label">Dialect</div>
         <select>
             <option selected>Any</option>
             {% for dialect in dialects %}
             <option value="{{ dialect }}">{{ dialect }}</option>
             {% endfor %}
-        </select>
-        <div class="label">Transcription</div><input name="transcription">
-        <div class="label">Standartization</div><input name="standartization">
+        </select></div>
+        <div class="field"><div class="label">Transcription</div><input name="transcription"></div>
+        <div class="field"><div class="label">Standartization</div><input name="standartization"></div>
     </div>
-    <div id="search_col_2">
-        <div class="label">Lemma</div><input name="lemma">
-        <div class="label">Annotation tags</div><input name="annotations">
+    <div id="search_col_2" class="search_col">
+        <div class="field"><div class="label">Lemma</div><input name="lemma"></div>
+        <div class="field"><div class="label">Annotation tags</div><input name="annotations"></div>
         <button id="search_button">Search</button>
     </div>
 </form>
