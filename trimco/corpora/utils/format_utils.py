@@ -91,13 +91,13 @@ def add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dic
     return etree.tostring(transcript_obj)[3:-4].decode('utf-8')
 
 
-def get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict):
+def get_annot_div(tier_name, dialect, participant, transcript, normz_tokens_dict, annot_tokens_dict):
     transcript = prettify_transcript(transcript)
     if annot_tokens_dict:
         transcript = add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dict)
 
     participant_div = '<span class="participant">%s</span>' % participant
     transcript_div = '<span class="transcript">%s</span>' % transcript
-    annot_div = '<div class="annot" tier_name="%s">%s%s</div>' % (tier_name, participant_div, transcript_div)
+    annot_div = '<div class="annot" tier_name="%s", dialect="%s">%s%s</div>' % (tier_name, dialect, participant_div, transcript_div)
 
     return annot_div

@@ -109,7 +109,7 @@ class ElanToHTML:
                     print(normz_tokens_dict, annot_tokens_dict)
                     participant, tier_status = self.get_participant_tag_and_status(tier_obj)
                     audio_div = get_audio_annot_div(annot_data[0], annot_data[1])
-                    annot_div = get_annot_div(tier_name, participant, transcript, normz_tokens_dict, annot_tokens_dict)
+                    annot_div = get_annot_div(tier_name, self.dialect, participant, transcript, normz_tokens_dict, annot_tokens_dict)
                     html += '<div class="annot_wrapper %s">%s%s</div>' % (tier_status, audio_div, annot_div)
                     i += 1
 

@@ -36,6 +36,7 @@ def db_response_to_html(results):
         transcript, normz_tokens_dict, annot_tokens_dict = get_transcript_and_tags_dicts(item['words'])
         annot_div = get_annot_div(
             tier_name=item['tier'],
+            dialect=item['dialect'],
             participant=item['speaker'],
             transcript=transcript,
             normz_tokens_dict=normz_tokens_dict,

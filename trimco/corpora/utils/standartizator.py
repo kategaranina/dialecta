@@ -35,13 +35,15 @@ class Standartizator:
                     return new_norm
         return norm
 
-    def get_manual_standartizations(self, orig):
+    def get_manual_standartizations(self, orig, dialect=None):
+        print(dialect)
+        model = self.model if dialect is None else Model.objects.get(to_dialect=dialect)
         orig = orig.lower()
         manual_standartization = self.manual_words.get(orig)
         if manual_standartization is not None:
             return [manual_standartization[0][0]]
 
-        saved_word = find_word(orig, model=str(self.model))
+        saved_word = find_word(orig, model=str(model))
         if saved_word is not None:
             standartization_counts = Counter(saved_word['standartizations'])
             standartizations_by_freq = [s[0] for s in standartization_counts.most_common()]

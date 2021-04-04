@@ -72,7 +72,7 @@ class RecordingAdmin(VersionAdmin):
             url(r'\d+/edit/$', self.admin_site.admin_view(self.edit)),
             url(r'\d+/auto/$', self.admin_site.admin_view(self.auto_annotate)),
             url(r'^search/$', self.admin_site.admin_view(self.search)),
-            url(r'^ajax/$', self.ajax_dispatcher, name='ajax'),
+            url(r'^ajax/$', self.ajax_dispatcher, name='ajax')
         ]
         return my_urls + urls
 
@@ -129,10 +129,14 @@ class RecordingAdmin(VersionAdmin):
     def ajax_dispatcher(self, request):
         response = {}
         self.processing_request = True
+        # TODO: standartizator in search mode
 
         if request.POST['request_type'] == 'trt_annot_req':
             if request.POST['request_data[mode]'] == 'manual':
-                manual_words = self.standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
+                manual_words = self.standartizator.get_manual_standartizations(
+                    request.POST['request_data[trt]'],
+                    dialect=request.POST['request_data[dialect]']
+                )
                 response['result'] = manual_words or [request.POST['request_data[nrm]']]
 
             elif request.POST['request_data[mode]'] == 'auto':
