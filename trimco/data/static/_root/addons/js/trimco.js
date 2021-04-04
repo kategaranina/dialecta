@@ -66,7 +66,7 @@
 		$( "#workbench" ).addClass( "wb_reduced", 500, "easeOutBounce");
 	};
 
-	function activate_trt(trt_tag) {
+	function activate_trt(trt_tag, search_mode=false) {
 		/* prepering <trt> for (re)suggestion of <nrm> */
 		var mode = 'manual';
 		if ($('#auto_annotation').is(':checked')) {var mode = 'auto'};
@@ -81,7 +81,17 @@
 		trt_tag.addClass('focused');
 		if (mode=='manual') {
 			$('#examined_transcript').text(trt_tag.text());
-			ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'nrm': trt_tag.parent().find('nrm').text(), 'mode' : 'manual',});
+			var params = {
+			    'trt': trt_tag.text(),
+			    'nrm': trt_tag.parent().find('nrm').text(),
+			    'mode': 'manual',
+			    'dialect': trt_tag.closest('.annot').attr('dialect')
+			};
+			if (search_mode) {
+			    ajax_request('trt_annot_req', params, url="../ajax/");
+			} else {
+			    ajax_request('trt_annot_req', params)
+			}
 		};
 		if (mode=='auto') {
 			auto_annotation_request(trt_tag)
@@ -393,7 +403,7 @@
 		$("#grp-context-navigation").append($("<div id='save_button'><button id='save_to_file' class='fa fa-floppy-o'></div>"));
 
 		/*AUDIO: PLAY AT CLICK*/
-		$('.audiofragment').click(function(e) {
+		$(document).on('click', '.audiofragment', function() {
 			audiofragment_click($(this));
 		});
 
@@ -449,9 +459,9 @@
 			console.log(focused_right_lst);
 		});
 
-		$('trt').click(function(e) {
-			console.log($('#auto_annotation').is(':checked'));
-			activate_trt($(this));
+		$(document).on('click', 'trt', function() {
+		    var search_mode = !!$('#search_form').length;
+			activate_trt($(this), search_mode=search_mode);
 		});
 
 		$('#save_to_file').click(function(e){
