@@ -66,7 +66,7 @@
 		$( "#workbench" ).addClass( "wb_reduced", 500, "easeOutBounce");
 	};
 
-	function activate_trt(trt_tag, search_mode=false) {
+	function activate_trt(trt_tag, ajax_url="../../ajax/") {
 		/* prepering <trt> for (re)suggestion of <nrm> */
 		var mode = 'manual';
 		if ($('#auto_annotation').is(':checked')) {var mode = 'auto'};
@@ -87,11 +87,7 @@
 			    'mode': 'manual',
 			    'dialect': trt_tag.closest('.annot').attr('dialect')
 			};
-			if (search_mode) {
-			    ajax_request('trt_annot_req', params, url="../ajax/");
-			} else {
-			    ajax_request('trt_annot_req', params)
-			}
+			ajax_request('trt_annot_req', params, url=ajax_url);
 		};
 		if (mode=='auto') {
 			auto_annotation_request(trt_tag)
@@ -461,7 +457,7 @@
 
 		$(document).on('click', 'trt', function() {
 		    var search_mode = !!$('#search_form').length;
-			activate_trt($(this), search_mode=search_mode);
+			activate_trt($(this), ajax_url='../ajax_search/');
 		});
 
 		$('#save_to_file').click(function(e){
@@ -500,7 +496,7 @@
                 'lemma': $('input[name="lemma"]').val(),
                 'annotations': $('input[name="annotations"]').val()
             }
-            ajax_request('search', formdata, url="../ajax/");
+            ajax_request('search', formdata, url="../ajax_search/");
             adjust_DOM_spacing();
         });
 	});

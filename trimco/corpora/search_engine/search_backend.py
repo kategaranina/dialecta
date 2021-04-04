@@ -27,6 +27,7 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
         query_parts['annotations']['$elemMatch']['lemma'] = lemma
 
     query = {'words': {'$elemMatch': query_parts}}
+    print(query)
     return query
 
 
