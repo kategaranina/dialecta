@@ -188,9 +188,9 @@ class RecordingAdmin(VersionAdmin):
             elif request.POST['request_data[mode]'] == 'auto':
                 response['result'] = current_standartizator.get_auto_standartization(request.POST['request_data[trt]'])
 
-        # elif request.POST['request_type'] == 'annot_suggest_req':
-        #     ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
-        #     response['result'] = current_standartizator.get_annotation_options_list(ann)
+        elif request.POST['request_type'] == 'annot_suggest_req':
+            ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
+            response['result'] = current_standartizator.get_annotation_options_list(ann)
 
         # elif request.POST['request_type'] == 'save_elan_req':
         #     self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])

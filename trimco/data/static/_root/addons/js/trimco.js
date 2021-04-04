@@ -1,11 +1,14 @@
 (function($) {
 	var processing_request = false;
-	function ajax_request(req_type, req_data, url="../../ajax/") {  // TODO: req_type to different funcs?
+	function ajax_request(req_type, req_data, search=false) {  // TODO: req_type to different funcs?
         if (processing_request == true) {
             console.log('processing previous request, please wait'); // Error to log
             return false;
         };
         processing_request = true;
+
+        var url = "../../ajax/";
+        if (search) { url = "../ajax_search/" };
 
         $.ajax({  //Call ajax function sending the option loaded
             url: url,  //This is the url of the ajax view where you make the search
@@ -66,7 +69,7 @@
 		$( "#workbench" ).addClass( "wb_reduced", 500, "easeOutBounce");
 	};
 
-	function activate_trt(trt_tag, ajax_url="../../ajax/") {
+	function activate_trt(trt_tag, search=false) {
 		/* prepering <trt> for (re)suggestion of <nrm> */
 		var mode = 'manual';
 		if ($('#auto_annotation').is(':checked')) {var mode = 'auto'};
@@ -87,7 +90,7 @@
 			    'mode': 'manual',
 			    'dialect': trt_tag.closest('.annot').attr('dialect')
 			};
-			ajax_request('trt_annot_req', params, url=ajax_url);
+			ajax_request('trt_annot_req', params, search=search);
 		};
 		if (mode=='auto') {
 			auto_annotation_request(trt_tag)
@@ -380,6 +383,10 @@
 		sound.play('segment');
 	}
 
+	function check_search_mode() {
+	    return !!$('#search_form').length;
+	}
+
 	/*
 	********************************************************
 	DOM EVENTS ONLY:
@@ -456,8 +463,7 @@
 		});
 
 		$(document).on('click', 'trt', function() {
-		    var search_mode = !!$('#search_form').length;
-			activate_trt($(this), ajax_url='../ajax_search/');
+			activate_trt($(this), search=check_search_mode());
 		});
 
 		$('#save_to_file').click(function(e){
@@ -469,7 +475,15 @@
 
 		$('#add_normalization').click(function(e) {
 			/* looking for annotation variants */
-			ajax_request('annot_suggest_req', {'trt':$('#examined_transcript').text(),'nrm' : $('#normalization_input').val(),});
+			ajax_request(
+			    'annot_suggest_req',
+			    {
+                    'trt': $('#examined_transcript').text(),
+                    'nrm': $('#normalization_input').val(),
+                    'dialect': $('trt.focused').closest('.annot').attr('dialect')
+                },
+			    search=check_search_mode()
+			);
 		});
 
 		$('#add_annotation').click(function(e) {
@@ -496,7 +510,7 @@
                 'lemma': $('input[name="lemma"]').val(),
                 'annotations': $('input[name="annotations"]').val()
             }
-            ajax_request('search', formdata, url="../ajax_search/");
+            ajax_request('search', formdata, search=true);
             adjust_DOM_spacing();
         });
 	});
