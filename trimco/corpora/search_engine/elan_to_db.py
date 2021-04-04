@@ -1,3 +1,4 @@
+import os
 from pympi import Eaf
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
@@ -7,6 +8,7 @@ from corpora.utils.elan_utils import (
     clean_transcription, get_tier_alignment,
     get_annotation_alignment
 )
+from trimco.settings import MEDIA_ROOT
 
 
 def process_one_annotation(orig, standartization, annotation):
@@ -57,7 +59,8 @@ def process_one_tier(eaf_filename, audio_filename, dialect, speaker, tier_name, 
 
 
 def process_one_elan(eaf_filename, audio_filename, dialect):
-    eaf_obj = Eaf(eaf_filename)
+    full_eaf_filename = os.path.join(MEDIA_ROOT, eaf_filename)
+    eaf_obj = Eaf(full_eaf_filename)
     sentences = []
 
     for tier_name, tier in eaf_obj.tiers.items():

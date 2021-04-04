@@ -40,7 +40,8 @@ def db_response_to_html(results):
             participant=item['speaker'],
             transcript=transcript,
             normz_tokens_dict=normz_tokens_dict,
-            annot_tokens_dict=annot_tokens_dict
+            annot_tokens_dict=annot_tokens_dict,
+            elan_file=item['elan']
         )
 
         audio_annot_div = get_audio_annot_div(item['audio']['start'], item['audio']['end'])
