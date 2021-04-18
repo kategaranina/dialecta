@@ -5,7 +5,7 @@ from lxml import etree
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import (
     get_audio_link, get_audio_annot_div,
-    get_annot_div, get_participant_status
+    get_annot_div, get_participant_tag_and_status
 )
 from corpora.utils.elan_utils import ANNOTATION_OPTION_SEP
 
@@ -40,10 +40,11 @@ def db_response_to_html(results):
 
     for item in results:
         transcript, normz_tokens_dict, annot_tokens_dict = get_transcript_and_tags_dicts(item['words'])
+        participant, participant_status = get_participant_tag_and_status(item['speaker'], item['tier'])
         annot_div = get_annot_div(
             tier_name=item['tier'],
             dialect=item['dialect'],
-            participant=item['speaker'],
+            participant=participant,
             transcript=transcript,
             normz_tokens_dict=normz_tokens_dict,
             annot_tokens_dict=annot_tokens_dict,
@@ -51,7 +52,6 @@ def db_response_to_html(results):
         )
 
         audio_annot_div = get_audio_annot_div(item['audio']['start'], item['audio']['end'])
-        participant_status = get_participant_status(item['tier'])
         annot_wrapper_div = '<div class="annot_wrapper %s">%s%s</div>' % (participant_status, audio_annot_div, annot_div)
 
         audio_div = get_audio_link(item['audio']['file'])

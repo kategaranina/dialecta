@@ -7,7 +7,7 @@ from .standartizator import Standartizator
 from .elan_utils import ElanObject, clean_transcription
 from .format_utils import (
     get_audio_link, get_audio_annot_div,
-    get_annot_div, get_participant_status
+    get_annot_div, get_participant_tag_and_status
 )
 
 
@@ -94,23 +94,26 @@ class ElanToHTML:
         print('Transcription > Standard learning examples:', self.file_obj.data.path)
 
         i = 0
-        self.participants_dict = {}
         html = get_audio_link(self.audio_file_path)
 
         for annot_data in self.elan_obj.annot_data_lst:
             tier_name = annot_data[3]
             tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
-            if tier_obj.attributes['TIER_ID'] != 'comment':
-                transcript = annot_data[2]
-                if transcript:
-                    normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
-                    annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
-                    print(normz_tokens_dict, annot_tokens_dict)
-                    participant, tier_status = self.get_participant_tag_and_status(tier_obj)
-                    audio_div = get_audio_annot_div(annot_data[0], annot_data[1])
-                    annot_div = get_annot_div(tier_name, self.dialect, participant, transcript, normz_tokens_dict, annot_tokens_dict)
-                    html += '<div class="annot_wrapper %s">%s%s</div>' % (tier_status, audio_div, annot_div)
-                    i += 1
+            tier_id = tier_obj.attributes['TIER_ID']
+            if tier_id == 'comment':
+                continue
+
+            transcript = annot_data[2]
+            if not transcript:
+                continue
+
+            normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
+            annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
+            participant, tier_status = get_participant_tag_and_status(tier_obj.attributes['PARTICIPANT'], tier_id)
+            audio_div = get_audio_annot_div(annot_data[0], annot_data[1])
+            annot_div = get_annot_div(tier_name, self.dialect.id, participant, transcript, normz_tokens_dict, annot_tokens_dict)
+            html += '<div class="annot_wrapper %s">%s%s</div>' % (tier_status, audio_div, annot_div)
+            i += 1
 
         self.html = '<div class="eaf_display">%s</div>' %(html)
 
@@ -151,20 +154,6 @@ class ElanToHTML:
             pass
 
         return tokens_dict
-
-    def get_participant_tag_and_status(self, tier_obj):
-        if tier_obj is None:
-            return '', ''
-
-        participant = tier_obj.attributes['PARTICIPANT'].title()
-        if participant not in self.participants_dict:
-            filtered_participant = filter(None, participant.split(' '))
-            self.participants_dict[participant] = '. '.join(namepart[0] for namepart in filtered_participant) + '.'
-        else:
-            participant = self.participants_dict[participant]
-
-        tier_status = get_participant_status(tier_obj.attributes['TIER_ID'])
-        return participant, tier_status
 
     def save_html_to_elan(self, html):
         html_obj = etree.fromstring(html)

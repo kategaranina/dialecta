@@ -11,6 +11,14 @@ def get_participant_status(tier_name):
     return ''
 
 
+def get_participant_tag_and_status(participant, tier_name):
+    participant = participant.title()
+    participant = filter(None, participant.split(' '))
+    participant = '. '.join(namepart[0] for namepart in participant) + '.'
+    tier_status = get_participant_status(tier_name)
+    return participant, tier_status
+
+
 def get_audio_annot_div(stttime, endtime):
     return '<div class="audiofragment" starttime="%s" endtime="%s"><button class="fa fa-spinner off"></button></div>' % (stttime, endtime)
 
