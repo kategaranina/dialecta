@@ -175,8 +175,7 @@ class RecordingAdmin(VersionAdmin):
             return HttpResponse(json.dumps(response))
 
         if request.POST['request_type'] == 'save_elan_req':
-            print('nya')  # TODO: make custom saving func
-            # self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])
+            ElanToHTML.save_html_extracts_to_elans(request.POST['request_data[html]'])
             return HttpResponse(json.dumps(response))
 
         # elif request.POST['request_type'] == 'save_annotation':

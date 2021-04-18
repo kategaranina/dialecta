@@ -1,7 +1,6 @@
 import datetime
 import os
 from lxml import etree
-from decimal import Decimal
 from django.conf import settings
 
 from .standartizator import Standartizator
@@ -169,40 +168,15 @@ class ElanToHTML:
 
     def save_html_to_elan(self, html):
         html_obj = etree.fromstring(html)
-
         for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
-            tier_name = el.xpath('*[@class="annot"]/@tier_name')[0]
-            raw_start = el.xpath('*[@class="audiofragment"]/@starttime')[0]
-            raw_end = el.xpath('*[@class="audiofragment"]/@endtime')[0]
-            start = int(Decimal(raw_start))
-            end = int(Decimal(raw_end))
-            t_counter = 0
-            annot_value_lst = []
-            nrm_value_lst = []
-
-            for token in el.xpath('*//token'):    
-                nrm_lst = token.xpath('nrm/text()')
-                lemma_lst = token.xpath('lemma_full/text()')
-                morph_lst = token.xpath('morph_full/text()')
-
-                try:
-                    if lemma_lst + morph_lst:
-                        annot_value_lst.append('%s:%s:%s' % (t_counter, lemma_lst[0], morph_lst[0]))
-                    if nrm_lst:
-                        nrm_value_lst.append('%s:%s' % (t_counter, nrm_lst[0]))
-                except IndexError:
-                    print(
-                        'Exception while saving. Normalization: %s,'
-                        'Lemmata: %s, Morphology: %s, Counter: %s'
-                        % (nrm_lst, lemma_lst, morph_lst, t_counter)
-                    )
-
-                t_counter += 1
-
-            if annot_value_lst:
-                self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
-
-            if nrm_value_lst:
-                self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
-
+            self.elan_obj.process_html_annot(el)
         self.elan_obj.save()
+
+    @staticmethod
+    def save_html_extracts_to_elans(html):
+        html_obj = etree.fromstring(html)
+        for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
+            elan_name = el.xpath('*[@class="annot"]/@elan')[0]
+            elan_obj = ElanObject(os.path.join(settings.MEDIA_ROOT, elan_name))
+            elan_obj.process_html_annot(el)
+            elan_obj.save()

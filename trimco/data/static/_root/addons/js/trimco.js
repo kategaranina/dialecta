@@ -469,10 +469,15 @@
 		$('#save_to_file').click(function(e){
 			if ($('#save_to_file').hasClass('fa-floppy-o')) {
 				$('#save_to_file').removeClass('fa-floppy-o').addClass('fa-spinner off');
+
+				var div_id = '.eaf_display';
+				var is_search_mode = check_search_mode();
+				if (is_search_mode) {div_id = '#search_result'};
+                console.log(div_id)
 				ajax_request(
                     'save_elan_req',
-                    {'html' : '<div>'+$('.eaf_display').html()+'</div>',},
-                    search=check_search_mode()
+                    {'html' : '<div>'+$(div_id).html()+'</div>',},
+                    search=is_search_mode
 				);
 			}
 		});

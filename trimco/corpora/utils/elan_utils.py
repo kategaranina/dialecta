@@ -1,5 +1,6 @@
 import re
 import os
+from decimal import Decimal
 from pympi import Eaf, Elan
 
 
@@ -105,6 +106,41 @@ class ElanObject:
 
         Elan.to_eaf(self.path, self.Eaf, pretty=True)
         os.remove(self.path + '.bak')
+
+    def process_html_annot(self, html_annot):
+        tier_name = html_annot.xpath('*[@class="annot"]/@tier_name')[0]
+        raw_start = html_annot.xpath('*[@class="audiofragment"]/@starttime')[0]
+        raw_end = html_annot.xpath('*[@class="audiofragment"]/@endtime')[0]
+        start = int(Decimal(raw_start))
+        end = int(Decimal(raw_end))
+        t_counter = 0
+        annot_value_lst = []
+        nrm_value_lst = []
+
+        for token in html_annot.xpath('*//token'):
+            nrm_lst = token.xpath('nrm/text()')
+            lemma_lst = token.xpath('lemma_full/text()')
+            morph_lst = token.xpath('morph_full/text()')
+
+            try:
+                if lemma_lst + morph_lst:
+                    annot_value_lst.append('%s:%s:%s' % (t_counter, lemma_lst[0], morph_lst[0]))
+                if nrm_lst:
+                    nrm_value_lst.append('%s:%s' % (t_counter, nrm_lst[0]))
+            except IndexError:
+                print(
+                    'Exception while saving. Normalization: %s,'
+                    'Lemmata: %s, Morphology: %s, Counter: %s'
+                    % (nrm_lst, lemma_lst, morph_lst, t_counter)
+                )
+
+            t_counter += 1
+
+        if annot_value_lst:
+            self.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
+
+        if nrm_value_lst:
+            self.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
 
 
 def clean_transcription(transcription):
