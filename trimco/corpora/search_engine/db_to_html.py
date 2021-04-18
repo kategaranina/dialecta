@@ -1,7 +1,13 @@
+from decimal import Decimal
+
+from lxml import etree
+
+from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import (
     get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_status
 )
+from corpora.utils.elan_utils import ANNOTATION_OPTION_SEP
 
 
 def get_transcript_and_tags_dicts(words):
@@ -53,3 +59,45 @@ def db_response_to_html(results):
         item_divs.append(item_div)
 
     return ''.join(item_divs)
+
+
+def process_html_token(token_el):
+    word_dict = {}
+    trt_lst = token_el.xpath('trt/text()')
+    nrm_lst = token_el.xpath('nrm/text()')
+    morph_lst = token_el.xpath('morph_full/text()')
+
+    if not trt_lst:
+        return word_dict
+
+    word_dict['transcription'] = trt_lst[0].lower()
+
+    if nrm_lst:
+        word_dict['standartization'] = nrm_lst[0].lower()
+
+    if morph_lst:
+        anns = morph_lst[0].lower().split(ANNOTATION_OPTION_SEP)
+        word_dict['annotations'] = [
+            {'lemma': ann.split('-')[0], 'tags': ann.split('-')[1:]}
+            for ann in anns
+        ]
+
+    return word_dict
+
+
+def html_to_db(html_result):
+    html_obj = etree.fromstring(html_result)
+    for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
+        elan_name = el.xpath('*[@class="annot"]/@elan')[0]
+        tier_name = el.xpath('*[@class="annot"]/@tier_name')[0]
+        start = int(Decimal(el.xpath('*[@class="audiofragment"]/@starttime')[0]))
+        end = int(Decimal(el.xpath('*[@class="audiofragment"]/@endtime')[0]))
+
+        words = []
+        for token in el.xpath('*//token'):
+            word_dict = process_html_token(token)
+            words.append(word_dict)
+
+        filter_query = {'elan': elan_name, 'tier': tier_name, 'audio.start': start, 'audio.end': end}
+        update_query = {'$set': {'words': words}}
+        SENTENCE_COLLECTION.update_one(filter_query, update_query)

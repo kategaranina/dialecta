@@ -8,7 +8,7 @@ from corpora.utils.elan_utils import (
     clean_transcription, get_tier_alignment,
     get_annotation_alignment
 )
-from trimco.settings import MEDIA_ROOT
+from django.conf import settings
 
 
 def process_one_annotation(orig, standartization, annotation):
@@ -59,7 +59,7 @@ def process_one_tier(eaf_filename, audio_filename, dialect, speaker, tier_name, 
 
 
 def process_one_elan(eaf_filename, audio_filename, dialect):
-    full_eaf_filename = os.path.join(MEDIA_ROOT, eaf_filename)
+    full_eaf_filename = os.path.join(settings.MEDIA_ROOT, eaf_filename)
     eaf_obj = Eaf(full_eaf_filename)
     sentences = []
 

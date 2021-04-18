@@ -11,6 +11,7 @@ from corpora.utils.standartizator import Standartizator
 from corpora.utils.annotation_menu import annotation_menu
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
 from corpora.search_engine.search_backend import search
+from corpora.search_engine.db_to_html import html_to_db
 
 import json
 from django.http import HttpResponse
@@ -176,6 +177,7 @@ class RecordingAdmin(VersionAdmin):
 
         if request.POST['request_type'] == 'save_elan_req':
             ElanToHTML.save_html_extracts_to_elans(request.POST['request_data[html]'])
+            html_to_db(request.POST['request_data[html]'])
             return HttpResponse(json.dumps(response))
 
         # elif request.POST['request_type'] == 'save_annotation':

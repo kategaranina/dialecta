@@ -1,5 +1,3 @@
-from bson.json_util import dumps
-
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from .db_to_html import db_response_to_html
 
