@@ -14,7 +14,9 @@
 		<ol id="normalization_suggestions_lst"/>
 	</div>
 	<div id='annotation_controls'>
-		<input id="auto_annotation" type="checkbox" name="auto_annotation" value="on" />Auto annotation
+		{% if auto_annotation_option %}
+			<input id="auto_annotation" type="checkbox" name="auto_annotation" value="on" />Auto annotation
+		{% endif %}
 	</div>
 </div>
 <div id="wb_col_2">

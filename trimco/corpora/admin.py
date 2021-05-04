@@ -93,6 +93,7 @@ class RecordingAdmin(VersionAdmin):
             'media': self.media['js'],
             'annot_menu_select': annot_menu_select,
             'annot_menu_checkboxes': annot_menu_checkboxes,
+            'auto_annotation_option': True
         }
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
 
@@ -106,7 +107,8 @@ class RecordingAdmin(VersionAdmin):
             'media': self.media['js'],
             'annot_menu_select': annot_menu_select,
             'annot_menu_checkboxes': annot_menu_checkboxes,
-            'dialects': []
+            'dialects': [],
+            'auto_annotation_option': False
         }
         return render_to_response(self.search_template, context_instance=RequestContext(request, context))
 
@@ -124,6 +126,7 @@ class RecordingAdmin(VersionAdmin):
             'media': self.media['js'],
             'annot_menu_select': annot_menu_select,
             'annot_menu_checkboxes': annot_menu_checkboxes,
+            'auto_annotation_option': True
         }
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
 
