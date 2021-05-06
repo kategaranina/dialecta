@@ -25,12 +25,14 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
 
     if dialect:
         query['dialect'] = {'$in': [int(d) for d in dialect]}
+    elif not query_parts:
+        return
 
     return query
 
 
 def search(dialect, transcription, standartization, lemma, annotation):
     query = compile_query(dialect, transcription, standartization, lemma, annotation)
-    results = SENTENCE_COLLECTION.find(query)
+    results = SENTENCE_COLLECTION.find(query) if query is not None else None
     result_html = db_response_to_html(results)
     return result_html

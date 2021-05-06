@@ -36,6 +36,9 @@ def get_transcript_and_tags_dicts(words):
 
 
 def db_response_to_html(results):
+    if results is None:
+        return '<div id="no_result">Empty search query.</div>'
+
     item_divs = []
 
     for item in results:
@@ -58,7 +61,7 @@ def db_response_to_html(results):
         item_div = audio_div + annot_wrapper_div
         item_divs.append(item_div)
 
-    return ''.join(item_divs)
+    return ''.join(item_divs) or '<div id="no_result">Nothing found.</div>'
 
 
 def process_html_token(token_el):

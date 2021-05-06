@@ -261,3 +261,7 @@ token::after {
 #search #dialect_label {
     width: 50px;
 }
+
+#search_result #no_result {
+    margin: 30px 0 0 140px;
+}
