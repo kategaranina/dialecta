@@ -238,11 +238,26 @@ token::after {
 }
 
 #search_button {
-    margin: 0;
-    width: 100%;
-    height: 25px;
+    margin: 0 0 0 140px;
+    width: 202px;
 }
 
 #search_result {
     clear: both;
+}
+
+#search select {
+    overflow: auto;
+    padding: 0;
+    height: 105px;
+    width: 200px;
+    background-image: none;
+}
+
+#search_form {
+    display: inline-block;
+}
+
+#search #dialect_label {
+    width: 50px;
 }
