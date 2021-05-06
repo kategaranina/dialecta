@@ -49,6 +49,7 @@
                     }
                     else if (req_type == 'search') {
                         $('#search_result').html(result.result);
+                        adjust_DOM_spacing();
                     }
                 }
             }
@@ -520,7 +521,6 @@
                 'annotations': $('input[name="annotations"]').val()
             }
             ajax_request('search', formdata, search=true);
-            adjust_DOM_spacing();
         });
 	});
 })(django.jQuery);
