@@ -25,8 +25,8 @@ FIX BREADCRUMPS, SEE BASE.HTML:
         <div class="field"><div class="label">Dialect</div>
         <select name="dialect">
             <option selected value="">Any</option>
-            {% for dialect in dialects %}
-            <option value="{{ dialect }}">{{ dialect }}</option>
+            {% for dialect_id, dialect in dialects %}
+            <option value="{{ dialect_id }}">{{ dialect }}</option>
             {% endfor %}
         </select></div>
         <div class="field"><div class="label">Transcription</div><input name="transcription"></div>

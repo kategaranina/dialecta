@@ -12,6 +12,7 @@ from corpora.utils.annotation_menu import annotation_menu
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
 from corpora.search_engine.search_backend import search
 from corpora.search_engine.db_to_html import html_to_db
+from morphology.models import Dialect
 
 import json
 from django.http import HttpResponse
@@ -101,6 +102,7 @@ class RecordingAdmin(VersionAdmin):
     @transaction.atomic
     def search(self, request):
         annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
+        dialects = [(x.id, x.abbreviation) for x in Dialect.objects.all()]
 
         context = {
             'ctext': '',
@@ -108,7 +110,7 @@ class RecordingAdmin(VersionAdmin):
             'media': self.media['js'],
             'annot_menu_select': annot_menu_select,
             'annot_menu_checkboxes': annot_menu_checkboxes,
-            'dialects': [],
+            'dialects': dialects,
             'auto_annotation_option': False
         }
         return render_to_response(self.search_template, context_instance=RequestContext(request, context))
