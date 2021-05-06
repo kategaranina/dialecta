@@ -1,0 +1,12 @@
+.g-d-6, .l-2cr-fluid.l-d-6 .c-1 {
+    width: 360px;
+}
+
+form#grp-changelist-search-form {
+    display: inline-block;
+}
+
+#search_button {
+    float: left;
+    margin-right: 10px;
+}

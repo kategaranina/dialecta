@@ -61,7 +61,8 @@ class RecordingAdmin(VersionAdmin):
     save_as = True
 
     class Media:
-        js = ("js/ustie_id.js",)
+        js = ("js/ustie_id.js", "js/search_button.js")
+        css = {'all': ("css/search_button.css",)}
 
     def speakerlist(self, obj):
         return ', '.join([a.string_id for a in obj.to_speakers.all()])
