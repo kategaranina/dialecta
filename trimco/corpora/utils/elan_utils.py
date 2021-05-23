@@ -14,6 +14,8 @@ STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')
 STANDARTIZATION_NUM_REGEX = re.compile(r'^(\d+):(.+)')
 ANNOTATION_NUM_REGEX = re.compile(r'(\d+?):.+?:(.+)')
 
+TECH_REGEX = re.compile(r'(?:\.\.\.|\?|\[|]|\.|!|un\'?int\.?)+')
+
 
 class Tier:
     def __init__(self, name, info):
@@ -144,7 +146,7 @@ class ElanObject:
 
 
 def clean_transcription(transcription):
-    return re.sub(r'\.\.\.|\?|\[|]|\.|!|un\'?int\.?', '', transcription).strip()
+    return TECH_REGEX.sub('', transcription).strip()
 
 
 def get_tier_alignment(orig_tier, standartization_tier, annotation_tier):

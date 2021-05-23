@@ -5,8 +5,7 @@ from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.elan_utils import (
     ANNOTATION_OPTION_SEP, STANDARTIZATION_REGEX,
     STANDARTIZATION_NUM_REGEX, ANNOTATION_NUM_REGEX,
-    clean_transcription, get_tier_alignment,
-    get_annotation_alignment
+    TECH_REGEX, get_tier_alignment, get_annotation_alignment
 )
 from django.conf import settings
 
@@ -17,14 +16,23 @@ def process_one_annotation(orig, standartization, annotation):
     standartizations = get_annotation_alignment(standartization, num_regex=STANDARTIZATION_NUM_REGEX)
     annotations = get_annotation_alignment(annotation, num_regex=ANNOTATION_NUM_REGEX)
 
-    for i, word in enumerate(clean_transcription(orig).split()):
+    word_num = 0
+    tech_items = TECH_REGEX.findall(orig)[::-1]
+    clean_transcription = TECH_REGEX.sub(' <tech> ', orig)
+
+    for word in clean_transcription.split():
+        if word == '<tech>':
+            word = tech_items.pop()
+            words.append({'transcription': word})
+            continue
+
         word_dict = {'transcription': word.lower()}
 
-        std = standartizations.get(i)
+        std = standartizations.get(word_num)
         if std is not None:
             word_dict['standartization'] = std.lower()
 
-        anns = annotations.get(i)
+        anns = annotations.get(word_num)
         if anns is not None:
             anns = anns.lower().split(ANNOTATION_OPTION_SEP)
             word_dict['annotations'] = [
@@ -33,6 +41,7 @@ def process_one_annotation(orig, standartization, annotation):
             ]
 
         words.append(word_dict)
+        word_num += 1
 
     return words
 
