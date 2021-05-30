@@ -388,6 +388,24 @@
 	    return !!$('#search_form').length;
 	}
 
+	function construct_replace_query() {
+        var query = [];
+        if ($('input[name="from_standartization"]').val()) {
+            query.push('nrm:contains("' + $('input[name="from_standartization"]').val() + '")')
+        };
+        if ($('input[name="from_lemma"]').val()) {
+            query.push('lemma:contains("' + $('input[name="from_lemma"]').val() + '")')
+        };
+        if ($('input[name="from_annotations"]').val()) {
+            query.push('morph:contains("' + $('input[name="from_annotations"]').val() + '")')
+        };
+        if ($('input[name="from_transcription"]').val()) {
+            query.push('trt:contains("' + $('input[name="from_transcription"]').val() + '")')
+        };
+        if (query) {
+            return query.join(' ~ ');
+        };
+    }
 	/*
 	********************************************************
 	DOM EVENTS ONLY:
@@ -521,6 +539,14 @@
                 'annotations': $('input[name="annotations"]').val()
             }
             ajax_request('search', formdata, search=true);
+        });
+
+        $('#replace_button').click(function(e) {
+            var query = construct_replace_query();
+            for (match in $(query)) {
+                var token = match.parent;
+                console.log(token);
+            }
         });
 	});
 })(django.jQuery);
