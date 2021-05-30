@@ -42,6 +42,28 @@ FIX BREADCRUMPS, SEE BASE.HTML:
 </form>
 </div>
 
+<div id="replace_form">
+<form id="replace">
+    <div>
+    <div id="replace_col_1" class="search_col">
+        <div class="field"><div class="label">Transcription</div><input name="from_transcription"></div>
+        <div class="field"><div class="label">Standartization</div><input name="from_standartization"></div>
+        <div class="field"><div class="label">Lemma</div><input name="from_lemma"></div>
+        <div class="field"><div class="label">Annotation tags</div><input name="from_annotations"></div>
+    </div>
+    <div id="replace_col_2" class="search_col">
+        <div class="field"><input name="to_transcription" readonly></div>
+        <div class="field"><input name="to_standartization"></div>
+        <div class="field"><input name="to_lemma"></div>
+        <div class="field"><input name="to_annotations"></div>
+    </div>
+    </div>
+<button id="replace_button" class="grp-button" type="button">Replace</button>
+</form>
+</div>
+
+
+
 <div id="search_result"></div>
 
 {% endblock %}

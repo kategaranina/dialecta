@@ -213,7 +213,7 @@ token::after {
 	margin-left: 20px;
 }
 
-#search .label {
+#search .label, #replace .label {
     float: left;
     display: block;
     width: 120px;
@@ -221,7 +221,7 @@ token::after {
     text-align: right;
 }
 
-#search input {
+#search input, #replace input {
     height: 15px;
     width: 200px;
     border: #aaa solid 1px;
@@ -237,7 +237,7 @@ token::after {
     padding: 5px 0;
 }
 
-#search_button {
+#search_button, #replace_button {
     margin: 0 0 0 140px;
     width: 202px;
 }
@@ -254,7 +254,7 @@ token::after {
     background-image: none;
 }
 
-#search_form {
+#search_form, #replace_form {
     display: inline-block;
 }
 
