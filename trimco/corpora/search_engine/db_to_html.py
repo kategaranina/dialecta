@@ -14,7 +14,8 @@ def get_transcript_and_tags_dicts(words):
     transcript = []
     normz_tokens_dict = {}
     annot_tokens_dict = {}
-    for i, w in enumerate(words):
+    i = 0
+    for w in words:
         transcript.append(w['transcription'])
 
         standartization = w.get('standartization')
@@ -31,6 +32,8 @@ def get_transcript_and_tags_dicts(words):
             full_ann = '-'.join([ann['lemma']] + ann['tags'])
             annots.append(full_ann)
         annot_tokens_dict[i] = ['/'.join(lemmata), '/'.join(annots)]
+
+        i += 1
 
     return ' '.join(transcript), normz_tokens_dict, annot_tokens_dict
 
@@ -66,11 +69,20 @@ def db_response_to_html(results):
 
 def process_html_token(token_el):
     word_dict = {}
+
+    if token_el.tag in ['note', 'tech']:
+        trt = token_el.text
+        if token_el.tag == 'note':
+            trt = '[' + trt + ']'
+        word_dict['transcription'] = trt
+        return word_dict
+
     trt_lst = token_el.xpath('trt/text()')
     nrm_lst = token_el.xpath('nrm/text()')
     morph_lst = token_el.xpath('morph_full/text()')
 
     if not trt_lst:
+        word_dict['transcription'] = token_el.text
         return word_dict
 
     word_dict['transcription'] = trt_lst[0].lower()
@@ -97,7 +109,7 @@ def html_to_db(html_result):
         end = int(Decimal(el.xpath('*[@class="audiofragment"]/@endtime')[0]))
 
         words = []
-        for token in el.xpath('*//token'):
+        for token in el.xpath('*//*[self::token or self::tech or self::note]'):
             word_dict = process_html_token(token)
             words.append(word_dict)
 
