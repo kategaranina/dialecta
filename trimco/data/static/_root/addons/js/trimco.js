@@ -388,6 +388,20 @@
 	    return !!$('#search_form').length;
 	}
 
+	function fill_replace_form(token) {
+	    var elements = [
+            ["standartization", "nrm"],
+            ["lemma", "lemma"],
+            ["annotations", "morph"],
+            ["transcription", "trt"]
+        ];
+        for (var [el_name, tag] of elements) {
+            var value = token.find(tag).html();
+            $('input[name="from_' + el_name + '"]').val(value);
+            $('input[name="to_' + el_name + '"]').val(value);
+        }
+    }
+
 	function construct_replace_query() {
         var query = [];
         var elements = [ // NB: order is important
@@ -412,15 +426,15 @@
         for (var [el_name, tag] of elements) {
             var value = $('input[name="' + el_name + '"]').val();
             if (value) {
-                $(token).find(tag).html(value);
+                token.find(tag).html(value);
                 if (tag == "lemma") {
-                    $(token).find("lemma_full").html(value);
-                    var full_value = value + '-' + $(token).find("morph").html();
-                    $(token).find("morph_full").html(full_value);
+                    token.find("lemma_full").html(value);
+                    var full_value = value + '-' + token.find("morph").html();
+                    token.find("morph_full").html(full_value);
                 };
                 if (tag == "morph") {
-                    var full_value = $(token).find("lemma").html() + '-' + value;
-                    $(token).find("morph_full").html(full_value);
+                    var full_value = token.find("lemma").html() + '-' + value;
+                    token.find("morph_full").html(full_value);
                 };
             };
         };
@@ -502,7 +516,10 @@
 		});
 
 		$(document).on('click', 'trt', function() {
-			activate_trt($(this), search=check_search_mode());
+		    var search_mode = check_search_mode();
+			activate_trt($(this), search=search_mode);
+			if (search_mode) { fill_replace_form($(this).parent()) };
+
 		});
 
 		$('#save_to_file').click(function(e){
