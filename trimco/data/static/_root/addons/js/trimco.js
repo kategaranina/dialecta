@@ -390,22 +390,42 @@
 
 	function construct_replace_query() {
         var query = [];
-        if ($('input[name="from_standartization"]').val()) {
-            query.push('nrm:contains("' + $('input[name="from_standartization"]').val() + '")')
+        var elements = [ // NB: order is important
+            ["from_standartization", "nrm"],
+            ["from_lemma", "lemma"],
+            ["from_annotations", "morph"],
+            ["from_transcription", "trt"]
+        ];
+        for (var [el_name, tag] of elements) {
+            var value = $('input[name="' + el_name + '"]').val();
+            if (value) { query.push(tag + ':contains("' + value + '")') };
         };
-        if ($('input[name="from_lemma"]').val()) {
-            query.push('lemma:contains("' + $('input[name="from_lemma"]').val() + '")')
-        };
-        if ($('input[name="from_annotations"]').val()) {
-            query.push('morph:contains("' + $('input[name="from_annotations"]').val() + '")')
-        };
-        if ($('input[name="from_transcription"]').val()) {
-            query.push('trt:contains("' + $('input[name="from_transcription"]').val() + '")')
-        };
-        if (query) {
-            return query.join(' ~ ');
+        if (query) { return query.join(' ~ ') };
+    }
+
+    function replace(token) {
+        var elements = [ // NB: order is important
+            ["to_standartization", "nrm"],
+            ["to_lemma", "lemma"],
+            ["to_annotations", "morph"]
+        ];
+        for (var [el_name, tag] of elements) {
+            var value = $('input[name="' + el_name + '"]').val();
+            if (value) {
+                $(token).find(tag).html(value);
+                if (tag == "lemma") {
+                    $(token).find("lemma_full").html(value);
+                    var full_value = value + '-' + $(token).find("morph").html();
+                    $(token).find("morph_full").html(full_value);
+                };
+                if (tag == "morph") {
+                    var full_value = $(token).find("lemma").html() + '-' + value;
+                    $(token).find("morph_full").html(full_value);
+                };
+            };
         };
     }
+
 	/*
 	********************************************************
 	DOM EVENTS ONLY:
@@ -543,10 +563,10 @@
 
         $('#replace_button').click(function(e) {
             var query = construct_replace_query();
-            for (match in $(query)) {
-                var token = match.parent;
-                console.log(token);
-            }
+            $(query).each(function () {
+                var token = $(this).parent();
+                replace(token);
+            });
         });
 	});
 })(django.jQuery);
