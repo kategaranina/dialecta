@@ -100,7 +100,7 @@ div#eaf_display {
 	float: left;
 }
 div.annot_wrapper {
-	padding-top: 40pt;
+	padding-top: 43pt;
 	display: flex;
 	-webkit-user-select: none; /* Chrome/Safari */        
 	-moz-user-select: none; /* Firefox */
@@ -118,15 +118,30 @@ div.annot {
 	padding-left: 10pt;
 	margin-right: -10pt;
 }
-span.participant {
-	position: absolute;
-	font-size: 8pt;
-	margin-top: -12pt;
+
+.meta {
+    margin-top: -20px;
+    display: block;
 }
+
+span.participant {
+    margin-right: 15px;
+	display: block;
+	float: left;
+}
+
+span.recording {
+    margin-right: 15px;
+	display: block;
+	float: left;
+	color: gray;
+}
+
 span.transcript {
 	text-align: center;
 	font-size: 14pt;
-	display: inline-flex;
+	display: block;
+	clear: both;
 }
 trt {
 	color: #041330;

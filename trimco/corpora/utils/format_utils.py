@@ -106,8 +106,15 @@ def get_annot_div(tier_name, dialect, participant, transcript, normz_tokens_dict
 
     participant_div = '<span class="participant">%s</span>' % participant
     transcript_div = '<span class="transcript">%s</span>' % transcript
-    elan_attr = 'elan="%s"' % elan_file if elan_file is not None else ''
-    annot_div = '<div class="annot" tier_name="%s" dialect="%s" %s>%s%s</div>' % \
-                (tier_name, dialect, elan_attr, participant_div, transcript_div)
+
+    if elan_file:
+        elan_attr = 'elan="%s"' % elan_file
+        recording = elan_file.rsplit('/', 1)[-1].rsplit('.', 1)[0]
+        recording_div = '<span class="recording">%s</span>' % recording
+    else:
+        elan_attr, recording_div = '', ''
+
+    annot_div = '<div class="annot" tier_name="%s" dialect="%s" %s><div class="meta">%s%s</div>%s</div>' % \
+                (tier_name, dialect, elan_attr, participant_div, recording_div, transcript_div)
 
     return annot_div
