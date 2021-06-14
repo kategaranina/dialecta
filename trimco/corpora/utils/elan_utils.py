@@ -9,6 +9,7 @@ from pympi import Eaf, Elan
 
 ANNOTATION_WORD_SEP = '|'
 ANNOTATION_OPTION_SEP = '/'
+UNKNOWN_PREFIX = '(unkn)_'
 
 STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')
 STANDARTIZATION_NUM_REGEX = re.compile(r'^(\d+):(.+)')

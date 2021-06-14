@@ -4,11 +4,13 @@ from pympi import Eaf
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.elan_utils import (
     ANNOTATION_OPTION_SEP, STANDARTIZATION_REGEX,
-    STANDARTIZATION_NUM_REGEX, ANNOTATION_NUM_REGEX,
+    STANDARTIZATION_NUM_REGEX, ANNOTATION_NUM_REGEX, UNKNOWN_PREFIX,
     TECH_REGEX, get_tier_alignment, get_annotation_alignment
 )
 from django.conf import settings
 
+
+settings.configure()
 
 def process_one_annotation(orig, standartization, annotation):
     words = []
@@ -23,22 +25,38 @@ def process_one_annotation(orig, standartization, annotation):
     for word in clean_transcription.split():
         if word == '<tech>':
             word = tech_items.pop()
-            words.append({'transcription': word})
+            words.append({
+                'transcription': word,
+                'transcription_view': word
+            })
             continue
 
-        word_dict = {'transcription': word.lower()}
+        word_dict = {
+            'transcription': word.lower(),
+            'transcription_view': word
+        }
 
         std = standartizations.get(word_num)
         if std is not None:
+            word_dict['standartization_view'] = std
             word_dict['standartization'] = std.lower()
 
         anns = annotations.get(word_num)
         if anns is not None:
-            anns = anns.lower().split(ANNOTATION_OPTION_SEP)
-            word_dict['annotations'] = [
-                {'lemma': ann.split('-')[0], 'tags': ann.split('-')[1:]}
-                for ann in anns
-            ]
+            anns = anns.split(ANNOTATION_OPTION_SEP)
+            word_dict['annotations'] = []
+            for ann in anns:
+                lemma_view, tags_view = ann.split('-', 1)
+                pp_ann = ann.lower().split('-')
+                lemma, tags = pp_ann[0], pp_ann[1:]
+                lemma = lemma.replace(UNKNOWN_PREFIX, '')
+
+                word_dict['annotations'].append({
+                    'lemma': lemma,
+                    'tags': tags,
+                    'lemma_view': lemma_view,
+                    'tags_view': tags_view
+                })
 
         words.append(word_dict)
         word_num += 1

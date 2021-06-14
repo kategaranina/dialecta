@@ -6,20 +6,20 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
     query_parts = {}
 
     if transcription:
-        query_parts['transcription'] = transcription
+        query_parts['transcription'] = transcription.lower()
 
     if standartization:
-        query_parts['standartization'] = standartization
+        query_parts['standartization'] = standartization.lower()
 
     if annotation:
-        annotation = annotation.replace('-', ' ')
+        annotation = annotation.lower().replace('-', ' ')
         ann_parts = annotation.split()
         query_parts['annotations'] = {'$elemMatch': {'tags': {'$all': ann_parts}}}
 
     if lemma:
         if 'annotations' not in query_parts:
             query_parts['annotations'] = {'$elemMatch': {}}
-        query_parts['annotations']['$elemMatch']['lemma'] = lemma
+        query_parts['annotations']['$elemMatch']['lemma'] = lemma.lower()
 
     query = {'words': {'$elemMatch': query_parts}}
 

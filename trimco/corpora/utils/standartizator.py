@@ -6,6 +6,7 @@ from django.conf import settings
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
 from .annotation_menu import annotation_menu
+from .elan_utils import UNKNOWN_PREFIX
 
 
 class Standartizator:
@@ -118,7 +119,7 @@ class Standartizator:
 
             # pymorphy2 specific
             methods = {str(x[0]) for x in annot.methods_stack}
-            lemma = annot.normal_form if methods == {'<DictionaryAnalyzer>'} else '(unkn)_' + annot.normal_form
+            lemma = annot.normal_form if methods == {'<DictionaryAnalyzer>'} else UNKNOWN_PREFIX + annot.normal_form
 
             result_list.append([lemma, tag, annot.score])
 

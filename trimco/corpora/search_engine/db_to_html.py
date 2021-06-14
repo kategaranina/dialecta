@@ -16,9 +16,9 @@ def get_transcript_and_tags_dicts(words):
     annot_tokens_dict = {}
     i = 0
     for w in words:
-        transcript.append(w['transcription'])
+        transcript.append(w['transcription_view'])
 
-        standartization = w.get('standartization')
+        standartization = w.get('standartization_view')
         if standartization is None:
             continue
 
@@ -27,9 +27,9 @@ def get_transcript_and_tags_dicts(words):
         lemmata = []
         annots = []
         for ann in w.get('annotations', []):
-            if ann['lemma'] not in lemmata:
-                lemmata.append(ann['lemma'])
-            full_ann = '-'.join([ann['lemma']] + ann['tags'])
+            if ann['lemma_view'] not in lemmata:
+                lemmata.append(ann['lemma_view'])
+            full_ann = ann['lemma_view'] + '-' + ann['tags_view']
             annots.append(full_ann)
         annot_tokens_dict[i] = ['/'.join(lemmata), '/'.join(annots)]
 
