@@ -402,7 +402,7 @@
         }
     }
 
-	function construct_replace_query() {
+	function create_replace_query() {
         var query = [];
         var elements = [ // NB: order is important
             ["from_standartization", "nrm"],
@@ -412,9 +412,16 @@
         ];
         for (var [el_name, tag] of elements) {
             var value = $('input[name="' + el_name + '"]').val();
-            if (value) { query.push(tag + ':contains("' + value + '")') };
+            if (value) { query.push([tag, value]) };
         };
-        if (query) { return query.join(' ~ ') };
+        return query;
+    }
+
+    function check_token_by_query(token, query) {
+        for (var [tag, value] of query) {
+            if (token.find(tag).html() != value) { return false }
+        };
+        return true;
     }
 
     function replace(token) {
@@ -579,11 +586,13 @@
         });
 
         $('#replace_button').click(function(e) {
-            var query = construct_replace_query();
-            $(query).each(function () {
-                var token = $(this).parent();
-                replace(token);
-            });
+            var query = create_replace_query();
+            if (query) {
+                $("token").each( function() {
+                    var is_relevant = check_token_by_query($(this), query);
+                    if (is_relevant) { replace($(this)) }
+                });
+            };
         });
 	});
 })(django.jQuery);
