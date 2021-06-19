@@ -570,7 +570,16 @@
             var morph_full_tag = $('<morph_full style="display:none">' + lemma + '-' + morph + '</morph_full>');
 			var morph_tag = $('<morph>' + morph + '</morph></info>');
 
-			ajax_request('save_annotation', {'trt': $('#examined_transcript').text(), 'nrm': norm, 'lemma': lemma, 'annot': morph});
+            var save_annotation_params = {
+                'trt': $('#examined_transcript').text(),
+                'nrm': norm,
+                'lemma': lemma,
+                'annot': morph
+            }
+            var search_mode = check_search_mode()
+            if (search_mode) { save_annotation_params['dialect'] = $('trt.focused').closest('.annot').attr('dialect') };
+			ajax_request('save_annotation', save_annotation_params, search=search_mode);
+
 			set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
 		});
 
