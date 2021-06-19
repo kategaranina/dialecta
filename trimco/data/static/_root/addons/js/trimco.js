@@ -37,7 +37,8 @@
                             }
                             else {
                                 /* continuing to next token when empty*/
-                                activate_trt(nextInDOM('trt', $('trt.focused')));
+                                var next = nextInDOM('trt', $('trt.focused'));
+		                        if (next) {activate_trt(next)};
                             };
                         }
                     }
@@ -266,7 +267,7 @@
 
 	function nextInDOM(_selector, _subject) {
 		var next = getNext(_subject);
-		while(next.length != 0) {
+		while(next != null && next.length != 0) {
 			var found = searchFor(_selector, next);
 			if(found != null) return found;
 			next = getNext(next);
@@ -275,7 +276,8 @@
 	};
 	function getNext(_subject) {
 		if(_subject.next().length > 0) return _subject.next();
-		return getNext(_subject.parent());
+		if(_subject.parent().length > 0) return getNext(_subject.parent());
+		return null;
 	};
 	function searchFor(_selector, _subject) {
 		if(_subject.is(_selector)) return _subject;
@@ -335,7 +337,8 @@
 			$('trt.focused').removeAttr('style');
 			};
 		/* continuing to next token*/
-		activate_trt(nextInDOM('trt', $('trt.focused')));
+		var next = nextInDOM('trt', $('trt.focused'));
+		if (next) {activate_trt(next)};
 	}
 
 	/* ADJUST SPACING FOR DOM ON INITIAL LOAD */
