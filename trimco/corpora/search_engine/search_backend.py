@@ -1,3 +1,5 @@
+from pymongo import ASCENDING
+
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.elan_utils import ANNOTATION_PART_SEP
 from .db_to_html import db_response_to_html
@@ -35,5 +37,6 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
 def search(dialect, transcription, standartization, lemma, annotation):
     query = compile_query(dialect, transcription, standartization, lemma, annotation)
     results = SENTENCE_COLLECTION.find(query) if query is not None else None
+    results = results.sort([('elan', ASCENDING), ('audio.start',ASCENDING)])
     result_html = db_response_to_html(results)
     return result_html
