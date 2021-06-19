@@ -7,7 +7,7 @@ from corpora.utils.format_utils import (
     get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
-from corpora.utils.elan_utils import ANNOTATION_OPTION_SEP
+from corpora.utils.elan_utils import split_anns_for_db
 
 
 def get_transcript_and_tags_dicts(words):
@@ -74,6 +74,7 @@ def process_html_token(token_el):
         trt = token_el.text
         if token_el.tag == 'note':
             trt = '[' + trt + ']'
+        word_dict['transcription_view'] = trt
         word_dict['transcription'] = trt
         return word_dict
 
@@ -82,20 +83,19 @@ def process_html_token(token_el):
     morph_lst = token_el.xpath('morph_full/text()')
 
     if not trt_lst:
-        word_dict['transcription'] = token_el.text
+        word_dict['transcription_view'] = token_el.text
+        word_dict['transcription'] = token_el.text.lower()
         return word_dict
 
+    word_dict['transcription_view'] = trt_lst[0]
     word_dict['transcription'] = trt_lst[0].lower()
 
     if nrm_lst:
+        word_dict['standartization_view'] = nrm_lst[0]
         word_dict['standartization'] = nrm_lst[0].lower()
 
     if morph_lst:
-        anns = morph_lst[0].lower().split(ANNOTATION_OPTION_SEP)
-        word_dict['annotations'] = [
-            {'lemma': ann.split('-')[0], 'tags': ann.split('-')[1:]}
-            for ann in anns
-        ]
+        word_dict['annotations'] = split_anns_for_db(morph_lst[0])
 
     return word_dict
 

@@ -9,6 +9,7 @@ from pympi import Eaf, Elan
 
 ANNOTATION_WORD_SEP = '|'
 ANNOTATION_OPTION_SEP = '/'
+ANNOTATION_PART_SEP = '-'
 UNKNOWN_PREFIX = '(unkn)_'
 
 STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')
@@ -170,4 +171,23 @@ def get_annotation_alignment(annotation, num_regex):
         for ann in annotation.split(ANNOTATION_WORD_SEP):
             ann_num, ann = num_regex.search(ann).groups()
             annotations[int(ann_num)] = ann
+    return annotations
+
+
+def split_anns_for_db(anns_str):
+    anns = anns_str.split(ANNOTATION_OPTION_SEP)
+    annotations = []
+
+    for ann in anns:
+        lemma_view, tags_view = ann.split(ANNOTATION_PART_SEP, 1)
+        pp_ann = ann.lower().split(ANNOTATION_PART_SEP)
+        lemma, tags = pp_ann[0], pp_ann[1:]
+        lemma = lemma.replace(UNKNOWN_PREFIX, '')
+        annotations.append({
+            'lemma': lemma,
+            'tags': tags,
+            'lemma_view': lemma_view,
+            'tags_view': tags_view
+        })
+
     return annotations

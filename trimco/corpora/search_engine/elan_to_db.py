@@ -3,9 +3,9 @@ from pympi import Eaf
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.elan_utils import (
-    ANNOTATION_OPTION_SEP, STANDARTIZATION_REGEX,
-    STANDARTIZATION_NUM_REGEX, ANNOTATION_NUM_REGEX, UNKNOWN_PREFIX,
-    TECH_REGEX, get_tier_alignment, get_annotation_alignment
+    STANDARTIZATION_REGEX, STANDARTIZATION_NUM_REGEX,
+    ANNOTATION_NUM_REGEX, TECH_REGEX, split_anns_for_db,
+    get_tier_alignment, get_annotation_alignment
 )
 from django.conf import settings
 
@@ -43,20 +43,7 @@ def process_one_annotation(orig, standartization, annotation):
 
         anns = annotations.get(word_num)
         if anns is not None:
-            anns = anns.split(ANNOTATION_OPTION_SEP)
-            word_dict['annotations'] = []
-            for ann in anns:
-                lemma_view, tags_view = ann.split('-', 1)
-                pp_ann = ann.lower().split('-')
-                lemma, tags = pp_ann[0], pp_ann[1:]
-                lemma = lemma.replace(UNKNOWN_PREFIX, '')
-
-                word_dict['annotations'].append({
-                    'lemma': lemma,
-                    'tags': tags,
-                    'lemma_view': lemma_view,
-                    'tags_view': tags_view
-                })
+            word_dict['annotations'] = split_anns_for_db(anns)
 
         words.append(word_dict)
         word_num += 1

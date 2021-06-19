@@ -1,4 +1,5 @@
 from corpora.utils.db_utils import SENTENCE_COLLECTION
+from corpora.utils.elan_utils import ANNOTATION_PART_SEP
 from .db_to_html import db_response_to_html
 
 
@@ -12,7 +13,7 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
         query_parts['standartization'] = standartization.lower()
 
     if annotation:
-        annotation = annotation.lower().replace('-', ' ')
+        annotation = annotation.lower().replace(ANNOTATION_PART_SEP, ' ')
         ann_parts = annotation.split()
         query_parts['annotations'] = {'$elemMatch': {'tags': {'$all': ann_parts}}}
 

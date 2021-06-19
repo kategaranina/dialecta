@@ -186,15 +186,6 @@ class RecordingAdmin(VersionAdmin):
             html_to_db(request.POST['request_data[html]'])
             return HttpResponse(json.dumps(response))
 
-        # elif request.POST['request_type'] == 'save_annotation':
-        #     insert_manual_annotation_in_mongo(
-        #         model=str(self.standartizator.model),
-        #         word=request.POST['request_data[trt]'],
-        #         standartization=request.POST['request_data[nrm]'],
-        #         lemma=request.POST['request_data[lemma]'],
-        #         grammar=request.POST['request_data[annot]']
-        #     )
-
         dialect = request.POST.get('request_data[dialect]', '')
         if not dialect:
             return HttpResponse(json.dumps(response))
@@ -212,6 +203,15 @@ class RecordingAdmin(VersionAdmin):
         elif request.POST['request_type'] == 'annot_suggest_req':
             ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
             response['result'] = current_standartizator.get_annotation_options_list(ann)
+
+        elif request.POST['request_type'] == 'save_annotation':
+            insert_manual_annotation_in_mongo(
+                model=str(current_standartizator.model),
+                word=request.POST['request_data[trt]'],
+                standartization=request.POST['request_data[nrm]'],
+                lemma=request.POST['request_data[lemma]'],
+                grammar=request.POST['request_data[annot]']
+            )
 
         return HttpResponse(json.dumps(response))
 
