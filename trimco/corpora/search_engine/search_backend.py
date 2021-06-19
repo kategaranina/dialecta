@@ -26,7 +26,7 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
 
     query = {'words': {'$elemMatch': query_parts}}
 
-    if dialect:
+    if dialect and any(d for d in dialect):
         query['dialect'] = {'$in': [int(d) for d in dialect]}
     elif not query_parts:
         return
