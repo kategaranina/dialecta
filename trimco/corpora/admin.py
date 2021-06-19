@@ -174,7 +174,7 @@ class RecordingAdmin(VersionAdmin):
 
         if request.POST['request_type'] == 'search':
             response['result'] = search(
-                dialect=request.POST.get('request_data[dialect][]', []),
+                dialect=request.POST.getlist('request_data[dialect][]', []),
                 transcription=request.POST['request_data[transcription]'],
                 standartization=request.POST['request_data[standartization]'],
                 lemma=request.POST['request_data[lemma]'],
