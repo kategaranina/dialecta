@@ -111,7 +111,10 @@ class ElanToHTML:
             annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
             participant, tier_status = get_participant_tag_and_status(tier_obj.attributes['PARTICIPANT'], tier_id)
             audio_div = get_audio_annot_div(annot_data[0], annot_data[1])
-            annot_div = get_annot_div(tier_name, self.dialect.id, participant, transcript, normz_tokens_dict, annot_tokens_dict)
+            annot_div = get_annot_div(
+                tier_name, self.dialect.id, participant, transcript, normz_tokens_dict, annot_tokens_dict,
+                elan_file=str(self.path).rsplit('/', 1)[-1]
+            )
             html += '<div class="annot_wrapper %s">%s%s</div>' % (tier_status, audio_div, annot_div)
             i += 1
 

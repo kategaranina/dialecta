@@ -152,6 +152,7 @@ class RecordingAdmin(VersionAdmin):
 
         elif request.POST['request_type'] == 'save_elan_req':
             self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])
+            html_to_db(request.POST['request_data[html]'])
 
         elif request.POST['request_type'] == 'save_annotation':
             insert_manual_annotation_in_mongo(
