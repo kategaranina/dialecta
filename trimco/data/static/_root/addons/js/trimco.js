@@ -337,8 +337,10 @@
 			$('trt.focused').removeAttr('style');
 			};
 		/* continuing to next token*/
-		var next = nextInDOM('trt', $('trt.focused'));
-		if (next) {activate_trt(next)};
+		setTimeout(function () {
+            var next = nextInDOM('trt', $('trt.focused'));
+		    if (next) {activate_trt(next)};
+        }, 0)
 	}
 
 	/* ADJUST SPACING FOR DOM ON INITIAL LOAD */
