@@ -10,9 +10,9 @@ from corpora.utils.elan_utils import (
 from django.conf import settings
 
 
-# TODO: remove!!!
-settings.configure()
-settings.MEDIA_ROOT = '/home/apertium/dialecta/dialecta/trimco/data/media'
+# # TODO: remove!!!
+# settings.configure()
+# settings.MEDIA_ROOT = '/home/apertium/dialecta/dialecta/trimco/data/media'
 
 def process_one_annotation(orig, standartization, annotation):
     words = []
@@ -96,7 +96,8 @@ def process_one_elan(eaf_filename, audio_filename, dialect):
         speaker = eaf_obj.tiers[speaker_tier][2]['PARTICIPANT'].title()
         tier_sentences = process_one_tier(
             eaf_filename, audio_filename, dialect, speaker, speaker_tier,
-            orig_tier, standartization_tier, annotation_tier)
+            orig_tier, standartization_tier, annotation_tier
+        )
         sentences.extend(tier_sentences)
 
     return sentences
