@@ -468,16 +468,20 @@
 		console.log(dictionary.suggest("молако"));
 		*/
 
-		adjust_DOM_spacing();
-		$("#grp-context-navigation").append($("<div id='save_button'><button id='save_to_file' class='fa fa-floppy-o'></div>"));
+        if (!check_search_mode()) {
+            adjust_DOM_spacing();
+            /*AUDIO: LOADING FILE*/
+            new Howl({
+                urls: [$('#elan_audio').attr('src')],
+                onload: function() {
+                    $(".audiofragment .fa-spinner").removeClass('fa-spinner off').addClass('fa-play');
+                }
+            });
+        };
 
-		/*AUDIO: LOADING FILE*/
-		new Howl({
-            urls: [$('#elan_audio').attr('src')],
-            onload: function() {
-                $(".audiofragment .fa-spinner").removeClass('fa-spinner off').addClass('fa-play');
-            }
-        });
+        $("#grp-context-navigation").append(
+            $("<div id='save_button'><button id='save_to_file' class='fa fa-floppy-o'></div>")
+        );
 
 //		/*AUDIO: PLAY AT CLICK*/
 //		$('.audiofragment').click(function(e) {
