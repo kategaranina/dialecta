@@ -25,8 +25,7 @@ SECRET_KEY = 'k+3ipyx)=c)_o_%z4_ybnp#7_0#f3bdt#e*gox_^cf7cw#)p+t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://vmd16147.contabo.host:10000/']
-
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
@@ -127,19 +126,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-#STATIC_ROOT = BASE_DIR+'/static/_root/'
-
-if 'OPENSHIFT_REPO_DIR' in os.environ:
-    STATIC_ROOT = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'trimco', 'data', 'static')
-else:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'data', STATIC_URL.strip("/"))
-
-#STATICFILES_DIRS = [BASE_DIR+'/static/_root/addons/']
-
-if 'OPENSHIFT_REPO_DIR' in os.environ:
-    STATICFILES_DIRS = [os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'trimco', 'data', 'static', '_root', 'addons')]
-else:
-    STATICFILES_DIRS = [BASE_DIR+'/data/static/_root/addons/']
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'data', STATIC_URL.strip("/"))  # STATIC_ROOT
+]
 
 #MEDIA_ROOT = BASE_DIR+'/media/'
 if 'OPENSHIFT_REPO_DIR' in os.environ:
@@ -150,4 +139,7 @@ else:
 
 GRAPPELLI_ADMIN_TITLE = 'BaltSlavDialects 0.1'
 
-NORMALIZER_PATH = '/data/csmtiser/'
+NORMALIZER_PATH = '/home/apertium/dialecta/csmtiser/'
+
+MONGO_URL = 'mongodb://localhost:27017/'
+MONGO_DB_NAME = 'dialecta'

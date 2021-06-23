@@ -7,7 +7,7 @@ from django.conf import settings
 
 class AnnotationMenuFromXML:
     def __init__(self, xml_name):
-        path = os.path.join(settings.STATIC_ROOT, xml_name)
+        path = os.path.join(settings.STATICFILES_DIRS[0], xml_name)
         self.tree = etree.parse(path)
         self.build_terms_dict()
         self.build_dep_dict()
