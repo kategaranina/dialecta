@@ -12,15 +12,14 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from .settings_local import SECRET_KEY, GEOPOSITION_GOOGLE_MAPS_API_KEY
+
 
 SITE_ID = 1
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'k+3ipyx)=c)_o_%z4_ybnp#7_0#f3bdt#e*gox_^cf7cw#)p+t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -106,6 +105,26 @@ DATABASES = {
     }
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        # Log to a text file that can be rotated by logrotate
+        'logfile': {
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': os.path.join(os.path.dirname(BASE_DIR), 'logs', 'dialecta_errors.log')
+        },
+    },
+    'loggers': {
+        # Might as well log any errors anywhere else in Django
+        'django': {
+            'handlers': ['logfile'],
+            'level': 'ERROR',
+            'propagate': False
+        }
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -135,7 +154,6 @@ if 'OPENSHIFT_REPO_DIR' in os.environ:
     MEDIA_ROOT = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'trimco', 'data', 'media')
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'data', MEDIA_URL.strip("/"))
-
 
 GRAPPELLI_ADMIN_TITLE = 'BaltSlavDialects 0.1'
 
