@@ -149,7 +149,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'data', STATIC_URL.strip("/"))  # STATIC_ROOT
 ]
 
-#MEDIA_ROOT = BASE_DIR+'/media/'
 if 'OPENSHIFT_REPO_DIR' in os.environ:
     MEDIA_ROOT = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'trimco', 'data', 'media')
 else:
