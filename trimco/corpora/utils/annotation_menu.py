@@ -150,6 +150,7 @@ class AnnotationMenuFromXML:
         if is_lemma:
             new_tags = [lemma] + new_tags
 
+        # TODO: import ANNOTATION_TAG_SEP
         new_tags = '-'.join(new_tags).replace(';-', '; ')
         return new_tags
 

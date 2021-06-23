@@ -3,6 +3,19 @@ from lxml import etree
 from .annotation_menu import annotation_menu
 
 
+ANNOTATION_WORD_SEP = '|'
+ANNOTATION_OPTION_SEP = '/'
+ANNOTATION_PART_SEP = ':'
+ANNOTATION_TAG_SEP = '-'
+UNKNOWN_PREFIX = '(unkn)_'
+
+STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')
+STANDARTIZATION_NUM_REGEX = re.compile(r'^(\d+):(.+)')
+ANNOTATION_NUM_REGEX = re.compile(r'(\d+?):.+?:(.+)')
+
+TECH_REGEX = re.compile(r'(?:\.\.\.|\?|\[|]|\.|!|un\'?int\.?)+')
+
+
 def get_participant_status(tier_name):
     if '_i_' in tier_name:
         return 'inwr'
@@ -74,21 +87,21 @@ def add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dic
             continue
 
         if i in annot_tokens_dict.keys():
-            raw_morph_tags_full = annot_tokens_dict[i][1].split('/')
-            morph_tags_full = '/'.join(
+            raw_morph_tags_full = annot_tokens_dict[i][1].split(ANNOTATION_OPTION_SEP)
+            morph_tags_full = ANNOTATION_OPTION_SEP.join(
                 annotation_menu.override_abbreviations(x, is_lemma=True)
                 for x in raw_morph_tags_full
             )  # DB
             tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
 
-            moprh_tags = raw_morph_tags_full[0].split('-', 1)[1]
+            moprh_tags = raw_morph_tags_full[0].split(ANNOTATION_TAG_SEP, 1)[1]
             morph_tags = annotation_menu.override_abbreviations(moprh_tags)  # DB
             tag.insert(0, etree.fromstring('<morph>' + morph_tags + '</morph>'))
 
             lemma_full = annot_tokens_dict[i][0]
             tag.insert(0, etree.fromstring('<lemma_full style="display:none">' + lemma_full + '</lemma_full>'))
 
-            lemma = lemma_full.split('/')[0]
+            lemma = lemma_full.split(ANNOTATION_OPTION_SEP)[0]
             tag.insert(0, etree.fromstring('<lemma>' + lemma + '</lemma>'))
 
         if i in normz_tokens_dict.keys():

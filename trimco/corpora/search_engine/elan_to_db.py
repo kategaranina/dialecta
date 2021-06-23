@@ -3,9 +3,11 @@ from pympi import Eaf
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.elan_utils import (
+    split_anns_for_db, get_tier_alignment, get_annotation_alignment
+)
+from corpora.utils.format_utils import (
     STANDARTIZATION_REGEX, STANDARTIZATION_NUM_REGEX,
-    ANNOTATION_NUM_REGEX, TECH_REGEX, split_anns_for_db,
-    get_tier_alignment, get_annotation_alignment
+    ANNOTATION_NUM_REGEX, TECH_REGEX
 )
 from django.conf import settings
 

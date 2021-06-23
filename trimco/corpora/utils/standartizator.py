@@ -6,7 +6,7 @@ from django.conf import settings
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
 from .annotation_menu import annotation_menu
-from .elan_utils import UNKNOWN_PREFIX
+from .format_utils import UNKNOWN_PREFIX, ANNOTATION_TAG_SEP
 
 
 class Standartizator:
@@ -98,7 +98,7 @@ class Standartizator:
         result_list = []
 
         for full_tag, count in unique_anns.most_common():
-            lemma, tag = full_tag.split('-', 1)
+            lemma, tag = full_tag.split(ANNOTATION_TAG_SEP, 1)
             score = count / total_anns
             result_list.append([lemma, tag, score])
 
@@ -115,7 +115,7 @@ class Standartizator:
 
             # TODO: move somewhere
             if self.model.name == 'be' and (orig.endswith('ṷšy') or orig.endswith('ṷši')) and tag.startswith('GER-'):
-                tag = 'ANTP-' + tag[4:]
+                tag = 'ANTP' + ANNOTATION_TAG_SEP + tag[4:]
 
             # pymorphy2 specific
             methods = {str(x[0]) for x in annot.methods_stack}

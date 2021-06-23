@@ -1,22 +1,13 @@
-import re
 import os
 from decimal import Decimal
 from pympi import Eaf, Elan
+from .format_utils import (
+    TECH_REGEX, ANNOTATION_WORD_SEP, ANNOTATION_OPTION_SEP,
+    ANNOTATION_PART_SEP, ANNOTATION_TAG_SEP, UNKNOWN_PREFIX
+)
 
 
 # TODO: join all funcs in ElanObject and use it everywhere
-
-
-ANNOTATION_WORD_SEP = '|'
-ANNOTATION_OPTION_SEP = '/'
-ANNOTATION_PART_SEP = '-'
-UNKNOWN_PREFIX = '(unkn)_'
-
-STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')
-STANDARTIZATION_NUM_REGEX = re.compile(r'^(\d+):(.+)')
-ANNOTATION_NUM_REGEX = re.compile(r'(\d+?):.+?:(.+)')
-
-TECH_REGEX = re.compile(r'(?:\.\.\.|\?|\[|]|\.|!|un\'?int\.?)+')
 
 
 class Tier:
@@ -128,9 +119,11 @@ class ElanObject:
 
             try:
                 if lemma_lst + morph_lst:
-                    annot_value_lst.append('%s:%s:%s' % (t_counter, lemma_lst[0], morph_lst[0]))
+                    annot_value_lst.append(
+                        '%s%s%s%s%s' % (t_counter, ANNOTATION_PART_SEP, lemma_lst[0], ANNOTATION_PART_SEP, morph_lst[0])
+                    )
                 if nrm_lst:
-                    nrm_value_lst.append('%s:%s' % (t_counter, nrm_lst[0]))
+                    nrm_value_lst.append('%s%s%s' % (t_counter, ANNOTATION_PART_SEP, nrm_lst[0]))
             except IndexError:
                 print(
                     'Exception while saving. Normalization: %s,'
@@ -141,10 +134,14 @@ class ElanObject:
             t_counter += 1
 
         if annot_value_lst:
-            self.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
+            self.add_extra_tags(
+                tier_name, start, end, ANNOTATION_WORD_SEP.join(annot_value_lst), 'annotation'
+            )
 
         if nrm_value_lst:
-            self.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
+            self.add_extra_tags(
+                tier_name, start, end, ANNOTATION_WORD_SEP.join(nrm_value_lst), 'standartization'
+            )
 
 
 def clean_transcription(transcription):
@@ -179,8 +176,8 @@ def split_anns_for_db(anns_str):
     annotations = []
 
     for ann in anns:
-        lemma_view, tags_view = ann.split(ANNOTATION_PART_SEP, 1)
-        pp_ann = ann.lower().split(ANNOTATION_PART_SEP)
+        lemma_view, tags_view = ann.split(ANNOTATION_TAG_SEP, 1)
+        pp_ann = ann.lower().split(ANNOTATION_TAG_SEP)
         lemma, tags = pp_ann[0], pp_ann[1:]
         lemma = lemma.replace(UNKNOWN_PREFIX, '')
         annotations.append({

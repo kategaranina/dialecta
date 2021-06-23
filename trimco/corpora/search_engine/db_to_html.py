@@ -4,6 +4,7 @@ from lxml import etree
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import (
+    ANNOTATION_OPTION_SEP, ANNOTATION_TAG_SEP,
     get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
@@ -29,9 +30,12 @@ def get_transcript_and_tags_dicts(words):
         for ann in w.get('annotations', []):
             if ann['lemma_view'] not in lemmata:
                 lemmata.append(ann['lemma_view'])
-            full_ann = ann['lemma_view'] + '-' + ann['tags_view']
+            full_ann = ann['lemma_view'] + ANNOTATION_TAG_SEP + ann['tags_view']
             annots.append(full_ann)
-        annot_tokens_dict[i] = ['/'.join(lemmata), '/'.join(annots)]
+        annot_tokens_dict[i] = [
+            ANNOTATION_OPTION_SEP.join(lemmata),
+            ANNOTATION_OPTION_SEP.join(annots)
+        ]
 
         i += 1
 

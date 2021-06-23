@@ -6,6 +6,8 @@ from django.conf import settings
 from .standartizator import Standartizator
 from .elan_utils import ElanObject, clean_transcription
 from .format_utils import (
+    ANNOTATION_WORD_SEP, ANNOTATION_OPTION_SEP,
+    ANNOTATION_TAG_SEP, ANNOTATION_PART_SEP,
     get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
@@ -71,13 +73,15 @@ class ElanToHTML:
             for token in annotation:
                 nrm = token[0]
                 anns = token[1]
-                lemma = '/'.join(set([x[0] for x in anns]))
-                morph = '/'.join([x[0] + '-' + x[1] for x in anns])
+                lemma = ANNOTATION_OPTION_SEP.join(set([x[0] for x in anns]))
+                morph = ANNOTATION_OPTION_SEP.join([x[0] + ANNOTATION_TAG_SEP + x[1] for x in anns])
                 try:
                     if lemma + morph:
-                        annot_value_lst.append('%s:%s:%s' % (t_counter, lemma, morph))
+                        annot_value_lst.append(
+                            '%s%s%s%s%s' % (t_counter, ANNOTATION_PART_SEP, lemma, ANNOTATION_PART_SEP, morph)
+                        )
                     if nrm:
-                        nrm_value_lst.append('%s:%s' % (t_counter, nrm))
+                        nrm_value_lst.append('%s%s%s' % (t_counter, ANNOTATION_PART_SEP, nrm))
                 except IndexError:
                     print(
                         'Exception while saving. Normalization: %s,'
@@ -85,10 +89,15 @@ class ElanToHTML:
                     )
                 t_counter += 1
 
+            # TODO: copypaste from elan_utils:135
             if annot_value_lst:
-                self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(annot_value_lst), 'annotation')
+                self.elan_obj.add_extra_tags(
+                    tier_name, start, end, ANNOTATION_WORD_SEP.join(annot_value_lst), 'annotation'
+                )
             if nrm_value_lst:
-                self.elan_obj.add_extra_tags(tier_name, start, end, '|'.join(nrm_value_lst), 'standartization')
+                self.elan_obj.add_extra_tags(
+                    tier_name, start, end, ANNOTATION_WORD_SEP.join(nrm_value_lst), 'standartization'
+                )
 
     def build_html(self):
         print('Transcription > Standard learning examples:', self.file_obj.data.path)
@@ -148,9 +157,9 @@ class ElanToHTML:
             if not nrm_annot_lst:
                 return tokens_dict
 
-            nrm_annot = nrm_annot_lst[0][-1].split('|')
+            nrm_annot = nrm_annot_lst[0][-1].split(ANNOTATION_WORD_SEP)
             for el in nrm_annot:
-                el = el.split(':')
+                el = el.split(ANNOTATION_PART_SEP)
                 tokens_dict[int(el[0])] = el[1:]
 
         except KeyError:

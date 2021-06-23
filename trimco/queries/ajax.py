@@ -7,6 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 from corpora.models import Recording
 from corpora.utils.elan_utils import ElanObject
+from corpora.utils.format_utils import (
+    ANNOTATION_WORD_SEP, ANNOTATION_TAG_SEP, ANNOTATION_PART_SEP
+)
 
 
 @csrf_exempt
@@ -124,7 +127,7 @@ class Query:
     def query_morph(self, token_dict):
         for conditions_obj in self.morph_conditions:
             for c, v in conditions_obj.get_morph():
-                c_in_ann = c in token_dict['annotation'].split('-')
+                c_in_ann = c in token_dict['annotation'].split(ANNOTATION_TAG_SEP)
                 if (not c_in_ann and v) or (c_in_ann and not v):
                     return False
         return True
@@ -147,9 +150,9 @@ class Query:
             if not nrm_annot_lst:
                 return tokens_dict
 
-            nrm_annot = nrm_annot_lst[0][-1].split('|')
+            nrm_annot = nrm_annot_lst[0][-1].split(ANNOTATION_WORD_SEP)
             for el in nrm_annot:
-                el = el.split(':')
+                el = el.split(ANNOTATION_PART_SEP)
                 tokens_dict[int(el[0])] = el[1:]
 
         except KeyError:

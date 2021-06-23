@@ -4,10 +4,13 @@ from pympi import Eaf
 
 from .db_utils import WORD_COLLECTION, STANDARTIZATION_COLLECTION
 from .elan_utils import (
-    ANNOTATION_OPTION_SEP, STANDARTIZATION_REGEX,
-    STANDARTIZATION_NUM_REGEX, ANNOTATION_NUM_REGEX,
     clean_transcription, get_tier_alignment,
     get_annotation_alignment
+)
+from .format_utils import (
+    ANNOTATION_OPTION_SEP, ANNOTATION_TAG_SEP,
+    STANDARTIZATION_REGEX, STANDARTIZATION_NUM_REGEX,
+    ANNOTATION_NUM_REGEX
 )
 
 
@@ -111,7 +114,7 @@ def insert_words_in_mongo(words):
 
 def insert_manual_annotation_in_mongo(model, word, standartization, lemma, grammar):
     standartization = standartization.lower()
-    annotation = lemma.lower() + '-' + grammar
+    annotation = lemma.lower() + ANNOTATION_TAG_SEP + grammar
     insert_one_word_in_mongo(word.lower(), model, [standartization])
     insert_one_standartization_in_mongo(standartization, model, [annotation])
 
