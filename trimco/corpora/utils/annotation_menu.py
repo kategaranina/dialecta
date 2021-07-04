@@ -2,12 +2,12 @@ import re
 import os
 import json
 from lxml import etree
-from django.conf import settings
+from trimco.settings import _STATIC_ROOT
 
 
 class AnnotationMenuFromXML:
     def __init__(self, xml_name):
-        path = os.path.join(settings.STATICFILES_DIRS[0], xml_name)
+        path = os.path.join(_STATIC_ROOT, xml_name)
         self.tree = etree.parse(path)
         self.build_terms_dict()
         self.build_dep_dict()

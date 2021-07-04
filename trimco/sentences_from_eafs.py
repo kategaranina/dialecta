@@ -26,8 +26,8 @@ def insert_sentences():
         audio_filename = audio_filename.rsplit('/', 1)[-1]
         curr_sentences = process_one_elan(eaf_filename, audio_filename, dialect)
         sentences.extend(curr_sentences)
-
-    insert_sentences_in_mongo(sentences)
+    if sentences:
+        insert_sentences_in_mongo(sentences)
 
 
 if __name__ == '__main__':

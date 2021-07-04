@@ -8,6 +8,7 @@ div#grp-content-container {
 }
 #workbench {
 	position: fixed;
+	z-index: 100;
 	top: 100px;
 	right: 0px;
 	-webkit-transition-duration: 0.3s;

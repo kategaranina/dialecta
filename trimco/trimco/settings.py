@@ -145,9 +145,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'data', STATIC_URL.strip("/"))  # STATIC_ROOT
-]
+_STATIC_ROOT = os.path.join(BASE_DIR, 'data', STATIC_URL.strip("/"))
+STATICFILES_DIRS = [_STATIC_ROOT]
 
 if 'OPENSHIFT_REPO_DIR' in os.environ:
     MEDIA_ROOT = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'trimco', 'data', 'media')
