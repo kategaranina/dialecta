@@ -12,10 +12,6 @@ from corpora.utils.format_utils import (
 from django.conf import settings
 
 
-# # TODO: remove!!!
-# settings.configure()
-# settings.MEDIA_ROOT = '/home/apertium/dialecta/dialecta/trimco/data/media'
-
 def process_one_annotation(orig, standartization, annotation):
     words = []
 
