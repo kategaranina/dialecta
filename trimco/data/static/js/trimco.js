@@ -50,6 +50,7 @@
                     }
                     else if (req_type == 'search') {
                         $('#search_result').html(result.result);
+                        $('#search_button').html('Search');
                         adjust_DOM_spacing();
                     }
                 }
@@ -614,10 +615,12 @@
                 'lemma': $('input[name="lemma"]').val(),
                 'annotations': $('input[name="annotations"]').val()
             }
+            $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
             ajax_request('search', formdata, search=true);
         });
 
         $('#replace_button').click(function(e) {
+            $('#replace_button').html('<i class="fa fa-spinner fa-spin"></i>');
             var query = create_replace_query();
             if (query) {
                 $("token").each( function() {
@@ -625,6 +628,7 @@
                     if (is_relevant) { replace($(this)) }
                 });
             };
+            $('#replace_button').html('Replace');
         });
 	});
 })(django.jQuery);

@@ -94,7 +94,8 @@ def add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dic
             )  # DB
             tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
 
-            moprh_tags = raw_morph_tags_full[0].split(ANNOTATION_TAG_SEP, 1)[1]
+            spl = raw_morph_tags_full[0].split(ANNOTATION_TAG_SEP, 1)
+            moprh_tags = spl[1] if len(spl) > 1 else ''
             morph_tags = annotation_menu.override_abbreviations(moprh_tags)  # DB
             tag.insert(0, etree.fromstring('<morph>' + morph_tags + '</morph>'))
 

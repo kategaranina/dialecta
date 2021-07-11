@@ -101,6 +101,9 @@ class AnnotationMenuFromXML:
 
     def override_abbreviations(self, tag_str, is_lemma=False):
         tags_lst = [t for t in re.split('[, -]', tag_str) if t]
+        if not tags_lst:
+            return ''
+
         if is_lemma:
             lemma, tags_lst = tags_lst[0], tags_lst[1:]
 
