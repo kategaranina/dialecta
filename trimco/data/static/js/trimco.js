@@ -50,6 +50,7 @@
                     }
                     else if (req_type == 'search') {
                         $('#search_result').html(result.result);
+                        if (result.total_pages!=null) { render_page_nums(result.total_pages) };
                         $('#search_button').html('Search');
                         adjust_DOM_spacing();
                     }
@@ -57,6 +58,13 @@
             }
         });
 	};
+
+	function render_page_nums(total_pages) {
+	    $('#page_nums').empty();
+	    for (i = 1; i <= total_pages; i++) {
+	        $('#page_nums').append('<div class="page_num">' + i + '</div>')
+	    }
+	}
 
 	function auto_annotation_request(trt_tag) {
 		ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'mode' : 'auto',});
@@ -613,7 +621,22 @@
                 'transcription': $('input[name="transcription"]').val(),
                 'standartization': $('input[name="standartization"]').val(),
                 'lemma': $('input[name="lemma"]').val(),
-                'annotations': $('input[name="annotations"]').val()
+                'annotations': $('input[name="annotations"]').val(),
+                'start_page': 0,
+                'return_total_pages': true
+            }
+            $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
+            ajax_request('search', formdata, search=true);
+        });
+
+        $(document).on('click', '.page_num', function(e) {
+            var formdata = {
+                'dialect': $('select[name="dialect"]').val(),
+                'transcription': $('input[name="transcription"]').val(),
+                'standartization': $('input[name="standartization"]').val(),
+                'lemma': $('input[name="lemma"]').val(),
+                'annotations': $('input[name="annotations"]').val(),
+                'start_page': $(this).text()
             }
             $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
             ajax_request('search', formdata, search=true);

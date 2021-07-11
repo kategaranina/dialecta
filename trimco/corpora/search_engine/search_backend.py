@@ -1,5 +1,8 @@
+import math
+
 from pymongo import ASCENDING
 
+from trimco.settings import MONGODB_LIMIT
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import ANNOTATION_TAG_SEP
 from .db_to_html import db_response_to_html, html_to_db
@@ -35,13 +38,23 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
     return query
 
 
-def search(dialect, transcription, standartization, lemma, annotation):
+def search(dialect, transcription, standartization, lemma, annotation, start_page, return_total_pages=False):
     query = compile_query(dialect, transcription, standartization, lemma, annotation)
-    results = SENTENCE_COLLECTION.find(query) if query is not None else None
-    if results is not None:
+    results = None
+    total_pages = None
+
+    if query is not None:
+        results = SENTENCE_COLLECTION.find(query)
+        if start_page > 1:
+            results = results.skip((start_page-1) * MONGODB_LIMIT)
+        results = results.limit(MONGODB_LIMIT)
         results = results.sort([('elan', ASCENDING), ('audio.start', ASCENDING)])
+
+        if return_total_pages:
+            total_pages = math.ceil(results.count() / MONGODB_LIMIT)
+
     result_html = db_response_to_html(results)
-    return result_html
+    return result_html, total_pages
 
 
 def saved_recording_to_db(eaf_path, audio_path, html, dialect):

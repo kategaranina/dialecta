@@ -159,3 +159,4 @@ NORMALIZER_PATH = '/home/apertium/dialecta/csmtiser/'
 
 MONGO_URL = 'mongodb://localhost:27017/'
 MONGO_DB_NAME = 'dialecta'
+MONGODB_LIMIT = 100
