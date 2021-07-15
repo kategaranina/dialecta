@@ -18,6 +18,7 @@
             timeout: 50000,
             error: function(x, t, m) {
                 console.log(x, t, m);
+                alert('Something went wrong. Please contact developers describing the actions that led to the error.')
                 processing_request = false;
             },
             success: function(response) {
