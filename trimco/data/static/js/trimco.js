@@ -50,7 +50,10 @@
                     }
                     else if (req_type == 'search') {
                         $('#search_result').html(result.result);
-                        if (result.total_pages!=null) { render_page_nums(result.total_pages) };
+                        if (result.total_pages!=null) {
+                            render_page_nums(result.total_pages);
+                            $(".page_num").first().addClass('current');
+                        };
                         $('#search_button').html('Search');
                         adjust_DOM_spacing();
                     }
@@ -630,6 +633,8 @@
         });
 
         $(document).on('click', '.page_num', function(e) {
+            $('.page_num').removeClass('current');
+            $(this).addClass('current');
             var formdata = {
                 'dialect': $('select[name="dialect"]').val(),
                 'transcription': $('input[name="transcription"]').val(),

@@ -292,4 +292,13 @@ token::after {
     padding: 10px;
     float: left;
     cursor: pointer;
+    font-size: 12pt;
+}
+
+.page_num.current {
+    background-color: #eccfec;
+}
+
+#page_nums {
+    margin: 43px;
 }
