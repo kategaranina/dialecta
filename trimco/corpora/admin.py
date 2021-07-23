@@ -20,6 +20,10 @@ from django.views.decorators.csrf import csrf_exempt
 from reversion.admin import VersionAdmin
 
 
+class HttpResponseConflict(HttpResponse):
+    status_code = 409  # Conflict
+
+
 @admin.register(Recording)
 class RecordingAdmin(VersionAdmin):
 
@@ -135,8 +139,13 @@ class RecordingAdmin(VersionAdmin):
 
     @csrf_exempt
     def ajax_dispatcher(self, request):
+        if self.processing_request:
+            return HttpResponseConflict()
+
         response = {}
         self.processing_request = True
+
+        # print(request.POST)  # TODO: debug, remove
 
         if request.POST['request_type'] == 'trt_annot_req':
             if request.POST['request_data[mode]'] == 'manual':
@@ -158,6 +167,7 @@ class RecordingAdmin(VersionAdmin):
                 html=request.POST['request_data[html]'],
                 dialect=self.recording_obj.to_dialect.id
             )
+            print('nya3')
 
         elif request.POST['request_type'] == 'save_annotation':
             insert_manual_annotation_in_mongo(
@@ -168,14 +178,18 @@ class RecordingAdmin(VersionAdmin):
                 grammar=request.POST['request_data[annot]']
             )
 
+        self.processing_request = False
         return HttpResponse(json.dumps(response))
 
     @csrf_exempt
     def ajax_search_dispatcher(self, request):
+        if self.processing_request:
+            return HttpResponseConflict()
+
         response = {}
         self.processing_request = True
 
-        print(request.POST)
+        print(request.POST)  # TODO: debug, remove
 
         if request.POST['request_type'] == 'search':
             response['result'], response['total_pages'] = search(
@@ -221,6 +235,7 @@ class RecordingAdmin(VersionAdmin):
                 grammar=request.POST['request_data[annot]']
             )
 
+        self.processing_request = False
         return HttpResponse(json.dumps(response))
 
 

@@ -15,7 +15,7 @@
             //contentType: "application/json; charset=utf-8",
             type: 'POST',
             data: {'request_type' : req_type, 'request_data' : req_data},
-            timeout: 50000,
+            timeout: 300000,
             error: function(x, t, m) {
                 console.log(x, t, m);
                 alert('Something went wrong. Please contact developers describing the actions that led to the error.')

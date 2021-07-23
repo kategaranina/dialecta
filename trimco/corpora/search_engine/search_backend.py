@@ -63,9 +63,11 @@ def saved_recording_to_db(eaf_path, audio_path, html, dialect):
 
     query = {'elan': eaf_filename}
     match = SENTENCE_COLLECTION.find_one(query)
+    print('nya1')
 
     if match is not None:
         html_to_db(html)
     else:
         sentences = process_one_elan(eaf_filename, audio_filename, dialect)
         insert_sentences_in_mongo(sentences)
+    print('nya2')
