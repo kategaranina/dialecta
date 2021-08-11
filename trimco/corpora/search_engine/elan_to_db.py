@@ -9,7 +9,7 @@ from corpora.utils.format_utils import (
     STANDARTIZATION_REGEX, STANDARTIZATION_NUM_REGEX,
     ANNOTATION_NUM_REGEX, TECH_REGEX
 )
-from django.conf import settings
+from trimco.settings import MEDIA_ROOT
 
 
 def process_one_annotation(orig, standartization, annotation):
@@ -73,7 +73,7 @@ def process_one_tier(eaf_filename, audio_filename, dialect, speaker, tier_name, 
 
 
 def process_one_elan(eaf_filename, audio_filename, dialect):
-    full_eaf_filename = os.path.join(settings.MEDIA_ROOT, eaf_filename)
+    full_eaf_filename = os.path.join(MEDIA_ROOT, eaf_filename)
     eaf_obj = Eaf(full_eaf_filename)
     sentences = []
 

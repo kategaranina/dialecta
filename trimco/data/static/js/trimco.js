@@ -1,6 +1,6 @@
 (function($) {
 	var processing_request = false;
-	function ajax_request(req_type, req_data, search=false) {  // TODO: req_type to different funcs?
+	function ajax_request(req_type, req_data, search=false, retry=0) {  // TODO: req_type to different funcs?
         if (processing_request == true) {
             console.log('processing previous request, please wait'); // Error to log
             return false;
@@ -20,6 +20,9 @@
                 console.log(x, t, m);
                 alert('Something went wrong. Please contact developers describing the actions that led to the error.')
                 processing_request = false;
+                if (req_type == 'save_elan_req') {
+                    $('#save_to_file').removeClass('fa-spinner off').addClass('fa-floppy-o');
+                };
             },
             success: function(response) {
                 result = $.parseJSON(response);  // Get the results sended from ajax to here

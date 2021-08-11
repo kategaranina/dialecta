@@ -86,6 +86,11 @@ class RecordingAdmin(VersionAdmin):
 
     @transaction.atomic
     def edit(self, request):
+        if self.processing_request:
+            return HttpResponseConflict()
+
+        self.processing_request = True
+
         self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
         self.elan_converter = ElanToHTML(self.recording_obj)
         self.elan_converter.build_page()
@@ -101,10 +106,17 @@ class RecordingAdmin(VersionAdmin):
             'annot_menu_checkboxes': annot_menu_checkboxes,
             'auto_annotation_option': True
         }
+
+        self.processing_request = False
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
 
     @transaction.atomic
     def search(self, request):
+        if self.processing_request:
+            return HttpResponseConflict()
+
+        self.processing_request = True
+
         annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
         dialects = [(x.id, x.abbreviation) for x in Dialect.objects.all()]
 
@@ -117,10 +129,17 @@ class RecordingAdmin(VersionAdmin):
             'dialects': dialects,
             'auto_annotation_option': False
         }
+
+        self.processing_request = False
         return render_to_response(self.search_template, context_instance=RequestContext(request, context))
 
     @transaction.atomic
     def auto_annotate(self, request):
+        if self.processing_request:
+            return HttpResponseConflict()
+
+        self.processing_request = True
+
         self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
         self.elan_converter = ElanToHTML(self.recording_obj, mode='auto-annotation')
         self.elan_converter.build_page()
@@ -135,6 +154,8 @@ class RecordingAdmin(VersionAdmin):
             'annot_menu_checkboxes': annot_menu_checkboxes,
             'auto_annotation_option': True
         }
+
+        self.processing_request = False
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
 
     @csrf_exempt
@@ -144,6 +165,9 @@ class RecordingAdmin(VersionAdmin):
 
         response = {}
         self.processing_request = True
+
+        self.recording_obj = get_object_or_404(Recording, id=request.META['HTTP_REFERER'].split('/')[-3])
+        self.standartizator = Standartizator(self.recording_obj.to_dialect)
 
         # print(request.POST)  # TODO: debug, remove
 
@@ -167,7 +191,6 @@ class RecordingAdmin(VersionAdmin):
                 html=request.POST['request_data[html]'],
                 dialect=self.recording_obj.to_dialect.id
             )
-            print('nya3')
 
         elif request.POST['request_type'] == 'save_annotation':
             insert_manual_annotation_in_mongo(
@@ -201,15 +224,18 @@ class RecordingAdmin(VersionAdmin):
                 start_page=int(request.POST['request_data[start_page]']),
                 return_total_pages=request.POST.get('request_data[return_total_pages]', False)
             )
+            self.processing_request = False
             return HttpResponse(json.dumps(response))
 
         if request.POST['request_type'] == 'save_elan_req':
             ElanToHTML.save_html_extracts_to_elans(request.POST['request_data[html]'])
             html_to_db(request.POST['request_data[html]'])
+            self.processing_request = False
             return HttpResponse(json.dumps(response))
 
         dialect = request.POST.get('request_data[dialect]', '')
         if not dialect:
+            self.processing_request = False
             return HttpResponse(json.dumps(response))
 
         current_standartizator = Standartizator(dialect)
