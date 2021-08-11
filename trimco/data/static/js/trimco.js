@@ -636,6 +636,18 @@
             ajax_request('search', formdata, search=true);
         });
 
+        $('#search_help_button').click(function(e) {
+            $('#search_help').show()
+        });
+
+         $('#replace_help_button').click(function(e) {
+            $('#replace_help').show()
+        });
+
+        $('.close').click(function(e) {
+            $(this).parent().hide()
+        });
+
         $(document).on('click', '.page_num', function(e) {
             $('.page_num').removeClass('current');
             $(this).addClass('current');

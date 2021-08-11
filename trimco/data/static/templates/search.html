@@ -19,6 +19,23 @@ FIX BREADCRUMPS, SEE BASE.HTML:
 
 {% include "annotation_menu.html" %}
 
+<div class="help" id="search_help">
+    <button type="button" class="close fa fa-times"></button>
+    You can search by transcription, standartization, lemma and annotation tags. <br>
+    Currently, only exact search is possible for transcription, standartization and lemma. <br>
+    In the field "annotation tags", you can specify a set of tags in any order separated by space, e.g. "npro nom" or "nom npro". <br>
+    It is also possible to filter by dialect. "Dialect" field is multi-select. You can select several dialects: click on dialect names while holding Ctrl.
+</div>
+
+<div id="replace_help" class="help">
+    <button type="button" class="close fa fa-times"></button>
+    You can replace different fields content on current result page.
+    On the left, write the values for search. Currently, only exact match is supported. If search contains several fields, only words that contain all values will be matched. <br>
+    On the right, write the replacement values. If you leave the field blank, it will not be replaced. <br>
+    After you click "Replace", all matches on current page will be processed. When you go to the next page, the form is not cleared, so you can use it again. <br>
+    You can also click on any word in the result and the replace form will be filled with this word.
+</div>
+
 <div id="search_form">
 <form id="search">
     <div>
@@ -38,7 +55,7 @@ FIX BREADCRUMPS, SEE BASE.HTML:
         </select></div>
     </div>
     </div>
-<button id="search_button" class="grp-button" type="button">Search</button>
+<button id="search_button" class="grp-button" type="button">Search</button><button type="button" class="help_button fa fa-question" id="search_help_button"></button>
 <input type="reset" class="clear_button grp-button" value="Clear form">
 </form>
 </div>
@@ -59,7 +76,7 @@ FIX BREADCRUMPS, SEE BASE.HTML:
         <div class="field"><input name="to_annotations"></div>
     </div>
     </div>
-<button id="replace_button" class="grp-button" type="button">Replace</button>
+<button id="replace_button" class="grp-button" type="button">Replace</button><button type="button" class="help_button fa fa-question" id="replace_help_button"></button>
 <input type="reset" class="clear_button grp-button" value="Clear form">
 </form>
 </div>

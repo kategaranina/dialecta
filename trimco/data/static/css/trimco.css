@@ -302,3 +302,27 @@ token::after {
 #page_nums {
     margin: 43px;
 }
+
+.help_button {
+    margin: 2px 0 0 20px;
+}
+
+.help {
+    display: none;
+    background-color: white;
+    padding: 20px;
+    border: 1px solid gray;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+
+.close {
+    position:absolute;
+    top: 5px;
+    right: 5px;
+    margin: 0 !important;
+    z-index: 100000;
+}
