@@ -169,8 +169,6 @@ class RecordingAdmin(VersionAdmin):
         self.recording_obj = get_object_or_404(Recording, id=request.META['HTTP_REFERER'].split('/')[-3])
         self.standartizator = Standartizator(self.recording_obj.to_dialect)
 
-        # print(request.POST)  # TODO: debug, remove
-
         if request.POST['request_type'] == 'trt_annot_req':
             if request.POST['request_data[mode]'] == 'manual':
                 manual_words = self.standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
@@ -211,8 +209,6 @@ class RecordingAdmin(VersionAdmin):
 
         response = {}
         self.processing_request = True
-
-        print(request.POST)  # TODO: debug, remove
 
         if request.POST['request_type'] == 'search':
             response['result'], response['total_pages'] = search(

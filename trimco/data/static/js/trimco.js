@@ -18,7 +18,7 @@
             timeout: 300000,
             error: function(x, t, m) {
                 console.log(x, t, m);
-                alert('Something went wrong. Please contact developers describing the actions that led to the error.')
+                alert('Something went wrong. Try again later. If the error persists, please contact developers and describe the problem.')
                 processing_request = false;
                 if (req_type == 'save_elan_req') {
                     $('#save_to_file').removeClass('fa-spinner off').addClass('fa-floppy-o');
@@ -35,7 +35,6 @@
                             list_normlz_suggestions(result.result)
                         }
                         if (req_data['mode'] == 'auto') {
-                            //console.log(result.result);
                             if (result.result!=null) {
                                 apply_auto_annotation(result.result[0],result.result[1],result.result[2])
                             }
@@ -195,13 +194,11 @@
 		$('.manualAnnotation#form_input').val($('#normalization_input').val()).parent().addClass('active');
 		var this_annot_info = annot_tag.text().split(' ');
 		var annot_lst = this_annot_info[this_annot_info.length - 1].split('-');
-		//console.log(annot_lst);
 
 		$('option#'+annot_lst[0]).prop('selected', true)
 		$('option#'+annot_lst[0]).parent().parent().addClass('active');
 
 		$.each(annot_lst, function(i, el){
-			//console.log(el);
 			$('#'+el).prop('selected', true).parent().parent().addClass('active');
 			$('[name="'+el+'"]').prop('checked', true).parent().parent().addClass('active');
 			});
@@ -230,12 +227,10 @@
 						return false;
 					};
 					match = $('#'+id).prop('selected');
-					//console.log(option_tag.html(), $('#'+id).html(), $('#'+id).prop('selected'), );
 					if (match==false){return false};
 				});
 				if (match==true){return false};
 			});
-			//console.log(match)
 			update_annotation_field_status(option_tag, match);
 		});
 	};
@@ -383,20 +378,17 @@
 	/* PLAY SOUND */
 	function audiofragment_click(audio_fragment) {
 		var active_button = audio_fragment.find(">:first-child");
-		console.log(active_button)
         if (!active_button.hasClass('fa-play')){
                 return false;
         }
         var starttime = audio_fragment.attr('starttime');
         var duration = audio_fragment.attr('endtime') - starttime;
-        console.log($('#elan_audio').attr('src'))
         var sound =  new Howl({
             urls: [$('#elan_audio').attr('src')],
             sprite: {
                 segment: [starttime, duration],
             },
             onplay: function() {
-                //console.log(starttime, duration);
                 active_button.removeClass('fa-play').addClass('fa-pause');
             },
             onend: function() {
@@ -575,7 +567,6 @@
 				var div_id = '.eaf_display';
 				var is_search_mode = check_search_mode();
 				if (is_search_mode) {div_id = '#search_result'};
-                console.log(div_id)
 				ajax_request(
                     'save_elan_req',
                     {'html' : '<div>'+$(div_id).html()+'</div>',},
