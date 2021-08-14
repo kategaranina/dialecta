@@ -24,8 +24,14 @@ def insert_sentences():
         eaf_filename, audio_filename, dialect = rec
         eaf_filename = eaf_filename.rsplit('/', 1)[-1]
         audio_filename = audio_filename.rsplit('/', 1)[-1]
-        curr_sentences = process_one_elan(eaf_filename, audio_filename, dialect)
-        sentences.extend(curr_sentences)
+        print(eaf_filename)
+        try:
+            curr_sentences = process_one_elan(eaf_filename, audio_filename, dialect)
+            sentences.extend(curr_sentences)
+        except Exception as e:
+            print('ERROR', e)
+            print()
+
     if sentences:
         insert_sentences_in_mongo(sentences)
 

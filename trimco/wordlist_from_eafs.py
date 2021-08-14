@@ -48,9 +48,15 @@ def insert_wordlist():
             print('ERROR: ' + rec_path + ': no model for chosen dialect')
             continue
 
-        model_name = models[model_id]
-        words = process_one_elan(rec_path, model_name)
-        insert_words_in_mongo(words)
+        print(rec_path)
+
+        try:
+            model_name = models[model_id]
+            words = process_one_elan(rec_path, model_name)
+            insert_words_in_mongo(words)
+        except Exception as e:
+            print('ERROR', e)
+            print()
 
 
 if __name__ == '__main__':
