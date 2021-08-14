@@ -5,7 +5,7 @@ from lxml import etree
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import (
     ANNOTATION_OPTION_SEP, ANNOTATION_TAG_SEP,
-    get_audio_link, get_audio_annot_div,
+    TECH_REGEX, get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
 from corpora.utils.elan_utils import split_anns_for_db
@@ -15,10 +15,14 @@ def get_transcript_and_tags_dicts(words):
     transcript = []
     normz_tokens_dict = {}
     annot_tokens_dict = {}
-    i = 0
+    i = -1
     for w in words:
         transcript.append(w['transcription_view'])
 
+        if TECH_REGEX.match(w['transcription_view']) is not None:
+            continue
+
+        i += 1
         standartization = w.get('standartization_view')
         if standartization is None:
             continue
@@ -32,12 +36,11 @@ def get_transcript_and_tags_dicts(words):
                 lemmata.append(ann['lemma_view'])
             full_ann = ann['lemma_view'] + ANNOTATION_TAG_SEP + ann['tags_view']
             annots.append(full_ann)
+
         annot_tokens_dict[i] = [
             ANNOTATION_OPTION_SEP.join(lemmata),
             ANNOTATION_OPTION_SEP.join(annots)
         ]
-
-        i += 1
 
     return ' '.join(transcript), normz_tokens_dict, annot_tokens_dict
 
