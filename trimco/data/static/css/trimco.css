@@ -103,13 +103,6 @@ div#eaf_display {
 div.annot_wrapper {
 	padding-top: 43pt;
 	display: flex;
-	-webkit-user-select: none; /* Chrome/Safari */        
-	-moz-user-select: none; /* Firefox */
-	-ms-user-select: none; /* IE10+ */
-
-	/* Rules below not implemented in browsers yet */
-	-o-user-select: none;
-	user-select: none;
 }
 div.audiofragment {
 	float: left;
@@ -142,6 +135,13 @@ span.transcript {
 	font-size: 14pt;
 	display: block;
 	clear: both;
+	-webkit-user-select: none; /* Chrome/Safari */
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+
+	/* Rules below not implemented in browsers yet */
+	-o-user-select: none;
+	user-select: none;
 }
 trt {
 	color: #041330;
