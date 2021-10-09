@@ -59,6 +59,7 @@
                         };
                         $('#search_button').html('Search');
                         adjust_DOM_spacing();
+                        $(".audiofragment .fa-spinner").removeClass('fa-spinner off').addClass('fa-play');
                     }
                 }
             }
@@ -381,12 +382,16 @@
         if (!active_button.hasClass('fa-play')){
                 return false;
         }
+        active_button.removeClass('fa-play').addClass('fa-spinner off');
         var starttime = audio_fragment.attr('starttime');
         var duration = audio_fragment.attr('endtime') - starttime;
-        var sound =  new Howl({
-            urls: [$('#elan_audio').attr('src')],
+        var sound = new Howl({
+            urls: [$(audio_fragment).parent().prevAll('#elan_audio').attr('src')],
             sprite: {
                 segment: [starttime, duration],
+            },
+            onload: function() {
+                active_button.removeClass('fa-spinner off').addClass('fa-play');
             },
             onplay: function() {
                 active_button.removeClass('fa-play').addClass('fa-pause');
@@ -461,6 +466,17 @@
         };
     }
 
+    function create_audio() {
+        /*AUDIO: LOADING FILE*/
+        new Howl({
+            urls: [$('#elan_audio').attr('src')],
+            onload: function() {
+                $(".audiofragment .fa-spinner").removeClass('fa-spinner off').addClass('fa-play');
+            }
+        });
+    }
+
+
 	/*
 	********************************************************
 	DOM EVENTS ONLY:
@@ -478,13 +494,7 @@
 
         if (!check_search_mode()) {
             adjust_DOM_spacing();
-            /*AUDIO: LOADING FILE*/
-            new Howl({
-                urls: [$('#elan_audio').attr('src')],
-                onload: function() {
-                    $(".audiofragment .fa-spinner").removeClass('fa-spinner off').addClass('fa-play');
-                }
-            });
+            create_audio();
         };
 
         $("#grp-context-navigation").append(
