@@ -14,6 +14,7 @@
             url: url,  //This is the url of the ajax view where you make the search
             //contentType: "application/json; charset=utf-8",
             type: 'POST',
+            async: false,
             data: {'request_type' : req_type, 'request_data' : req_data},
             timeout: 300000,
             error: function(x, t, m) {
@@ -351,7 +352,7 @@
 		/* continuing to next token*/
 		setTimeout(function () {
             var next = nextInDOM('trt', $('trt.focused'));
-		    if (next) {activate_trt(next)};
+		    if (next) {activate_trt(next, search=check_search_mode())};
         }, 0)
 	}
 
@@ -444,6 +445,7 @@
     }
 
     function replace(token) {
+        token.addClass('changed_by_replace');
         var elements = [ // NB: order is important
             ["to_standartization", "nrm"],
             ["to_lemma", "lemma"],
@@ -464,6 +466,20 @@
                 };
             };
         };
+    }
+
+    function save_replace_annotations() {
+        $('token.changed_by_replace').each( function() {
+            var save_annotation_params = {
+                'dialect': $(this).closest('.annot').attr('dialect'),
+                'trt': $(this).find('trt').html(),
+                'nrm': $(this).find('nrm').html(),
+                'lemma': $(this).find('lemma').html(),
+                'annot': $(this).find('morph').html()
+            };
+            ajax_request('save_annotation', save_annotation_params, search=true);
+       });
+       $('token.changed_by_replace').removeClass('changed_by_replace');
     }
 
     function create_audio() {
@@ -576,7 +592,10 @@
 
 				var div_id = '.eaf_display';
 				var is_search_mode = check_search_mode();
-				if (is_search_mode) {div_id = '#search_result'};
+				if (is_search_mode) {
+                    div_id = '#search_result';
+                    save_replace_annotations();
+				};
 				ajax_request(
                     'save_elan_req',
                     {'html' : '<div>'+$(div_id).html()+'</div>',},
@@ -617,7 +636,10 @@
                 'annot': morph
             }
             var search_mode = check_search_mode()
-            if (search_mode) { save_annotation_params['dialect'] = $('trt.focused').closest('.annot').attr('dialect') };
+            if (search_mode) {
+                save_annotation_params['dialect'] = $('trt.focused').closest('.annot').attr('dialect');
+                $('trt.focused').closest('token').removeClass('changed_by_replace');
+            };
 			ajax_request('save_annotation', save_annotation_params, search=search_mode);
 
 			set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
