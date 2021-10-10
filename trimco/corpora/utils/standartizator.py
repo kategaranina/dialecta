@@ -132,11 +132,15 @@ class Standartizator:
         if manual_corr is not None:
             return self.get_annotation_options_list_from_manual_words(standartization, manual_corr)
 
+        final_list = []
         standartization_from_db = find_standartization(standartization, model=str(self.model))
         if standartization_from_db is not None:
-            return self.get_annotaton_options_list_from_db(standartization_from_db['annotations'])
+            final_list += self.get_annotaton_options_list_from_db(standartization_from_db['annotations'])
 
-        return self.get_annotation_options_list_by_parsing(orig, standartization)
+        final_list += self.get_annotation_options_list_by_parsing(orig, standartization)
+
+        return final_list
+
 
     def get_annotation(self, text):
         annotations = []
