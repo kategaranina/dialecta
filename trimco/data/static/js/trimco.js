@@ -54,9 +54,8 @@
                     }
                     else if (req_type == 'search') {
                         $('#search_result').html(result.result);
-                        if (result.total_pages!=null) {
-                            render_page_nums(result.total_pages);
-                            $(".page_num").first().addClass('current');
+                        if (result.total_pages != null) {
+                            construct_page_section(1, result.total_pages);
                         };
                         $('#search_button').html('Search');
                         adjust_DOM_spacing();
@@ -66,13 +65,6 @@
             }
         });
 	};
-
-	function render_page_nums(total_pages) {
-	    $('#page_nums').empty();
-	    for (i = 1; i <= total_pages; i++) {
-	        $('#page_nums').append('<div class="page_num">' + i + '</div>')
-	    }
-	}
 
 	function auto_annotation_request(trt_tag) {
 		ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'mode' : 'auto',});
@@ -492,6 +484,42 @@
         });
     }
 
+    function construct_small_page_section(page_num, max_page_num) {
+        for (i = 1; i <= max_page_num; i++) {
+            var cls = "page_num";
+            if (i == 1) { cls += " first"; }
+            if (i == page_num) {cls += " current"; }
+            if (i == max_page_num) { cls += " last"; }
+            $('#page_nums').append('<div class="' + cls + '">' + i + '</div>');
+        }
+    }
+
+    function construct_large_page_section(page_num, max_page_num) {
+        var left = Math.max(1, page_num - 1);
+        var right = Math.min(page_num + 1, max_page_num);
+
+        if (page_num != 1) { $('#page_nums').append('<div class="page_num first">1</div>'); }
+
+        if (left - 1 > 2) { $('#page_nums').append('<div class="ellipsis">...</div>'); }
+        else if (left - 1 == 2) { $('#page_nums').append('<div class="page_num">2</div>'); }
+
+        if (left - 1 > 0) { $('#page_nums').append('<div class="page_num">' + left + '</div>'); }
+        $('#page_nums').append('<div class="page_num current">' + page_num + '</div>');
+        if (max_page_num - right > 0) { $('#page_nums').append('<div class="page_num">' + right + '</div>'); }
+
+        if (max_page_num - right > 1) { $('#page_nums').append('<div class="ellipsis">...</div>'); }
+        if (max_page_num != page_num) { $('#page_nums').append('<div class="page_num last">' + max_page_num + '</div>'); }
+
+        if (page_num == 1) { $('.page_num.current').addClass('first'); }
+        if (page_num == max_page_num) { $('.page_num.current').addClass('last'); }
+    }
+
+    function construct_page_section(page_num, max_page_num) {
+        $('#page_nums').empty();
+        if (max_page_num <= 15) { construct_small_page_section(page_num, max_page_num); }
+        else { construct_large_page_section(page_num, max_page_num); }
+    }
+
 
 	/*
 	********************************************************
@@ -672,8 +700,18 @@
         });
 
         $(document).on('click', '.page_num', function(e) {
-            $('.page_num').removeClass('current');
-            $(this).addClass('current');
+            var page_num = parseInt($(this).text());
+            var max_page_num = parseInt($('.page_num.last').text());
+            console.log(max_page_num);
+
+            if (max_page_num <= 15) {
+                $('.page_num').removeClass('current');
+                $(this).addClass('current');
+            } else {
+                $('#page_nums').empty();
+                construct_large_page_section(page_num, max_page_num);
+            }
+
             var formdata = {
                 'dialect': $('select[name="dialect"]').val(),
                 'transcription': $('input[name="transcription"]').val(),
