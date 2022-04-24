@@ -47,11 +47,18 @@ def get_transcript_and_tags_dicts(words):
 
 def db_response_to_html(results):
     if results is None:
-        return '<div id="no_result">Empty search query.</div>'
+        return '<div id="no_result">Empty search query.</div>', {}
 
     item_divs = []
+    page_info = {}
 
-    for item in results:
+    for i, item in enumerate(results):
+        if not i:
+            page_info['min'] = {
+                'elan': item['elan'],
+                'audio_start': item['audio']['start']
+            }
+
         transcript, normz_tokens_dict, annot_tokens_dict = get_transcript_and_tags_dicts(item['words'])
         participant, participant_status = get_participant_tag_and_status(item['speaker'], item['tier'])
         annot_div = get_annot_div(
@@ -71,7 +78,12 @@ def db_response_to_html(results):
         item_div = audio_div + annot_wrapper_div
         item_divs.append(item_div)
 
-    return ''.join(item_divs) or '<div id="no_result">Nothing found.</div>'
+        page_info['max'] = {
+            'elan': item['elan'],
+            'audio_start': item['audio']['start']
+        }
+
+    return ''.join(item_divs) or '<div id="no_result">Nothing found.</div>', page_info
 
 
 def process_html_token(token_el):

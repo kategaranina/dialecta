@@ -37,7 +37,8 @@ def get_audio_annot_div(stttime, endtime):
 
 
 def get_audio_link(audio_file_path):
-    return '<audio id="elan_audio" src="/media/%s" preload></audio>' % audio_file_path
+    return ''
+    # return '<audio id="elan_audio" src="/media/%s" preload></audio>' % audio_file_path
 
 
 def prettify_transcript(transcript):

@@ -211,15 +211,24 @@ class RecordingAdmin(VersionAdmin):
         self.processing_request = True
 
         if request.POST['request_type'] == 'search':
-            response['result'], response['total_pages'] = search(
+            total_pages = request.POST.get('request_data[total_pages]', '')
+            if total_pages == '':
+                total_pages = None
+
+            prev_page_info = request.POST.get('request_data[prev_page_info]', '')
+            prev_page_info = json.loads(prev_page_info) if prev_page_info != '' else {}
+
+            response['result'], response['page_info'], response['total_pages'] = search(
                 dialect=request.POST.getlist('request_data[dialect][]', []),
                 transcription=request.POST['request_data[transcription]'],
                 standartization=request.POST['request_data[standartization]'],
                 lemma=request.POST['request_data[lemma]'],
                 annotation=request.POST['request_data[annotations]'],
                 start_page=int(request.POST['request_data[start_page]']),
-                return_total_pages=request.POST.get('request_data[return_total_pages]', False)
+                prev_page_info=prev_page_info,
+                total_pages=total_pages
             )
+
             self.processing_request = False
             return HttpResponse(json.dumps(response))
 

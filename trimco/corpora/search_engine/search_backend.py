@@ -1,6 +1,6 @@
 import math
 
-from pymongo import ASCENDING
+from pymongo import ASCENDING, DESCENDING
 
 from trimco.settings import MONGODB_LIMIT
 from corpora.utils.db_utils import SENTENCE_COLLECTION
@@ -38,23 +38,57 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
     return query
 
 
-def search(dialect, transcription, standartization, lemma, annotation, start_page, return_total_pages=False):
+def search(
+        dialect, transcription, standartization, lemma, annotation,
+        start_page, prev_page_info, total_pages=None
+):
+    ascending_sort = [('elan', ASCENDING), ('audio.start', ASCENDING)]
+    descending_sort = [('elan', DESCENDING), ('audio.start', DESCENDING)]
     query = compile_query(dialect, transcription, standartization, lemma, annotation)
     results = None
-    total_pages = None
 
     if query is not None:
-        results = SENTENCE_COLLECTION.find(query)
-        if start_page > 1:
-            results = results.skip((start_page-1) * MONGODB_LIMIT)
-        results = results.limit(MONGODB_LIMIT)
-        results = results.sort([('elan', ASCENDING), ('audio.start', ASCENDING)])
+        if prev_page_info and start_page - prev_page_info['num'] == 1:  # next page
+            print('next page')
+            query['elan'] = {'$gte': prev_page_info['max']['elan']}
+            query['audio.start'] = {'$gt': prev_page_info['max']['audio_start']}
+            results = SENTENCE_COLLECTION.find(query)
+            results = results.sort(ascending_sort)
+            results = results.limit(MONGODB_LIMIT)
 
-        if return_total_pages:
-            total_pages = math.ceil(results.count() / MONGODB_LIMIT)
+        elif prev_page_info and start_page - prev_page_info['num'] == -1:  # prev page
+            print('prev page')
+            query['elan'] = {'$lte': prev_page_info['min']['elan']}
+            query['audio.start'] = {'$lt': prev_page_info['min']['audio_start']}
+            results = SENTENCE_COLLECTION.find(query)
+            results = results.sort(descending_sort)
+            results = results.limit(MONGODB_LIMIT)
+            results = results.sort(ascending_sort)  # doesn't work
 
-    result_html = db_response_to_html(results)
-    return result_html, total_pages
+        elif total_pages is not None and start_page == int(total_pages):  # last page
+            print('last page')
+            results = SENTENCE_COLLECTION.find(query)
+            results = results.sort(descending_sort)
+            results = results.limit(MONGODB_LIMIT)
+            results = results.sort(ascending_sort)  # doesn't work
+
+        else:
+            print('usual page')
+            results = SENTENCE_COLLECTION.find(query)
+            if start_page > 1:
+                results = results.skip((start_page-1) * MONGODB_LIMIT)
+            results = results.sort(ascending_sort)
+            results = results.limit(MONGODB_LIMIT)
+
+    if total_pages is None:
+        total_pages = math.ceil(results.count() / MONGODB_LIMIT)
+    else:  # do not return total_pages value if we have it as input
+        total_pages = None
+
+    result_html, page_info = db_response_to_html(results)
+    page_info['num'] = start_page
+
+    return result_html, page_info, total_pages
 
 
 def saved_recording_to_db(eaf_path, audio_path, html, dialect):

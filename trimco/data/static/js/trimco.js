@@ -1,5 +1,7 @@
 (function($) {
 	var processing_request = false;
+	var prev_page_info = {}
+
 	function ajax_request(req_type, req_data, search=false, retry=0) {  // TODO: req_type to different funcs?
         if (processing_request == true) {
             console.log('processing previous request, please wait'); // Error to log
@@ -54,6 +56,7 @@
                     }
                     else if (req_type == 'search') {
                         $('#search_result').html(result.result);
+                        prev_page_info = result.page_info;
                         if (result.total_pages != null) {
                             construct_page_section(1, result.total_pages);
                         };
@@ -545,11 +548,6 @@
             $("<div id='save_button'><button id='save_to_file' class='fa fa-floppy-o'></div>")
         );
 
-//		/*AUDIO: PLAY AT CLICK*/
-//		$('.audiofragment').click(function(e) {
-//			audiofragment_click($(this));
-//		});
-
 		/*AUDIO: PLAY AT CLICK*/
 		$(document).on('click', '.audiofragment', function() {
 			audiofragment_click($(this));
@@ -680,8 +678,8 @@
                 'standartization': $('input[name="standartization"]').val(),
                 'lemma': $('input[name="lemma"]').val(),
                 'annotations': $('input[name="annotations"]').val(),
-                'start_page': 0,
-                'return_total_pages': true
+                'start_page': 1,
+                'total_pages': null  // this meand that backend needs to return them
             }
             $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
             ajax_request('search', formdata, search=true);
@@ -702,7 +700,6 @@
         $(document).on('click', '.page_num', function(e) {
             var page_num = parseInt($(this).text());
             var max_page_num = parseInt($('.page_num.last').text());
-            console.log(max_page_num);
 
             if (max_page_num <= 15) {
                 $('.page_num').removeClass('current');
@@ -718,7 +715,9 @@
                 'standartization': $('input[name="standartization"]').val(),
                 'lemma': $('input[name="lemma"]').val(),
                 'annotations': $('input[name="annotations"]').val(),
-                'start_page': $(this).text()
+                'start_page': $(this).text(),
+                'total_pages': max_page_num,
+                'prev_page_info': JSON.stringify(prev_page_info)
             }
             $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
             ajax_request('search', formdata, search=true);
