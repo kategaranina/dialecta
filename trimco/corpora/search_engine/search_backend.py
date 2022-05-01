@@ -46,34 +46,52 @@ def search(
     descending_sort = [('elan', DESCENDING), ('audio.start', DESCENDING)]
     query = compile_query(dialect, transcription, standartization, lemma, annotation)
     results = None
+    reverse = False
 
     if query is not None:
         if prev_page_info and start_page - prev_page_info['num'] == 1:  # next page
-            print('next page')
-            query['elan'] = {'$gte': prev_page_info['max']['elan']}
-            query['audio.start'] = {'$gt': prev_page_info['max']['audio_start']}
+            limit_query = {
+                '$or': [
+                    {
+                        'elan': {'$eq': prev_page_info['max']['elan']},
+                        'audio.start': {'$gt': prev_page_info['max']['audio_start']}
+                    },
+                    {
+                        'elan': {'$gt': prev_page_info['max']['elan']}
+                    }
+                ]
+            }
+            query = {'$and': [limit_query, query]}
             results = SENTENCE_COLLECTION.find(query)
             results = results.sort(ascending_sort)
             results = results.limit(MONGODB_LIMIT)
 
         elif prev_page_info and start_page - prev_page_info['num'] == -1:  # prev page
-            print('prev page')
-            query['elan'] = {'$lte': prev_page_info['min']['elan']}
-            query['audio.start'] = {'$lt': prev_page_info['min']['audio_start']}
+            limit_query = {
+                '$or': [
+                    {
+                        'elan': {'$eq': prev_page_info['min']['elan']},
+                        'audio.start': {'$lt': prev_page_info['min']['audio_start']}
+                    },
+                    {
+                        'elan': {'$lt': prev_page_info['min']['elan']}
+                    }
+                ]
+            }
+            query = {'$and': [limit_query, query]}
             results = SENTENCE_COLLECTION.find(query)
             results = results.sort(descending_sort)
             results = results.limit(MONGODB_LIMIT)
-            results = results.sort(ascending_sort)  # doesn't work
+            reverse = True
 
         elif total_pages is not None and start_page == int(total_pages):  # last page
-            print('last page')
             results = SENTENCE_COLLECTION.find(query)
+            n_last_page = results.count() % MONGODB_LIMIT or MONGODB_LIMIT
             results = results.sort(descending_sort)
-            results = results.limit(MONGODB_LIMIT)
-            results = results.sort(ascending_sort)  # doesn't work
+            results = results.limit(n_last_page)
+            reverse = True
 
         else:
-            print('usual page')
             results = SENTENCE_COLLECTION.find(query)
             if start_page > 1:
                 results = results.skip((start_page-1) * MONGODB_LIMIT)
@@ -85,7 +103,7 @@ def search(
     else:  # do not return total_pages value if we have it as input
         total_pages = None
 
-    result_html, page_info = db_response_to_html(results)
+    result_html, page_info = db_response_to_html(results, reverse=reverse)
     page_info['num'] = start_page
 
     return result_html, page_info, total_pages

@@ -45,7 +45,7 @@ def get_transcript_and_tags_dicts(words):
     return ' '.join(transcript), normz_tokens_dict, annot_tokens_dict
 
 
-def db_response_to_html(results):
+def db_response_to_html(results, reverse=False):
     if results is None:
         return '<div id="no_result">Empty search query.</div>', {}
 
@@ -82,6 +82,10 @@ def db_response_to_html(results):
             'elan': item['elan'],
             'audio_start': item['audio']['start']
         }
+
+    if reverse:
+        item_divs = item_divs[::-1]
+        page_info['min'], page_info['max'] = page_info['max'], page_info['min']
 
     return ''.join(item_divs) or '<div id="no_result">Nothing found.</div>', page_info
 
