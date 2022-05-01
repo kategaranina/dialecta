@@ -24,6 +24,12 @@ class HttpResponseConflict(HttpResponse):
     status_code = 409  # Conflict
 
 
+CONFLICT_RESPONSE = HttpResponseConflict(
+    'Another request is currently running. Try to reload the page in several seconds. <br>'
+    'If the error persists, please contact developers and describe the problem.'
+)
+
+
 @admin.register(Recording)
 class RecordingAdmin(VersionAdmin):
 
@@ -87,7 +93,7 @@ class RecordingAdmin(VersionAdmin):
     @transaction.atomic
     def edit(self, request):
         if self.processing_request:
-            return HttpResponseConflict()
+            return CONFLICT_RESPONSE
 
         self.processing_request = True
 
@@ -113,7 +119,7 @@ class RecordingAdmin(VersionAdmin):
     @transaction.atomic
     def search(self, request):
         if self.processing_request:
-            return HttpResponseConflict()
+            return CONFLICT_RESPONSE
 
         self.processing_request = True
 
@@ -136,7 +142,7 @@ class RecordingAdmin(VersionAdmin):
     @transaction.atomic
     def auto_annotate(self, request):
         if self.processing_request:
-            return HttpResponseConflict()
+            return CONFLICT_RESPONSE
 
         self.processing_request = True
 
@@ -161,7 +167,7 @@ class RecordingAdmin(VersionAdmin):
     @csrf_exempt
     def ajax_dispatcher(self, request):
         if self.processing_request:
-            return HttpResponseConflict()
+            return CONFLICT_RESPONSE
 
         response = {}
         self.processing_request = True
@@ -205,7 +211,7 @@ class RecordingAdmin(VersionAdmin):
     @csrf_exempt
     def ajax_search_dispatcher(self, request):
         if self.processing_request:
-            return HttpResponseConflict()
+            return CONFLICT_RESPONSE
 
         response = {}
         self.processing_request = True

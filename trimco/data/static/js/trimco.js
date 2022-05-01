@@ -2,7 +2,7 @@
 	var processing_request = false;
 	var prev_page_info = {}
 
-	function ajax_request(req_type, req_data, search=false, retry=0) {  // TODO: req_type to different funcs?
+	function ajax_request(req_type, req_data, search=false) {  // TODO: req_type to different funcs?
         if (processing_request == true) {
             console.log('processing previous request, please wait'); // Error to log
             return false;
@@ -19,7 +19,17 @@
             async: false,
             data: {'request_type' : req_type, 'request_data' : req_data},
             timeout: 300000,
+            tryCount : 0,
+            retryLimit : 3,
             error: function(x, t, m) {
+                this.tryCount++;
+                if (x.status == 409 & this.tryCount <= this.retryLimit) {
+                    var self = this;
+                    var retry = function () { $.ajax(self); }
+                    setTimeout(retry, 10000);
+                    return;
+                }
+
                 console.log(x, t, m);
                 alert('Something went wrong. Try again later. If the error persists, please contact developers and describe the problem.')
                 processing_request = false;
@@ -28,7 +38,7 @@
                 };
             },
             success: function(response) {
-                result = $.parseJSON(response);  // Get the results sended from ajax to here
+                result = $.parseJSON(response);  // Get the results sent from ajax to here
                 processing_request = false
                 if (result.error) { // If the function fails
                     console.log(result.error_text); // Error to log
