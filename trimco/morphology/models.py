@@ -68,13 +68,3 @@ class TokenToForm(models.Model):
 class Token(models.Model):
     transcription = models.CharField(max_length=50)
     to_forms = models.ManyToManyField('Form', through='TokenToForm')
-
-
-class NormalizationModel(models.Model):
-    to_dialect = models.ManyToManyField('Dialect')
-    to_additional_language = models.ForeignKey('Language', blank=True, null=True)
-    examples = models.TextField(blank=True)
-    exceptions = models.TextField(blank=True)
-
-    def __str__(self):
-        return ', '.join([x.abbreviation for x in self.to_dialect.all()])

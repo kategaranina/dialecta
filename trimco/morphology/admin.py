@@ -33,11 +33,6 @@ class TokenAdmin(VersionAdmin):
     pass
 
 
-@admin.register(NormalizationModel)
-class NormalizationModelAdmin(VersionAdmin):
-    pass
-
-
 @admin.register(GlossingRule)
 class GlossingRuleAdmin(VersionAdmin):
     pass
