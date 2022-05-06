@@ -626,17 +626,20 @@
 			if ($('#save_to_file').hasClass('fa-floppy-o')) {
 				$('#save_to_file').removeClass('fa-floppy-o').addClass('fa-spinner off');
 
-				var div_id = '.eaf_display';
-				var is_search_mode = check_search_mode();
-				if (is_search_mode) {
-                    div_id = '#search_result';
-                    save_replace_annotations();
-				};
-				ajax_request(
-                    'save_elan_req',
-                    {'html' : '<div>'+$(div_id).html()+'</div>',},
-                    search=is_search_mode
-				);
+                // delay is required for spinner icon to load
+                setTimeout(function () {
+                    var div_id = '.eaf_display';
+                    var is_search_mode = check_search_mode();
+                    if (is_search_mode) {
+                        div_id = '#search_result';
+                        save_replace_annotations();
+                    };
+                    ajax_request(  // TODO: save only changed anns
+                        'save_elan_req',
+                        {'html' : '<div>'+$(div_id).html()+'</div>',},
+                        search=is_search_mode
+                    );
+                }, 100)
 			}
 		});
 
