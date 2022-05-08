@@ -92,12 +92,27 @@ class Standartizator:
         return []
 
     @staticmethod
-    def get_annotaton_options_list_from_db(annots_from_db):
+    def unify_annotations(annotations):
+        unified_annotations = {}
+        for raw_annotation in annotations:
+            if isinstance(raw_annotation, list):
+                annotation = raw_annotation[0] + ANNOTATION_TAG_SEP + raw_annotation[1]
+            else:
+                annotation = raw_annotation
+
+            spl_annotation = tuple(sorted(set(annotation.split(ANNOTATION_TAG_SEP))))
+            if spl_annotation not in unified_annotations:
+                unified_annotations[spl_annotation] = [raw_annotation, 0]
+            unified_annotations[spl_annotation][1] += 1
+
+        return unified_annotations
+
+    def get_annotaton_options_list_from_db(self, annots_from_db):
         total_anns = len(annots_from_db)
-        unique_anns = Counter(annots_from_db)
+        unique_anns = self.unify_annotations(annots_from_db)
         result_list = []
 
-        for full_tag, count in unique_anns.most_common():
+        for full_tag, count in sorted(unique_anns.values(), key=lambda x: x[1]):
             lemma, tag = full_tag.split(ANNOTATION_TAG_SEP, 1)
             score = count / total_anns
             result_list.append([lemma, tag, score])
@@ -139,8 +154,9 @@ class Standartizator:
 
         final_list += self.get_annotation_options_list_by_parsing(orig, standartization)
 
+        unified_list = self.unify_annotations(final_list)
+        final_list = [x[0] for x in unified_list.values()]
         return final_list
-
 
     def get_annotation(self, text):
         annotations = []
