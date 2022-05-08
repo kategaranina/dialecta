@@ -176,7 +176,7 @@ class ElanToHTML:
     @staticmethod
     def save_html_extracts_to_elans(html):
         html_obj = etree.fromstring(html)
-        for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
+        for el in html_obj.xpath('//*[contains(@class,"annot_wrapper changed")]'):
             elan_name = el.xpath('*[@class="annot"]/@elan')[0]
             elan_obj = ElanObject(os.path.join(settings.MEDIA_ROOT, elan_name))
             elan_obj.process_html_annot(el)

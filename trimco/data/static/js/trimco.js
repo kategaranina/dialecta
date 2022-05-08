@@ -354,6 +354,7 @@
 		else {
 			$('trt.focused').removeAttr('style');
 			};
+		$('trt.focused').closest('.annot_wrapper').addClass('changed');
 		/* continuing to next token*/
 		setTimeout(function () {
             var next = nextInDOM('trt', $('trt.focused'));
@@ -451,6 +452,7 @@
 
     function replace(token) {
         token.addClass('changed_by_replace');
+        token.closest('.annot_wrapper').addClass('changed');
         var elements = [ // NB: order is important
             ["to_standartization", "nrm"],
             ["to_lemma", "lemma"],
@@ -634,7 +636,7 @@
                         div_id = '#search_result';
                         save_replace_annotations();
                     };
-                    ajax_request(  // TODO: save only changed anns
+                    ajax_request(  //
                         'save_elan_req',
                         {'html' : '<div>'+$(div_id).html()+'</div>',},
                         search=is_search_mode
