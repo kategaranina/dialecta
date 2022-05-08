@@ -636,7 +636,7 @@
                         div_id = '#search_result';
                         save_replace_annotations();
                     };
-                    ajax_request(  //
+                    ajax_request(
                         'save_elan_req',
                         {'html' : '<div>'+$(div_id).html()+'</div>',},
                         search=is_search_mode
