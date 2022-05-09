@@ -1,7 +1,7 @@
 import os
 import pymorphy2
 import datetime
-from collections import defaultdict, Counter
+from collections import defaultdict, OrderedDict, Counter
 from django.conf import settings
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
@@ -93,7 +93,7 @@ class Standartizator:
 
     @staticmethod
     def unify_annotations(annotations):
-        unified_annotations = {}
+        unified_annotations = OrderedDict()
         for raw_annotation in annotations:
             if isinstance(raw_annotation, list):
                 annotation = raw_annotation[0] + ANNOTATION_TAG_SEP + raw_annotation[1]
@@ -112,7 +112,7 @@ class Standartizator:
         unique_anns = self.unify_annotations(annots_from_db)
         result_list = []
 
-        for full_tag, count in sorted(unique_anns.values(), key=lambda x: x[1]):
+        for full_tag, count in sorted(unique_anns.values(), key=lambda x: x[1], reverse=True):
             lemma, tag = full_tag.split(ANNOTATION_TAG_SEP, 1)
             score = count / total_anns
             result_list.append([lemma, tag, score])
