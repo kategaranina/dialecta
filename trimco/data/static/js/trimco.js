@@ -531,7 +531,7 @@
 
     function construct_page_section(page_num, max_page_num) {
         $('#page_nums').empty();
-        if (max_page_num <= 15) { construct_small_page_section(page_num, max_page_num); }
+        if (max_page_num <= 30) { construct_small_page_section(page_num, max_page_num); }
         else { construct_large_page_section(page_num, max_page_num); }
     }
 
@@ -716,7 +716,7 @@
             var page_num = parseInt($(this).text());
             var max_page_num = parseInt($('.page_num.last').text());
 
-            if (max_page_num <= 15) {
+            if (max_page_num <= 30) {
                 $('.page_num').removeClass('current');
                 $(this).addClass('current');
             } else {
