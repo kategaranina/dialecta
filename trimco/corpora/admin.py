@@ -1,3 +1,6 @@
+import traceback
+import json
+
 from django.contrib import admin
 
 from django.db import transaction
@@ -14,7 +17,6 @@ from corpora.search_engine.search_backend import search, saved_recording_to_db
 from corpora.search_engine.db_to_html import html_to_db
 from morphology.models import Dialect
 
-import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from reversion.admin import VersionAdmin
@@ -97,21 +99,27 @@ class RecordingAdmin(VersionAdmin):
 
         self.processing_request = True
 
-        self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
-        self.elan_converter = ElanToHTML(self.recording_obj)
-        self.elan_converter.build_page()
-        annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
+        try:
+            self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
+            self.elan_converter = ElanToHTML(self.recording_obj)
+            self.elan_converter.build_page()
+            annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
 
-        self.standartizator = Standartizator(self.recording_obj.to_dialect)
+            self.standartizator = Standartizator(self.recording_obj.to_dialect)
 
-        context = {
-            'ctext': self.elan_converter.html,
-            'audio_path': self.recording_obj.audio.name,
-            'media': self.media['js'],
-            'annot_menu_select': annot_menu_select,
-            'annot_menu_checkboxes': annot_menu_checkboxes,
-            'auto_annotation_option': True
-        }
+            context = {
+                'ctext': self.elan_converter.html,
+                'audio_path': self.recording_obj.audio.name,
+                'media': self.media['js'],
+                'annot_menu_select': annot_menu_select,
+                'annot_menu_checkboxes': annot_menu_checkboxes,
+                'auto_annotation_option': True
+            }
+
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
 
         self.processing_request = False
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
@@ -123,18 +131,24 @@ class RecordingAdmin(VersionAdmin):
 
         self.processing_request = True
 
-        annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
-        dialects = [(x.id, x.abbreviation) for x in Dialect.objects.all()]
+        try:
+            annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
+            dialects = [(x.id, x.abbreviation) for x in Dialect.objects.all()]
 
-        context = {
-            'ctext': '',
-            'audio_path': '',
-            'media': self.media['js'],
-            'annot_menu_select': annot_menu_select,
-            'annot_menu_checkboxes': annot_menu_checkboxes,
-            'dialects': dialects,
-            'auto_annotation_option': False
-        }
+            context = {
+                'ctext': '',
+                'audio_path': '',
+                'media': self.media['js'],
+                'annot_menu_select': annot_menu_select,
+                'annot_menu_checkboxes': annot_menu_checkboxes,
+                'dialects': dialects,
+                'auto_annotation_option': False
+            }
+
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
 
         self.processing_request = False
         return render_to_response(self.search_template, context_instance=RequestContext(request, context))
@@ -146,20 +160,26 @@ class RecordingAdmin(VersionAdmin):
 
         self.processing_request = True
 
-        self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
-        self.elan_converter = ElanToHTML(self.recording_obj, mode='auto-annotation')
-        self.elan_converter.build_page()
+        try:
+            self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
+            self.elan_converter = ElanToHTML(self.recording_obj, mode='auto-annotation')
+            self.elan_converter.build_page()
 
-        annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
-        
-        context = {
-            'ctext': self.elan_converter.html,
-            'audio_path': self.recording_obj.audio.name,
-            'media': self.media['js'],
-            'annot_menu_select': annot_menu_select,
-            'annot_menu_checkboxes': annot_menu_checkboxes,
-            'auto_annotation_option': True
-        }
+            annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
+
+            context = {
+                'ctext': self.elan_converter.html,
+                'audio_path': self.recording_obj.audio.name,
+                'media': self.media['js'],
+                'annot_menu_select': annot_menu_select,
+                'annot_menu_checkboxes': annot_menu_checkboxes,
+                'auto_annotation_option': True
+            }
+
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
 
         self.processing_request = False
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
@@ -172,38 +192,44 @@ class RecordingAdmin(VersionAdmin):
         response = {}
         self.processing_request = True
 
-        self.recording_obj = get_object_or_404(Recording, id=request.META['HTTP_REFERER'].split('/')[-3])
-        self.standartizator = Standartizator(self.recording_obj.to_dialect)
+        try:
+            self.recording_obj = get_object_or_404(Recording, id=request.META['HTTP_REFERER'].split('/')[-3])
+            self.standartizator = Standartizator(self.recording_obj.to_dialect)
 
-        if request.POST['request_type'] == 'trt_annot_req':
-            if request.POST['request_data[mode]'] == 'manual':
-                manual_words = self.standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
-                response['result'] = manual_words or [request.POST['request_data[nrm]']]
+            if request.POST['request_type'] == 'trt_annot_req':
+                if request.POST['request_data[mode]'] == 'manual':
+                    manual_words = self.standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
+                    response['result'] = manual_words or [request.POST['request_data[nrm]']]
 
-            elif request.POST['request_data[mode]'] == 'auto':
-                response['result'] = self.standartizator.get_auto_standartization(request.POST['request_data[trt]'])
+                elif request.POST['request_data[mode]'] == 'auto':
+                    response['result'] = self.standartizator.get_auto_standartization(request.POST['request_data[trt]'])
 
-        elif request.POST['request_type'] == 'annot_suggest_req':
-            ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
-            response['result'] = self.standartizator.get_annotation_options_list(ann)
+            elif request.POST['request_type'] == 'annot_suggest_req':
+                ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
+                response['result'] = self.standartizator.get_annotation_options_list(ann)
 
-        elif request.POST['request_type'] == 'save_elan_req':
-            self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])
-            saved_recording_to_db(
-                eaf_path=self.recording_obj.data.path,
-                audio_path=self.recording_obj.audio.name,
-                html=request.POST['request_data[html]'],
-                dialect=self.recording_obj.to_dialect.id
-            )
+            elif request.POST['request_type'] == 'save_elan_req':
+                self.elan_converter.save_html_to_elan(request.POST['request_data[html]'])
+                saved_recording_to_db(
+                    eaf_path=self.recording_obj.data.path,
+                    audio_path=self.recording_obj.audio.name,
+                    html=request.POST['request_data[html]'],
+                    dialect=self.recording_obj.to_dialect.id
+                )
 
-        elif request.POST['request_type'] == 'save_annotation':
-            insert_manual_annotation_in_mongo(
-                model=str(self.standartizator.model),
-                word=request.POST['request_data[trt]'],
-                standartization=request.POST['request_data[nrm]'],
-                lemma=request.POST['request_data[lemma]'],
-                grammar=request.POST['request_data[annot]']
-            )
+            elif request.POST['request_type'] == 'save_annotation':
+                insert_manual_annotation_in_mongo(
+                    model=str(self.standartizator.model),
+                    word=request.POST['request_data[trt]'],
+                    standartization=request.POST['request_data[nrm]'],
+                    lemma=request.POST['request_data[lemma]'],
+                    grammar=request.POST['request_data[annot]']
+                )
+
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
 
         self.processing_request = False
         return HttpResponse(json.dumps(response))
@@ -217,30 +243,41 @@ class RecordingAdmin(VersionAdmin):
         self.processing_request = True
 
         if request.POST['request_type'] == 'search':
-            total_pages = request.POST.get('request_data[total_pages]', '')
-            if total_pages == '':
-                total_pages = None
+            try:
+                total_pages = request.POST.get('request_data[total_pages]', '')
+                if total_pages == '':
+                    total_pages = None
 
-            prev_page_info = request.POST.get('request_data[prev_page_info]', '')
-            prev_page_info = json.loads(prev_page_info) if prev_page_info != '' else {}
+                prev_page_info = request.POST.get('request_data[prev_page_info]', '')
+                prev_page_info = json.loads(prev_page_info) if prev_page_info != '' else {}
 
-            response['result'], response['page_info'], response['total_pages'] = search(
-                dialect=request.POST.getlist('request_data[dialect][]', []),
-                transcription=request.POST['request_data[transcription]'],
-                standartization=request.POST['request_data[standartization]'],
-                lemma=request.POST['request_data[lemma]'],
-                annotation=request.POST['request_data[annotations]'],
-                start_page=int(request.POST['request_data[start_page]']),
-                prev_page_info=prev_page_info,
-                total_pages=total_pages
-            )
+                response['result'], response['page_info'], response['total_pages'] = search(
+                    dialect=request.POST.getlist('request_data[dialect][]', []),
+                    transcription=request.POST['request_data[transcription]'],
+                    standartization=request.POST['request_data[standartization]'],
+                    lemma=request.POST['request_data[lemma]'],
+                    annotation=request.POST['request_data[annotations]'],
+                    start_page=int(request.POST['request_data[start_page]']),
+                    prev_page_info=prev_page_info,
+                    total_pages=total_pages
+                )
+            except Exception:
+                self.processing_request = False
+                print(traceback.format_exc())
+                raise Exception(traceback.format_exc())
 
             self.processing_request = False
             return HttpResponse(json.dumps(response))
 
         if request.POST['request_type'] == 'save_elan_req':
-            ElanToHTML.save_html_extracts_to_elans(request.POST['request_data[html]'])
-            html_to_db(request.POST['request_data[html]'])
+            try:
+                ElanToHTML.save_html_extracts_to_elans(request.POST['request_data[html]'])
+                html_to_db(request.POST['request_data[html]'])
+            except Exception:
+                self.processing_request = False
+                print(traceback.format_exc())
+                raise Exception(traceback.format_exc())
+
             self.processing_request = False
             return HttpResponse(json.dumps(response))
 
@@ -249,28 +286,34 @@ class RecordingAdmin(VersionAdmin):
             self.processing_request = False
             return HttpResponse(json.dumps(response))
 
-        current_standartizator = Standartizator(dialect)
+        try:
+            current_standartizator = Standartizator(dialect)
 
-        if request.POST['request_type'] == 'trt_annot_req':
-            if request.POST['request_data[mode]'] == 'manual':
-                manual_words = current_standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
-                response['result'] = manual_words or [request.POST['request_data[nrm]']]
+            if request.POST['request_type'] == 'trt_annot_req':
+                if request.POST['request_data[mode]'] == 'manual':
+                    manual_words = current_standartizator.get_manual_standartizations(request.POST['request_data[trt]'])
+                    response['result'] = manual_words or [request.POST['request_data[nrm]']]
 
-            elif request.POST['request_data[mode]'] == 'auto':
-                response['result'] = current_standartizator.get_auto_standartization(request.POST['request_data[trt]'])
+                elif request.POST['request_data[mode]'] == 'auto':
+                    response['result'] = current_standartizator.get_auto_standartization(request.POST['request_data[trt]'])
 
-        elif request.POST['request_type'] == 'annot_suggest_req':
-            ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
-            response['result'] = current_standartizator.get_annotation_options_list(ann)
+            elif request.POST['request_type'] == 'annot_suggest_req':
+                ann = [request.POST['request_data[trt]'], request.POST['request_data[nrm]']]
+                response['result'] = current_standartizator.get_annotation_options_list(ann)
 
-        elif request.POST['request_type'] == 'save_annotation':
-            insert_manual_annotation_in_mongo(
-                model=str(current_standartizator.model),
-                word=request.POST['request_data[trt]'],
-                standartization=request.POST['request_data[nrm]'],
-                lemma=request.POST['request_data[lemma]'],
-                grammar=request.POST['request_data[annot]']
-            )
+            elif request.POST['request_type'] == 'save_annotation':
+                insert_manual_annotation_in_mongo(
+                    model=str(current_standartizator.model),
+                    word=request.POST['request_data[trt]'],
+                    standartization=request.POST['request_data[nrm]'],
+                    lemma=request.POST['request_data[lemma]'],
+                    grammar=request.POST['request_data[annot]']
+                )
+
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
 
         self.processing_request = False
         return HttpResponse(json.dumps(response))
