@@ -125,7 +125,7 @@ def process_html_token(token_el):
 
 def html_to_db(html_result):
     html_obj = etree.fromstring(html_result)
-    for el in html_obj.xpath('//*[contains(@class,"annot_wrapper")]'):
+    for el in html_obj.xpath('//*[contains(@class,"annot_wrapper") and contains(@class, "changed")]'):
         elan_name = el.xpath('*[@class="annot"]/@elan')[0]
         tier_name = el.xpath('*[@class="annot"]/@tier_name')[0]
         start = int(Decimal(el.xpath('*[@class="audiofragment"]/@starttime')[0]))
