@@ -697,7 +697,8 @@
                 'total_pages': null  // this meand that backend needs to return them
             }
             $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
-            ajax_request('search', formdata, search=true);
+            // delay is required for spinner icon to load
+            setTimeout(function () { ajax_request('search', formdata, search=true); }, 100);
         });
 
         $('#search_help_button').click(function(e) {
@@ -735,7 +736,8 @@
                 'prev_page_info': JSON.stringify(prev_page_info)
             }
             $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
-            ajax_request('search', formdata, search=true);
+            // delay is required for spinner icon to load
+            setTimeout(function () { ajax_request('search', formdata, search=true); }, 100);
         });
 
         $('#replace_button').click(function(e) {
