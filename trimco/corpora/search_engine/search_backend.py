@@ -49,7 +49,7 @@ def search(
     reverse = False
 
     if query is not None:
-        if prev_page_info and start_page - prev_page_info['num'] == 1:  # next page
+        if 'max' in prev_page_info and start_page - prev_page_info['num'] == 1:  # next page
             limit_query = {
                 '$or': [
                     {
@@ -66,7 +66,7 @@ def search(
             results = results.sort(ascending_sort)
             results = results.limit(MONGODB_LIMIT)
 
-        elif prev_page_info and start_page - prev_page_info['num'] == -1:  # prev page
+        elif 'min' in prev_page_info and start_page - prev_page_info['num'] == -1:  # prev page
             limit_query = {
                 '$or': [
                     {
@@ -98,7 +98,7 @@ def search(
             results = results.sort(ascending_sort)
             results = results.limit(MONGODB_LIMIT)
 
-    if total_pages is None:
+    if total_pages is None and results is not None:
         total_pages = math.ceil(results.count() / MONGODB_LIMIT)
     else:  # do not return total_pages value if we have it as input
         total_pages = None

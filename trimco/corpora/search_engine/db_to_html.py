@@ -83,7 +83,7 @@ def db_response_to_html(results, reverse=False):
             'audio_start': item['audio']['start']
         }
 
-    if reverse:
+    if reverse and item_divs:
         item_divs = item_divs[::-1]
         page_info['min'], page_info['max'] = page_info['max'], page_info['min']
 
