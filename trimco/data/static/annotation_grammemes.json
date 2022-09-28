@@ -1,0 +1,625 @@
+{
+  "grammemes": {
+    "ADJF": {
+      "surface_tag": "ADJF",
+      "description": "имя прилагательное (полное)",
+      "example": "хороший",
+      "category": "part of speech"
+    },
+    "ADJS": {
+      "surface_tag": "ADJS",
+      "description": "имя прилагательное (краткое)",
+      "example": "хорош",
+      "category": "part of speech"
+    },
+    "ADVB": {
+      "surface_tag": "ADV",
+      "description": "наречие",
+      "example": "круто",
+      "category": "part of speech"
+    },
+    "COMP": {
+      "surface_tag": "COMP",
+      "description": "компаратив",
+      "example": "лучше, получше, выше",
+      "category": "part of speech"
+    },
+    "CONJ": {
+      "surface_tag": "CONJ",
+      "description": "союз",
+      "example": "и",
+      "category": "part of speech"
+    },
+    "GRND": {
+      "surface_tag": "GER",
+      "description": "деепричастие",
+      "example": "прочитав, рассказывая",
+      "category": "part of speech"
+    },
+    "INFN": {
+      "surface_tag": "INF",
+      "description": "глагол (инфинитив)",
+      "example": "говорить, сказать",
+      "category": "part of speech"
+    },
+    "NOUN": {
+      "surface_tag": "NOUN",
+      "description": "имя существительное",
+      "example": "хомяк",
+      "category": "part of speech"
+    },
+    "NPRO": {
+      "surface_tag": "NPRO",
+      "description": "местоимение-существительное",
+      "example": "он",
+      "category": "part of speech"
+    },
+    "NUMR": {
+      "surface_tag": "NUMR",
+      "description": "числительное",
+      "example": "три, пятьдесят",
+      "category": "part of speech"
+    },
+    "PRED": {
+      "surface_tag": "PRED",
+      "description": "предикатив",
+      "example": "некогда, жаль, хорошо, пора",
+      "category": "part of speech"
+    },
+    "PREP": {
+      "surface_tag": "PREP",
+      "description": "предлог",
+      "example": "в",
+      "category": "part of speech"
+    },
+    "PRTF": {
+      "surface_tag": "PRTF",
+      "description": "причастие (полное)",
+      "example": "прочитавший, прочитанная",
+      "category": "part of speech"
+    },
+    "PRTS": {
+      "surface_tag": "PRTS",
+      "description": "причастие (краткое)",
+      "example": "прочитана",
+      "category": "part of speech"
+    },
+    "PRCL": {
+      "surface_tag": "PTC",
+      "description": "частица",
+      "example": "бы, же, лишь",
+      "category": "part of speech"
+    },
+    "VERB": {
+      "surface_tag": "VERB",
+      "description": "глагол",
+      "example": "идет",
+      "category": "part of speech"
+    },
+    "INTJ": {
+      "surface_tag": "INTJ",
+      "description": "междометие",
+      "example": "",
+      "category": "part of speech"
+    },
+    "ANTP": {
+      "surface_tag": "ANTP",
+      "description": "anteriority participle",
+      "example": "",
+      "category": "part of speech"
+    },
+    "femn": {
+      "surface_tag": "F",
+      "description": "женский род",
+      "example": "работница, табуретка",
+      "category": "gender"
+    },
+    "masc": {
+      "surface_tag": "M",
+      "description": "мужской род",
+      "example": "работник, стол",
+      "category": "gender"
+    },
+    "neut": {
+      "surface_tag": "N",
+      "description": "средний род",
+      "example": "животное, озеро",
+      "category": "gender"
+    },
+    "plur": {
+      "surface_tag": "PL",
+      "description": "множественное число",
+      "example": "",
+      "category": "number"
+    },
+    "sing": {
+      "surface_tag": "SG",
+      "description": "единственное число",
+      "example": "",
+      "category": "number"
+    },
+    "nomn": {
+      "surface_tag": "NOM",
+      "description": "именительный",
+      "example": "хомяк ест",
+      "category": "case"
+    },
+    "gen1": {
+      "surface_tag": "GEN",
+      "description": "родительный",
+      "example": "у нас нет хомяка",
+      "category": "case"
+    },
+    "gen2": {
+      "surface_tag": "GEN2",
+      "description": "второй родительный (частичный)",
+      "example": "ложка сахару (gen - производство сахара); стакан яду (gen - нет яда)",
+      "category": "case"
+    },
+    "accs": {
+      "surface_tag": "ACC",
+      "description": "винительный",
+      "example": "хомяк читает книгу",
+      "category": "case"
+    },
+    "acc2": {
+      "surface_tag": "ACC2",
+      "description": "второй винительный",
+      "example": "записался в солдаты, постричься в монахи; по два человека",
+      "category": "case"
+    },
+    "datv": {
+      "surface_tag": "DAT",
+      "description": "дательный",
+      "example": "сказать хомяку спасибо",
+      "category": "case"
+    },
+    "Dist": {
+      "surface_tag": "DAT2",
+      "description": "дистрибутивный дательный",
+      "example": "по] многу, нескольку, стольку",
+      "category": "case"
+    },
+    "ablt": {
+      "surface_tag": "INS",
+      "description": "творительный",
+      "example": "зерно съедено хомяком",
+      "category": "case"
+    },
+    "loc1": {
+      "surface_tag": "LOC",
+      "description": "предложный",
+      "example": "хомяка несут в корзинке",
+      "category": "case"
+    },
+    "loc2": {
+      "surface_tag": "LOC2",
+      "description": "второй предложный (местный)",
+      "example": "я у него в долгу (loc- напоминать о долге); висит вшкафу (loc - монолог о шкафе); весь в снегу (loct- писать о снеге)",
+      "category": "case"
+    },
+    "voct": {
+      "surface_tag": "VOC",
+      "description": "звательный",
+      "example": "Саш, пойдем в кино.",
+      "category": "case"
+    },
+    "impf": {
+      "surface_tag": "IPFV",
+      "description": "несовершенный вид",
+      "example": "ходил, встречаю",
+      "category": "aspect"
+    },
+    "perf": {
+      "surface_tag": "PFV",
+      "description": "совершенный вид",
+      "example": "пошёл, встречу",
+      "category": "aspect"
+    },
+    "1per": {
+      "surface_tag": "1",
+      "description": "первое лицо",
+      "example": "украшаю",
+      "category": "person"
+    },
+    "2per": {
+      "surface_tag": "2",
+      "description": "второе лицо",
+      "example": "украшаешь",
+      "category": "person"
+    },
+    "3per": {
+      "surface_tag": "3",
+      "description": "третье лицо",
+      "example": "украшает",
+      "category": "person"
+    },
+    "futr": {
+      "surface_tag": "FUT",
+      "description": "будущее время",
+      "example": "",
+      "category": "tense"
+    },
+    "past": {
+      "surface_tag": "PST",
+      "description": "прошедшее время",
+      "example": "",
+      "category": "tense"
+    },
+    "pres": {
+      "surface_tag": "PRS",
+      "description": "настоящее время",
+      "example": "",
+      "category": "tense"
+    },
+    "impr": {
+      "surface_tag": "IMP",
+      "description": "повелительное наклонение",
+      "example": "",
+      "category": "mood"
+    },
+    "indc": {
+      "surface_tag": "IND",
+      "description": "изъявительное наклонение",
+      "example": "",
+      "category": "mood"
+    },
+    "actv": {
+      "surface_tag": "PA",
+      "description": "действительный залог",
+      "example": "",
+      "category": "voice"
+    },
+    "assv": {
+      "surface_tag": "PP",
+      "description": "страдательный залог",
+      "example": "",
+      "category": "voice"
+    }
+  },
+  "facultative": {
+    "COMPL": {
+      "label": "Complementizer",
+      "description": "союз-комплементайзер (актантный союз)",
+      "categories": "CONJ"
+    },
+    "Q": {
+      "label": "Question",
+      "description": "вопросительное",
+      "categories": "NPRO"
+    },
+    "rel": {
+      "label": "Relative",
+      "description": "относительнoе местоимениe",
+      "categories": "NPRO"
+    },
+    "anim": {
+      "label": "animate",
+      "description": "одушевленное",
+      "categories": "NOUN,ADJF,NPRO,NUMR"
+    },
+    "Abbr": {
+      "label": "Abbreviation",
+      "description": "аббревиатура",
+      "categories": "NOUN"
+    },
+    "Name": {
+      "label": "First Name",
+      "description": "имя",
+      "categories": "NOUN"
+    },
+    "Surn": {
+      "label": "Last Name",
+      "description": "фамилия",
+      "categories": "NOUN"
+    },
+    "Patr": {
+      "label": "Patronimic Name",
+      "description": "отчество",
+      "categories": "NOUN"
+    },
+    "Geox": {
+      "label": "Toponym",
+      "description": "топоним",
+      "categories": "NOUN"
+    },
+    "Apro": {
+      "label": "Pronominal",
+      "description": "местоименное",
+      "categories": "NOUN,ADJF,ADVB,NUMR"
+    },
+    "Anum": {
+      "label": "Ordinal",
+      "description": "порядковое",
+      "categories": "NUMR"
+    },
+    "dmns": {
+      "label": "demonstrative",
+      "description": "указательное",
+      "categories": "NPRO"
+    },
+    "Poss": {
+      "label": "Possessive",
+      "description": "притяжательное",
+      "categories": "NPRO"
+    },
+    "Coll": {
+      "label": "Collective Numeral",
+      "description": "собирательное числительное",
+      "categories": "NUMR"
+    },
+    "AUX": {
+      "label": "Auxiliary Verb",
+      "description": "вспомогательный глалол",
+      "categories": "VERB"
+    },
+    "COP": {
+      "label": "Copula",
+      "description": "cвязка (копула)",
+      "categories": "VERB"
+    },
+    "short": {
+      "label": "Short Form",
+      "description": "краткая форма",
+      "categories": "NPRO"
+    },
+    "fimp": {
+      "label": "gerund of ipfv. stem",
+      "description": "деепричастие от глагола НСВ вида",
+      "categories": "GRND"
+    },
+    "V-sh": {
+      "label": "V-sh Ending",
+      "description": "деепричастие на -ши",
+      "categories": "GRND"
+    },
+    "Cmp2": {
+      "label": "Po- Comparative",
+      "description": "сравнительная степень на по-",
+      "categories": "COMP"
+    },
+    "V-ej": {
+      "label": "V-oj Comparative",
+      "description": "форма компаратива на -ей",
+      "categories": "COMP"
+    },
+    "suber": {
+      "label": "Superlative",
+      "description": "превосходная степень",
+      "categories": "ADJF"
+    },
+    "neg": {
+      "label": "Negative",
+      "description": "отрицание",
+      "categories": "ADJF,VERB,PRCL,PRED,PRTF,PRTS"
+    },
+    "Vpre": {
+      "label": "Prep. Variation",
+      "description": "Вариант предлога ( со, подо, ...)",
+      "categories": "PREP"
+    },
+    "2PVB": {
+      "label": "Double Prefix",
+      "description": "двойной префик",
+      "categories": "VERB,PRTF,PRTS"
+    },
+    "Mult": {
+      "label": "Multiple",
+      "description": "многократный",
+      "categories": "VERB"
+    },
+    "ref": {
+      "label": "Reflexive",
+      "description": "возвратный",
+      "categories": "VERB,NPRO"
+    },
+    "dim": {
+      "label": "Deminutive",
+      "description": "деминутив",
+      "categories": "NOUN,ADJF"
+    },
+    "V-be": {
+      "label": "V-be Ending",
+      "description": "форма на -ье",
+      "categories": "NOUN"
+    },
+    "V-en": {
+      "label": "V-en Ending",
+      "description": "форма на -енен",
+      "categories": "ADJS"
+    },
+    "V-ie": {
+      "label": "V-ie Ending",
+      "description": "отчество через -ие-",
+      "categories": "Patr"
+    },
+    "V-bi": {
+      "label": "V-bi Ending",
+      "description": "форма на -ьи",
+      "categories": "NOUN"
+    },
+    "V-ey": {
+      "label": "V-ey",
+      "description": "форма на -ею",
+      "categories": "NOUN"
+    },
+    "V-oy": {
+      "label": "V-oy",
+      "description": "форма на -ою",
+      "categories": "NOUN"
+    },
+    "incl": {
+      "label": "Inclusive",
+      "description": "говорящий включён в действие",
+      "categories": "VERB.impr,NPRO"
+    },
+    "dist": {
+      "label": "distortion",
+      "description": "искажение",
+      "categories": "ALLFORMS"
+    },
+    "dial.stem": {
+      "label": "Dial. Stem",
+      "description": "в литературнм языке не наблюдается чередования, характерного для данной основы",
+      "categories": "ALLFORMS"
+    },
+    "dial.stemalter": {
+      "label": "Dial. Stem Alteration",
+      "description": "изменение основы по всей парадигме",
+      "categories": "ALLFORMS"
+    },
+    "dial.refl": {
+      "label": "Dial. Reflexive",
+      "description": "отличие диалектного глагола от литературного в применении возвратного постфикса",
+      "categories": "ALLFORMS"
+    },
+    "dial.refltype": {
+      "label": "Dial. Reflexive Type",
+      "description": "фиксирует как алломорфы возвратного постфикса, вообще не встречающиеся в литературном языке (-се и -си), так и употребление какого-л. алломорфа, где в ЛЯ требуется другой",
+      "categories": "ALLFORMS"
+    },
+    "dial.gend": {
+      "label": "Dial. Gender",
+      "description": "oтвечает за отклонения от литературной нормы в сфере родовой принадлежности лексем",
+      "categories": "ALLFORMS"
+    },
+    "dial.lex": {
+      "label": "Dial. Lex.",
+      "description": "форма диалектной лексемы",
+      "categories": "ALLFORMS"
+    },
+    "dial.flex": {
+      "label": "Dial. Flex.",
+      "description": "диалектное окончание",
+      "categories": "ALLFORMS"
+    },
+    "dial.type": {
+      "label": "Dial. Type",
+      "description": "диалектный тип словоизменения",
+      "categories": "ALLFORMS"
+    },
+    "dial.flextype": {
+      "label": "Dial. Flex. Type",
+      "description": "выбор между пометами type и flex неоднозначен",
+      "categories": "ALLFORMS"
+    },
+    "dial.case": {
+      "label": "Dial. Case",
+      "description": "описывает употребление (с точки зрения литературного языка) одной падежной формы вместо другой",
+      "categories": "ALLFORMS"
+    },
+    "dial.contr": {
+      "label": "Dial. Contraction",
+      "description": "стяжённая форма прилагательного",
+      "categories": "ALLFORMS"
+    },
+    "dial.pref": {
+      "label": "Dial. Prefix",
+      "description": "наличие префикса",
+      "categories": "ALLFORMS"
+    }
+  },
+  "order": {
+    "NOUN": {
+      "default": [
+        "gender",
+        "case",
+        "number"
+      ]
+    },
+    "ADJF": {
+      "default": [
+        "gender",
+        "case",
+        "number"
+      ],
+      "number:pl": [
+        "case",
+        "number"
+      ]
+    },
+    "ADJS": {
+      "default": [
+        "gender",
+        "number"
+      ],
+      "number:pl": [
+        "number"
+      ]
+    },
+    "PRTF": {
+      "default": [
+        "voice",
+        "gender",
+        "case",
+        "number"
+      ],
+      "number:pl": [
+        "voice",
+        "case",
+        "number"
+      ]
+    },
+    "PRTS": {
+      "default": [
+        "voice",
+        "gender",
+        "number"
+      ],
+      "number:pl": [
+        "voice",
+        "number"
+      ]
+    },
+    "NPRO": {
+      "default": [
+        "gender",
+        "case",
+        "number"
+      ]
+    },
+    "NUMR": {
+      "default": [
+        "case"
+      ]
+    },
+    "VERB": {
+      "default": [
+        "aspect",
+        "tense",
+        "mood",
+        "person",
+        "number"
+      ],
+      "mood:imp": [
+        "aspect",
+        "mood",
+        "number"
+      ],
+      "tense:pst, number:sg": [
+        "aspect",
+        "tense",
+        "mood",
+        "number",
+        "gender"
+      ],
+      "tense:pst, number:pl": [
+        "aspect",
+        "tense",
+        "mood",
+        "number"
+      ]
+    },
+    "INF": {
+      "default": [
+        "aspect"
+      ]
+    },
+    "GER": {
+      "default": [
+        "aspect",
+        "tense"
+      ]
+    }
+  }
+}
