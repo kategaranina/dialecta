@@ -1,6 +1,5 @@
 import re
 from lxml import etree
-from .annotation_menu import annotation_menu
 
 
 ANNOTATION_WORD_SEP = '|'
@@ -88,16 +87,12 @@ def add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dic
 
         if i in annot_tokens_dict.keys():
             raw_morph_tags_full = annot_tokens_dict[i][1].split(ANNOTATION_OPTION_SEP)
-            morph_tags_full = ANNOTATION_OPTION_SEP.join(
-                annotation_menu.override_abbreviations(x, is_lemma=True)
-                for x in raw_morph_tags_full
-            )  # DB
+            morph_tags_full = ANNOTATION_OPTION_SEP.join(raw_morph_tags_full)
             tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
 
             spl = raw_morph_tags_full[0].split(ANNOTATION_TAG_SEP, 1)
             moprh_tags = spl[1] if len(spl) > 1 else ''
-            morph_tags = annotation_menu.override_abbreviations(moprh_tags)  # DB
-            tag.insert(0, etree.fromstring('<morph>' + morph_tags + '</morph>'))
+            tag.insert(0, etree.fromstring('<morph>' + moprh_tags + '</morph>'))
 
             lemma_full = annot_tokens_dict[i][0]
             tag.insert(0, etree.fromstring('<lemma_full style="display:none">' + lemma_full + '</lemma_full>'))

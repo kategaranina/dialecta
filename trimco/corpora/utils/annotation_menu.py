@@ -4,12 +4,13 @@ import json
 from collections import defaultdict
 
 from trimco.settings import _STATIC_ROOT
+from .format_utils import ANNOTATION_TAG_SEP
 
 
 class AnnotationMenu:
     def __init__(self, json_name):
         self.config = self._read_config(json_name)
-        self.tags_by_category = self._get_tags_by_category()
+        self.surface_tags_by_category = self._get_tags_by_category()
         self.order_idxs = self._get_order_idxs()
 
         lemma_input_str = (
@@ -56,7 +57,9 @@ class AnnotationMenu:
     def _get_tags_by_category(self):
         tags_by_category = defaultdict(list)
         for tag, tag_dict in self.config['grammemes'].items():
-            tags_by_category[tag_dict['category']].append(tag)
+            surface_tag = tag_dict['surface_tag']
+            if surface_tag not in tags_by_category[tag_dict['category']]:
+                tags_by_category[tag_dict['category']].append(surface_tag)
         return tags_by_category
 
     def _get_order_idxs(self):
@@ -76,11 +79,10 @@ class AnnotationMenu:
 
     def _get_main_options(self):
         main_options = []
-        for category, tags in self.tags_by_category.items():
+        for category, tags in self.surface_tags_by_category.items():
             options = ['<option id="blank"></option>']
             for tag in tags:
-                surface_tag = self.config['grammemes'][tag]['surface_tag']
-                options.append(f'<option id="{surface_tag}">{surface_tag}</option>')
+                options.append(f'<option id="{tag}">{tag}</option>')
 
             select_form = (
                 f'<div class="manualAnnotationContainer">'
@@ -123,13 +125,10 @@ class AnnotationMenu:
 
         return order_key
 
-    def override_abbreviations(self, tag_str, is_lemma=False):
-        tags_lst = [t for t in re.split('[, -]', tag_str) if t]
+    def override_abbreviations(self, tag_str):
+        tags_lst = [t for t in re.split(r'[, \-]', tag_str) if t]
         if not tags_lst:
             return ''
-
-        if is_lemma:
-            lemma, tags_lst = tags_lst[0], tags_lst[1:]
 
         tags_dict = {
             self.config['grammemes'][t]['category']: self.config['grammemes'][t]['surface_tag']
@@ -141,7 +140,10 @@ class AnnotationMenu:
             if t in tags_lst
         ]
 
-        pos = tags_dict['part_of_speech']  # must always be there
+        pos = tags_dict.get('part of speech')
+        if pos is None:  # UNKN, LATIN, PNCT
+            return tag_str
+
         final_tags = [pos]
         if pos in self.config['order']:
             order_key = self._get_order(pos, tags_dict)
@@ -150,12 +152,39 @@ class AnnotationMenu:
 
         final_tags.extend(facultative)
 
-        if is_lemma:
-            final_tags = [lemma] + final_tags
-
-        # TODO: import ANNOTATION_TAG_SEP
-        final_tags = '-'.join(final_tags).replace(';-', '; ')  # todo: wtf
+        final_tags = ANNOTATION_TAG_SEP.join(final_tags).replace(';-', '; ')  # todo: wtf
         return final_tags
 
 
 annotation_menu = AnnotationMenu("annotation_grammemes.json")
+
+
+if __name__ == '__main__':
+    from pymorphy2 import MorphAnalyzer
+
+    test_config = {
+        'долг': 'NOUN-m-nom-sg',
+        'долгу': 'NOUN-m-gen2-sg',
+        'красивая': 'ADJF-f-nom-sg',
+        'красивые': 'ADJF-nom-pl',
+        'идут': 'VERB-ipfv-prs-ind-3-pl',
+        'приехали': 'VERB-pfv-pst-ind-pl',
+        'хорошо': 'ADV',
+        'смотри': 'VERB-ipfv-imp-sg',
+        'шла': 'VERB-ipfv-pst-ind-sg-f',
+        'пятидесяти': 'NUMR-gen',
+        'идти': 'INF-ipfv',
+        'Новгород': 'NOUN-m-acc-sg-Geox',
+        'Пети': 'NOUN-m-gen-sg-anim-Name',
+        'МВД': 'NOUN-n-gen-sg-Abbr',
+        'ВШЭ': 'UNKN'
+    }
+
+    m = MorphAnalyzer()
+    for word, true_res in test_config.items():
+        auto_annot = str(m.parse(word)[0].tag)
+        overriden = annotation_menu.override_abbreviations(auto_annot)
+        try:
+            assert overriden == true_res
+        except AssertionError:
+            print('ERROR', word, true_res, overriden, sep='\t')
