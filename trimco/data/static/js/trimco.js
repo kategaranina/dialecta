@@ -1,8 +1,8 @@
 (function($) {
-	var processing_request = false;
-	var prev_page_info = {}
+    var processing_request = false;
+    var prev_page_info = {}
 
-	function ajax_request(req_type, req_data, search=false) {  // TODO: req_type to different funcs?
+    function ajax_request(req_type, req_data, search=false) {  // TODO: req_type to different funcs?
         if (processing_request == true) {
             console.log('processing previous request, please wait'); // Error to log
             return false;
@@ -54,7 +54,7 @@
                             else {
                                 /* continuing to next token when empty*/
                                 var next = nextInDOM('trt', $('trt.focused'));
-		                        if (next) {activate_trt(next)};
+                                if (next) {activate_trt(next)};
                             };
                         }
                     }
@@ -77,375 +77,353 @@
                 }
             }
         });
-	};
+    };
 
-	function auto_annotation_request(trt_tag) {
-		ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'mode' : 'auto',});
-	};
+    function auto_annotation_request(trt_tag) {
+        ajax_request('trt_annot_req', {'trt' : trt_tag.text(), 'mode' : 'auto',});
+    };
 
-	function wb_annotation_mode () {
-		$( "#workbench" ).removeClass( "wb_reduced", 500, "easeOutBounce");
-		$('#wb_col_1').children().attr('style', 'pointer-events: none;opacity: 0.4;');
-	};
-	function wb_normlization_mode () {
-		$('#annotation_suggestions_lst').empty();
-		$('#wb_col_1').children().removeAttr('style');
-		$( "#workbench" ).addClass( "wb_reduced", 500, "easeOutBounce");
-	};
+    function wb_annotation_mode () {
+        $( "#workbench" ).removeClass( "wb_reduced", 500, "easeOutBounce");
+        $('#wb_col_1').children().attr('style', 'pointer-events: none;opacity: 0.4;');
+    };
+    function wb_normlization_mode () {
+        $('#annotation_suggestions_lst').empty();
+        $('#wb_col_1').children().removeAttr('style');
+        $( "#workbench" ).addClass( "wb_reduced", 500, "easeOutBounce");
+    };
 
-	function activate_trt(trt_tag, search=false) {
-		/* prepering <trt> for (re)suggestion of <nrm> */
-		var mode = 'manual';
-		if ($('#auto_annotation').is(':checked')) {var mode = 'auto'};
+    function activate_trt(trt_tag, search=false) {
+        /* prepering <trt> for (re)suggestion of <nrm> */
+        var mode = 'manual';
+        if ($('#auto_annotation').is(':checked')) {var mode = 'auto'};
 
-		if (mode=='manual') {
-			$('#normalization_suggestions_lst').empty();
-			$('#normalization_input').val('');
-			wb_normlization_mode();
-		};
-		$('trt.focused').removeAttr('id');
-		$('trt').removeClass('focused');
-		trt_tag.addClass('focused');
-		if (mode=='manual') {
-			$('#examined_transcript').text(trt_tag.text());
-			var params = {
-			    'trt': trt_tag.text(),
-			    'nrm': trt_tag.parent().find('nrm').text(),
-			    'mode': 'manual',
-			    'dialect': trt_tag.closest('.annot').attr('dialect')
-			};
-			ajax_request('trt_annot_req', params, search=search);
-		};
-		if (mode=='auto') {
-			auto_annotation_request(trt_tag)
-		}
-	};
+        if (mode=='manual') {
+            $('#normalization_suggestions_lst').empty();
+            $('#normalization_input').val('');
+            wb_normlization_mode();
+        };
+        $('trt.focused').removeAttr('id');
+        $('trt').removeClass('focused');
+        trt_tag.addClass('focused');
+        if (mode=='manual') {
+            $('#examined_transcript').text(trt_tag.text());
+            var params = {
+                'trt': trt_tag.text(),
+                'nrm': trt_tag.parent().find('nrm').text(),
+                'mode': 'manual',
+                'dialect': trt_tag.closest('.annot').attr('dialect')
+            };
+            ajax_request('trt_annot_req', params, search=search);
+        };
+        if (mode=='auto') {
+            auto_annotation_request(trt_tag)
+        }
+    };
 
-	function apply_auto_annotation(token, normalization, annotation) {
+    function apply_auto_annotation(token, normalization, annotation) {
 
-		console.log($.now(), token, normalization, annotation);
+        console.log($.now(), token, normalization, annotation);
 
         var full_ann = annotation.map(x => x[0]+'-'+x[1]).join('/');
         var full_lemma = Array.from(new Set(annotation.map(x => x[0]))).join('/');
 
-		var norm_tag = $('<nrm>'+normalization+'</nrm>');
+        var norm_tag = $('<nrm>'+normalization+'</nrm>');
         var lemma_full_tag = $('<lemma_full style="display:none">'+full_lemma+'</lemma_full>');
-		var lemma_tag = $('<lemma>'+annotation[0][0]+'</lemma>');
+        var lemma_tag = $('<lemma>'+annotation[0][0]+'</lemma>');
         var morph_full_tag = $('<morph_full style="display:none">'+full_ann+'</morph_full>');
-		var morph_tag = $('<morph>'+annotation[0][1]+'</morph></info>');
-		set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'auto')
+        var morph_tag = $('<morph>'+annotation[0][1]+'</morph></info>');
+        set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'auto')
 
-		/* FROM TAG */
-		//var norm_tag = $('<nrm>'+$('#normalization_input').val()+'</nrm>');
-		//var lemma_tag = $('<lemma>'+$('#annotation_suggestions_lst li.selected .lemma_suggestion' ).text()+'</lemma>');
-		//var morph_tag = $('<morph>'+$('#annotation_suggestions_lst li.selected .morph_suggestion' ).text()+'</morph></info>');
-	};
+        /* FROM TAG */
+        //var norm_tag = $('<nrm>'+$('#normalization_input').val()+'</nrm>');
+        //var lemma_tag = $('<lemma>'+$('#annotation_suggestions_lst li.selected .lemma_suggestion' ).text()+'</lemma>');
+        //var morph_tag = $('<morph>'+$('#annotation_suggestions_lst li.selected .morph_suggestion' ).text()+'</morph></info>');
+    };
 
-	function list_normlz_suggestions(suggestions_lst) { //actually suggestions_lst now is one word from <nrm> tag except for normalizations from manual list
-		lst_container_tag = $('#normalization_suggestions_lst');
-		for (var i in suggestions_lst){
-			var tag = $('<li>'+suggestions_lst[i]+'</li>')
-			lst_container_tag.append(tag);
-			if (i == 0) {
-				tag.addClass("selected");
-				$('#normalization_input').val(suggestions_lst[i]);
-			};
-		};
-		//var tag = $('<li>'+suggestions_lst+'</li>')
-		//lst_container_tag.append(tag);
-		//tag.addClass("selected");
-		//$('#normalization_input').val(suggestions_lst);
-		$('#normalization_suggestions_lst li').click(function(e) {
-			$(this).addClass("selected").siblings().removeClass("selected");
-			$('#normalization_input').val($(this).text())
-		});
-	};
+    function list_normlz_suggestions(suggestions_lst) { //actually suggestions_lst now is one word from <nrm> tag except for normalizations from manual list
+        lst_container_tag = $('#normalization_suggestions_lst');
+        for (var i in suggestions_lst){
+            var tag = $('<li>'+suggestions_lst[i]+'</li>')
+            lst_container_tag.append(tag);
+            if (i == 0) {
+                tag.addClass("selected");
+                $('#normalization_input').val(suggestions_lst[i]);
+            };
+        };
+        //var tag = $('<li>'+suggestions_lst+'</li>')
+        //lst_container_tag.append(tag);
+        //tag.addClass("selected");
+        //$('#normalization_input').val(suggestions_lst);
+        $('#normalization_suggestions_lst li').click(function(e) {
+            $(this).addClass("selected").siblings().removeClass("selected");
+            $('#normalization_input').val($(this).text())
+        });
+    };
 
-	/* LIST ANNOTATION SUGGESTIONS (and add to DOM, if only one) */
+    /* LIST ANNOTATION SUGGESTIONS (and add to DOM, if only one) */
 
-	function list_annot_suggestions(suggestions_lst) {
-		lst_container_tag = $('#annotation_suggestions_lst');
-		lst_container_tag.empty();
-		for (var i in suggestions_lst){
-			var tag = $('<li><span class="lemma_suggestion">'+suggestions_lst[i][0]+'</span> <span class="morph_suggestion">'+suggestions_lst[i][1]+'</span></li>')
-			lst_container_tag.append(tag);
-			wb_annotation_mode(); // manual annotation mode in all  cases
-			if (i == 0) {
-				tag.addClass("selected");
-				populate_annotation_form(tag);
-			}
-			else if (i > 0) {
-				// Manual annotation mode when more then one option
-				//wb_annotation_mode();
-			};
-		};
-		/* Auto annotation behaviour when one option*/
-		/*
-		if (i==0) {
-			set_annotation();
-		};*/
+    function list_annot_suggestions(suggestions_lst) {
+        lst_container_tag = $('#annotation_suggestions_lst');
+        lst_container_tag.empty();
+        for (var i in suggestions_lst){
+            var tag = $('<li><span class="lemma_suggestion">'+suggestions_lst[i][0]+'</span> <span class="morph_suggestion">'+suggestions_lst[i][1]+'</span></li>')
+            lst_container_tag.append(tag);
+            wb_annotation_mode(); // manual annotation mode in all  cases
+            if (i == 0) {
+                tag.addClass("selected");
+                populate_annotation_form(tag);
+            }
+            else if (i > 0) {
+                // Manual annotation mode when more then one option
+                //wb_annotation_mode();
+            };
+        };
+        /* Auto annotation behaviour when one option*/
+        /*
+        if (i==0) {
+            set_annotation();
+        };*/
 
-		$('#annotation_suggestions_lst li').click(function(e) {
-			$(this).addClass("selected").siblings().removeClass("selected");
-			populate_annotation_form($(this));
-		});
-	};
+        $('#annotation_suggestions_lst li').click(function(e) {
+            $(this).addClass("selected").siblings().removeClass("selected");
+            populate_annotation_form($(this));
+        });
+    };
 
-	function populate_annotation_form(annot_tag) {
-	    // reset previous annotation form
-		$('.manualAnnotationContainer').removeClass('active');
-		$('option').removeAttr('selected');
-		$("input.manualAnnotation[type='checkbox']").prop('checked', false);
+    function populate_annotation_form(annot_tag) {
+        // reset previous annotation form
+        $('.manualAnnotationContainer').removeClass('active');
+        $('option').removeAttr('selected');
+        $("input.manualAnnotation[type='checkbox']").prop('checked', false);
 
         // parts of current tag
         var this_form = $('#normalization_input').val();
-		var this_annot_info = annot_tag.text().split(' ');
-		var lemma = this_annot_info.slice(0, -1).join(' ');
-		var tags = this_annot_info[this_annot_info.length - 1].split('-');
+        var this_annot_info = annot_tag.text().split(' ');
+        var lemma = this_annot_info.slice(0, -1).join(' ');
+        var tags = this_annot_info[this_annot_info.length - 1].split('-');
 
         // adding lemma
-		$('.manualAnnotation#lemma_input').val(lemma).parent().addClass('active');
-		$('.manualAnnotation#form_input').val(this_form).parent().addClass('active');
+        $('.manualAnnotation#lemma_input').val(lemma).parent().addClass('active');
+        $('.manualAnnotation#form_input').val(this_form).parent().addClass('active');
 
-//		$('option#'+tags[0]).prop('selected', true)
-//		$('option#'+tags[0]).parent().parent().addClass('active');
+//        $('option#'+tags[0]).prop('selected', true)
+//        $('option#'+tags[0]).parent().parent().addClass('active');
 
-		$.each(tags, function(i, el){
-		    // for compulsory `select` objects
-			$('#'+el).prop('selected', true)
-			$('#'+el).parent().parent().addClass('active');
+        $.each(tags, function(i, el){
+            // for compulsory `select` objects
+            $('#'+el).prop('selected', true)
+            $('#'+el).parent().parent().addClass('active');
 
-			// for checkboxes
-			$('[name="'+el+'"]').prop('checked', true)
-			$('[name="'+el+'"]').parent().parent().addClass('active');
-		});
+            // for checkboxes
+            $('[name="'+el+'"]').prop('checked', true)
+            $('[name="'+el+'"]').parent().parent().addClass('active');
+        });
 
-		activate_annotation_form_fields();
+        activate_annotation_form_fields();
 
-		$('select.manualAnnotation').change(function(e){
-			activate_annotation_form_fields();
-		});
-	};
+        $('select.manualAnnotation').change(function(e){
+            activate_annotation_form_fields();
+        });
+    };
 
-	function activate_annotation_form_fields() {
-	    // separate function `activate_annotation_form_fields` is needed
-	    // because it's called when content of select.manualAnnotation changes
-		activate_annotation_options();
-		activate_annotation_checkboxes();
-	};
+    function activate_annotation_form_fields() {
+        // separate function `activate_annotation_form_fields` is needed
+        // because it's called when content of select.manualAnnotation changes
+        activate_annotation_options();
+        activate_annotation_checkboxes();
+    };
 
-	function activate_annotation_options() {
-		/* SELECT OPTIONS */
-//		$.each($("select.manualAnnotation"), function(i){
-//			var match = false;
-//			var option_tag = $(this);
-//			$.each(option_tag.data('dep'), function(i, dict){
-//				$.each(dict['tags'], function(i, id){
-//					if (id=='ALLFORMS') {
-//						match = true;
-//						return false;
-//					};
-//					match = $('#'+id).prop('selected');
-////					console.log($('#'+id), match);
-//					if (match==false){return false};
-//				});
-//				if (match==true){return false};
-//			});
-//			update_annotation_field_status(option_tag, match);
-//		});
-
-		$.each($("select.manualAnnotation"), function(i){
-		    var display_idx = -1;
+    function activate_annotation_options() {
+        /* SELECT OPTIONS */
+        $.each($("select.manualAnnotation"), function(i){
+            var display_idx = -1;
             var option_tag = $(this);
 
-		    $.each(option_tag.data('dep'), function(i, dep_dict){
-		        display_idx = dep_dict['index'];
+            $.each(option_tag.data('dep'), function(i, dep_dict){
+                display_idx = dep_dict['index'];
 
-		        $.each(dep_dict['tags'], function(i, tag){
-		            var is_tag_selected = $('#' + tag).prop('selected');
-//		            console.log(tag, is_tag_selected);
+                $.each(dep_dict['tags'], function(i, tag){
+                    var is_tag_selected = $('#' + tag).prop('selected');
 
-		            // if select form must me displayed for all forms
-		            if ( tag == 'ALLFORMS' ) {
-		                display_idx = dep_dict['index'];
-		                return false;
+                    // if select form must me displayed for all forms
+                    if ( tag == 'ALLFORMS' ) {
+                        display_idx = dep_dict['index'];
+                        return false;
 
-		            // if one of the required tag is not selected,
-		            // do not show this select form
-		            } else if ( !is_tag_selected ) {
-		                display_idx = -1;
-		                console.log(tag, is_tag_selected, display_idx);
-		                return false;
-		            }
-		        });
-		        // stop if one of the requirement sets for select form is satisfied
-		        console.log(display_idx);
-		        if ( display_idx > -1 ) { return false; }
-		    });
+                    // if one of the required tag is not selected,
+                    // do not show this select form
+                    } else if ( !is_tag_selected ) {
+                        display_idx = -1;
+                        return false;
+                    }
+                });
+                // stop if one of the requirement sets for select form is satisfied
+                if ( display_idx > -1 ) { return false; }
+            });
 
-//            console.log(display_idx);
-		    update_annotation_field_status(option_tag, display_idx);
-		});
-		sort_annotation_options();
-	};
+            update_annotation_field_status(option_tag, display_idx);
+        });
+        sort_annotation_options();
+    };
 
-	function sort_annotation_options(){
-	    var annot_form = '#manual_annotation form';
-	    $(annot_form)
-	        .children()
-	        .sort((a,b) => $(a).attr("idx") - $(b).attr("idx"))
+    function sort_annotation_options(){
+        var annot_form = '#manual_annotation form';
+        $(annot_form)
+            .children()
+            .sort((a,b) => $(a).attr("idx") - $(b).attr("idx"))
             .appendTo(annot_form);
-	}
+    }
 
-	function activate_annotation_checkboxes() {
-		/* CHECKBOXES */
-		$.each($("input.manualAnnotation[type='checkbox']"), function(i){
-			var match = 1;
+    function activate_annotation_checkboxes() {
+        /* CHECKBOXES */
+        $.each($("input.manualAnnotation[type='checkbox']"), function(i){
+            var match = 1;
 
-			$.each($(this).data('dep'), function(i, tag){
-			    var is_tag_selected = $('#' + tag).prop('selected');
-				if (tag == 'ALLFORMS') {
-					match = 1;
-					return false;
+            $.each($(this).data('dep'), function(i, tag){
+                var is_tag_selected = $('#' + tag).prop('selected');
+                if (tag == 'ALLFORMS') {
+                    match = 1;
+                    return false;
 
-				} else if ( !is_tag_selected ) {
+                } else if ( !is_tag_selected ) {
                     match = -1;
                     return false;
                 }
-			});
+            });
 
-			update_annotation_field_status($(this), match);
-		});
-	};
+            update_annotation_field_status($(this), match);
+        });
+    };
 
-	function update_annotation_field_status(field, display_idx) {
-		if ( display_idx > -1 ) {
-			field.parents('.manualAnnotationContainer').addClass('active');
-			field.parents('.manualAnnotationContainer').attr('idx', display_idx);
-		}
-		else {
-			field.parents('.manualAnnotationContainer').removeClass('active');
-			field.parents('.manualAnnotationContainer').removeAttr('idx');  // for sorting
-		};
-	};
+    function update_annotation_field_status(field, display_idx) {
+        if ( display_idx > -1 ) {
+            field.parents('.manualAnnotationContainer').addClass('active');
+            field.parents('.manualAnnotationContainer').attr('idx', display_idx);
+        }
+        else {
+            field.parents('.manualAnnotationContainer').removeClass('active');
+            field.parents('.manualAnnotationContainer').removeAttr('idx');
+        };
+    };
 
-	/* TEXT MEASURMENTS */
+    /* TEXT MEASURMENTS */
 
-	function getTextWidth(tag) {
-		// re-use canvas object for better performance
-		var text = tag.text()
-		var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
-		var context = canvas.getContext("2d");
-		context.font = tag.css('font');
-		var metrics = context.measureText(text);
-		return metrics.width;
-	};
+    function getTextWidth(tag) {
+        // re-use canvas object for better performance
+        var text = tag.text()
+        var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+        var context = canvas.getContext("2d");
+        context.font = tag.css('font');
+        var metrics = context.measureText(text);
+        return metrics.width;
+    };
 
-	/* FIND NEXT IN DOM */
+    /* FIND NEXT IN DOM */
 
-	function nextInDOM(_selector, _subject) {
-		var next = getNext(_subject);
-		while(next != null && next.length != 0) {
-			var found = searchFor(_selector, next);
-			if(found != null) return found;
-			next = getNext(next);
-		}
-		return null;
-	};
-	function getNext(_subject) {
-		if(_subject.next().length > 0) return _subject.next();
-		if(_subject.parent().length > 0) return getNext(_subject.parent());
-		return null;
-	};
-	function searchFor(_selector, _subject) {
-		if(_subject.is(_selector)) return _subject;
-		else {
-			var found = null;
-			_subject.children().each(function() {
-				found = searchFor(_selector, $(this));
-				if(found != null) return false;
-			});
-			return found;
-		}
-		return null; // will/should never get here
-	};
+    function nextInDOM(_selector, _subject) {
+        var next = getNext(_subject);
+        while(next != null && next.length != 0) {
+            var found = searchFor(_selector, next);
+            if(found != null) return found;
+            next = getNext(next);
+        }
+        return null;
+    };
+    function getNext(_subject) {
+        if(_subject.next().length > 0) return _subject.next();
+        if(_subject.parent().length > 0) return getNext(_subject.parent());
+        return null;
+    };
+    function searchFor(_selector, _subject) {
+        if(_subject.is(_selector)) return _subject;
+        else {
+            var found = null;
+            _subject.children().each(function() {
+                found = searchFor(_selector, $(this));
+                if(found != null) return false;
+            });
+            return found;
+        }
+        return null; // will/should never get here
+    };
 
-	/* ANNOTATION OPTIONS TO STRING */
+    /* ANNOTATION OPTIONS TO STRING */
 
-	function annot_to_str() {
-		var tags_final_lst = []
-		$.each($(".active select"), function(i){
-			tags_final_lst.push($(this).val());
-		});
-		$.each($(".active label input:checked"), function(i){
-			tags_final_lst.push($(this).val());
-		});
-		return tags_final_lst.join("-");
-	};
+    function annot_to_str() {
+        var tags_final_lst = []
+        $.each($(".active select"), function(i){
+            tags_final_lst.push($(this).val());
+        });
+        $.each($(".active label input:checked"), function(i){
+            tags_final_lst.push($(this).val());
+        });
+        return tags_final_lst.join("-");
+    };
 
-	/* ANNOTATION TO DOM: FINAL */
+    /* ANNOTATION TO DOM: FINAL */
 
-	function set_annotation (norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, mode) {
+    function set_annotation (norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, mode) {
 
-		/* adding normalization, lemma and morphology tags to DOM */
+        /* adding normalization, lemma and morphology tags to DOM */
 
-		$('trt.focused').parent().children('nrm, lemma_full, lemma, morph_full, morph').remove();
+        $('trt.focused').parent().children('nrm, lemma_full, lemma, morph_full, morph').remove();
 
-		$('trt.focused').parent().prepend(morph_tag);
+        $('trt.focused').parent().prepend(morph_tag);
         $('trt.focused').parent().prepend(morph_full_tag);
-		$('trt.focused').parent().prepend(lemma_tag);
+        $('trt.focused').parent().prepend(lemma_tag);
         $('trt.focused').parent().prepend(lemma_full_tag);
-		$('trt.focused').parent().prepend(norm_tag);
+        $('trt.focused').parent().prepend(norm_tag);
 
-		/* adjusting spacing*/
-		var len_transcript = getTextWidth($('.focused'));
-		var len_morph = getTextWidth(morph_tag);
-		var len_norm = getTextWidth(norm_tag);
-		var len_lemma = getTextWidth(lemma_tag);
-		if (len_morph > len_transcript && len_morph > len_norm && len_morph > len_lemma) {
-			$('trt.focused').css('margin-right', len_morph - len_transcript);
-		}
-		else if (len_norm > len_morph && len_norm > len_transcript && len_norm > len_lemma) {
-			$('.focused').css('margin-right', len_norm - len_transcript)
-		}
-		else if (len_lemma > len_morph && len_lemma > len_transcript && len_lemma > len_norm) {
-			$('.focused').css('margin-right', len_lemma - len_transcript)
-		}
-		else {
-			$('trt.focused').removeAttr('style');
-			};
-		$('trt.focused').closest('.annot_wrapper').addClass('changed');
-		/* continuing to next token*/
-		setTimeout(function () {
+        /* adjusting spacing*/
+        var len_transcript = getTextWidth($('.focused'));
+        var len_morph = getTextWidth(morph_tag);
+        var len_norm = getTextWidth(norm_tag);
+        var len_lemma = getTextWidth(lemma_tag);
+        if (len_morph > len_transcript && len_morph > len_norm && len_morph > len_lemma) {
+            $('trt.focused').css('margin-right', len_morph - len_transcript);
+        }
+        else if (len_norm > len_morph && len_norm > len_transcript && len_norm > len_lemma) {
+            $('.focused').css('margin-right', len_norm - len_transcript)
+        }
+        else if (len_lemma > len_morph && len_lemma > len_transcript && len_lemma > len_norm) {
+            $('.focused').css('margin-right', len_lemma - len_transcript)
+        }
+        else {
+            $('trt.focused').removeAttr('style');
+            };
+        $('trt.focused').closest('.annot_wrapper').addClass('changed');
+        /* continuing to next token*/
+        setTimeout(function () {
             var next = nextInDOM('trt', $('trt.focused'));
-		    if (next) {activate_trt(next, search=check_search_mode())};
+            if (next) {activate_trt(next, search=check_search_mode())};
         }, 0)
-	}
+    }
 
-	/* ADJUST SPACING FOR DOM ON INITIAL LOAD */
-	function adjust_DOM_spacing() {
-		$('token').each(function( index ) {
-			if ( $(this).children('morph').length ) {
-				var len_transcript = getTextWidth( $(this).children('trt') );
-				var len_morph = getTextWidth( $(this).children('morph') );
-				var len_norm = getTextWidth( $(this).children('nrm') );
-				var len_lemma = getTextWidth( $(this).children('lemma') );
-				if (len_morph > len_transcript && len_morph > len_norm && len_morph > len_lemma) {
-					$(this).css('margin-right', len_morph - len_transcript);
-				}
-				else if (len_norm > len_morph && len_norm > len_transcript && len_norm > len_lemma) {
-					$(this).children('trt').eq(0).css('margin-right', len_norm - len_transcript)
-				}
-				else if (len_lemma > len_morph && len_lemma > len_transcript && len_lemma > len_norm) {
-					$(this).children('trt').eq(0).css('margin-right', len_lemma - len_transcript)
-				}
-			}
-		});
-	}
+    /* ADJUST SPACING FOR DOM ON INITIAL LOAD */
+    function adjust_DOM_spacing() {
+        $('token').each(function( index ) {
+            if ( $(this).children('morph').length ) {
+                var len_transcript = getTextWidth( $(this).children('trt') );
+                var len_morph = getTextWidth( $(this).children('morph') );
+                var len_norm = getTextWidth( $(this).children('nrm') );
+                var len_lemma = getTextWidth( $(this).children('lemma') );
+                if (len_morph > len_transcript && len_morph > len_norm && len_morph > len_lemma) {
+                    $(this).css('margin-right', len_morph - len_transcript);
+                }
+                else if (len_norm > len_morph && len_norm > len_transcript && len_norm > len_lemma) {
+                    $(this).children('trt').eq(0).css('margin-right', len_norm - len_transcript)
+                }
+                else if (len_lemma > len_morph && len_lemma > len_transcript && len_lemma > len_norm) {
+                    $(this).children('trt').eq(0).css('margin-right', len_lemma - len_transcript)
+                }
+            }
+        });
+    }
 
-	/* PLAY SOUND */
-	function audiofragment_click(audio_fragment) {
-		var active_button = audio_fragment.find(">:first-child");
+    /* PLAY SOUND */
+    function audiofragment_click(audio_fragment) {
+        var active_button = audio_fragment.find(">:first-child");
         if (!active_button.hasClass('fa-play')){
                 return false;
         }
@@ -467,15 +445,15 @@
                 active_button.removeClass('fa-pause').addClass('fa-play');
             },
         });
-		sound.play('segment');
-	}
+        sound.play('segment');
+    }
 
-	function check_search_mode() {
-	    return !!$('#search_form').length;
-	}
+    function check_search_mode() {
+        return !!$('#search_form').length;
+    }
 
-	function fill_replace_form(token) {
-	    var elements = [
+    function fill_replace_form(token) {
+        var elements = [
             ["standartization", "nrm"],
             ["lemma", "lemma"],
             ["annotations", "morph"],
@@ -488,7 +466,7 @@
         }
     }
 
-	function create_replace_query() {
+    function create_replace_query() {
         var query = [];
         var elements = [ // NB: order is important
             ["from_standartization", "nrm"],
@@ -596,20 +574,20 @@
     }
 
 
-	/*
-	********************************************************
-	DOM EVENTS ONLY:
-	********************************************************
-	*/
+    /*
+    ********************************************************
+    DOM EVENTS ONLY:
+    ********************************************************
+    */
 
-	$(document).ready(function() {
+    $(document).ready(function() {
 
-		/* INITIAL ACTIONS ON LOAD */
+        /* INITIAL ACTIONS ON LOAD */
 
-		/* TYPO.JS SPELLCHECKER TEST
-		var dictionary = new Typo("ru_RU", false, false, {dictionaryPath: "/static/js/Typo.js-master/typo/dictionaries"});
-		console.log(dictionary.suggest("молако"));
-		*/
+        /* TYPO.JS SPELLCHECKER TEST
+        var dictionary = new Typo("ru_RU", false, false, {dictionaryPath: "/static/js/Typo.js-master/typo/dictionaries"});
+        console.log(dictionary.suggest("молако"));
+        */
 
         if (!check_search_mode()) {
             adjust_DOM_spacing();
@@ -620,73 +598,73 @@
             $("<div id='save_button'><button id='save_to_file' class='fa fa-floppy-o'></div>")
         );
 
-		/*AUDIO: PLAY AT CLICK*/
-		$(document).on('click', '.audiofragment', function() {
-			audiofragment_click($(this));
-		});
+        /*AUDIO: PLAY AT CLICK*/
+        $(document).on('click', '.audiofragment', function() {
+            audiofragment_click($(this));
+        });
 
-		var focused_right_lst = [];
-		var focused_left_lst = [];
+        var focused_right_lst = [];
+        var focused_left_lst = [];
 
-		/*MERGE CONTROLS*/
-		$('#merge_left').click(function(e) {
-			console.log('left clicked');
-			if (!$('trt.focused#0').length) {
-				focused_right_lst = [];
-				focused_left_lst = [];
-				$('trt.focused').attr('id','0');
-			}
-			var left_trt_tag = '';
-			if (focused_right_lst.length!=0){
-				focused_right_lst.pop().removeClass('focused');
-			}
-			else if (focused_left_lst.length>0) {
-				var left_trt_tag = focused_left_lst[focused_left_lst.length-1].parent().prev().find('trt');
-			}
-			else {
-				var left_trt_tag = $('trt.focused#0').parent().prev().find('trt');
-			}
-			if (left_trt_tag.length){
-				left_trt_tag.addClass('focused')
-				focused_left_lst.push(left_trt_tag);
-			};
-			console.log(focused_left_lst);
-		});
+        /*MERGE CONTROLS*/
+        $('#merge_left').click(function(e) {
+            console.log('left clicked');
+            if (!$('trt.focused#0').length) {
+                focused_right_lst = [];
+                focused_left_lst = [];
+                $('trt.focused').attr('id','0');
+            }
+            var left_trt_tag = '';
+            if (focused_right_lst.length!=0){
+                focused_right_lst.pop().removeClass('focused');
+            }
+            else if (focused_left_lst.length>0) {
+                var left_trt_tag = focused_left_lst[focused_left_lst.length-1].parent().prev().find('trt');
+            }
+            else {
+                var left_trt_tag = $('trt.focused#0').parent().prev().find('trt');
+            }
+            if (left_trt_tag.length){
+                left_trt_tag.addClass('focused')
+                focused_left_lst.push(left_trt_tag);
+            };
+            console.log(focused_left_lst);
+        });
 
-		$('#merge_right').click(function(e) {
-			console.log('right clicked');
-			if (!$('trt.focused#0').length) {
-				focused_right_lst = [];
-				focused_left_lst = [];
-				$('trt.focused').attr('id','0');
-			}
-			var right_trt_tag = '';
-			if (focused_left_lst.length!=0){
-				focused_left_lst.pop().removeClass('focused');
-			}
-			else if (focused_right_lst.length>0) {
-				var right_trt_tag = focused_right_lst[focused_right_lst.length-1].parent().next().find('trt');
-			}
-			else {
-				var right_trt_tag = $('trt.focused#0').parent().next().find('trt');
-			}
-			if (right_trt_tag.length){
-				right_trt_tag.addClass('focused')
-				focused_right_lst.push(right_trt_tag);
-			};
-			console.log(focused_right_lst);
-		});
+        $('#merge_right').click(function(e) {
+            console.log('right clicked');
+            if (!$('trt.focused#0').length) {
+                focused_right_lst = [];
+                focused_left_lst = [];
+                $('trt.focused').attr('id','0');
+            }
+            var right_trt_tag = '';
+            if (focused_left_lst.length!=0){
+                focused_left_lst.pop().removeClass('focused');
+            }
+            else if (focused_right_lst.length>0) {
+                var right_trt_tag = focused_right_lst[focused_right_lst.length-1].parent().next().find('trt');
+            }
+            else {
+                var right_trt_tag = $('trt.focused#0').parent().next().find('trt');
+            }
+            if (right_trt_tag.length){
+                right_trt_tag.addClass('focused')
+                focused_right_lst.push(right_trt_tag);
+            };
+            console.log(focused_right_lst);
+        });
 
-		$(document).on('click', 'trt', function() {
-		    var search_mode = check_search_mode();
-			activate_trt($(this), search=search_mode);
-			if (search_mode) { fill_replace_form($(this).parent()) };
+        $(document).on('click', 'trt', function() {
+            var search_mode = check_search_mode();
+            activate_trt($(this), search=search_mode);
+            if (search_mode) { fill_replace_form($(this).parent()) };
 
-		});
+        });
 
-		$('#save_to_file').click(function(e){
-			if ($('#save_to_file').hasClass('fa-floppy-o')) {
-				$('#save_to_file').removeClass('fa-floppy-o').addClass('fa-spinner off');
+        $('#save_to_file').click(function(e){
+            if ($('#save_to_file').hasClass('fa-floppy-o')) {
+                $('#save_to_file').removeClass('fa-floppy-o').addClass('fa-spinner off');
 
                 // delay is required for spinner icon to load
                 setTimeout(function () {
@@ -702,33 +680,33 @@
                         search=is_search_mode
                     );
                 }, 100)
-			}
-		});
+            }
+        });
 
-		$('#add_normalization').click(function(e) {
-			/* looking for annotation variants */
-			ajax_request(
-			    'annot_suggest_req',
-			    {
+        $('#add_normalization').click(function(e) {
+            /* looking for annotation variants */
+            ajax_request(
+                'annot_suggest_req',
+                {
                     'trt': $('#examined_transcript').text(),
                     'nrm': $('#normalization_input').val(),
                     'dialect': $('trt.focused').closest('.annot').attr('dialect')
                 },
-			    search=check_search_mode()
-			);
-		});
+                search=check_search_mode()
+            );
+        });
 
-		$('#add_annotation').click(function(e) {
-			/* confirming chosen annotation */
-			var norm = $('[title="Form"]').val();
-			var lemma = $('[title="Lemma"]').val();
-			var morph = annot_to_str();
+        $('#add_annotation').click(function(e) {
+            /* confirming chosen annotation */
+            var norm = $('[title="Form"]').val();
+            var lemma = $('[title="Lemma"]').val();
+            var morph = annot_to_str();
 
-			var norm_tag = $('<nrm>' + norm + '</nrm>');
+            var norm_tag = $('<nrm>' + norm + '</nrm>');
             var lemma_full_tag = $('<lemma_full style="display:none">' + lemma + '</lemma_full>');
-			var lemma_tag = $('<lemma>' + lemma + '</lemma>');
+            var lemma_tag = $('<lemma>' + lemma + '</lemma>');
             var morph_full_tag = $('<morph_full style="display:none">' + lemma + '-' + morph + '</morph_full>');
-			var morph_tag = $('<morph>' + morph + '</morph></info>');
+            var morph_tag = $('<morph>' + morph + '</morph></info>');
 
             var save_annotation_params = {
                 'trt': $('#examined_transcript').text(),
@@ -741,10 +719,10 @@
                 save_annotation_params['dialect'] = $('trt.focused').closest('.annot').attr('dialect');
                 $('trt.focused').closest('token').removeClass('changed_by_replace');
             };
-			ajax_request('save_annotation', save_annotation_params, search=search_mode);
+            ajax_request('save_annotation', save_annotation_params, search=search_mode);
 
-			set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
-		});
+            set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
+        });
 
         $('#search_button').click(function(e) {
             var formdata = {
@@ -811,5 +789,5 @@
             };
             $('#replace_button').html('Replace');
         });
-	});
+    });
 })(django.jQuery);
