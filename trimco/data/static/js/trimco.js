@@ -192,80 +192,140 @@
 	};
 
 	function populate_annotation_form(annot_tag) {
-
+	    // reset previous annotation form
 		$('.manualAnnotationContainer').removeClass('active');
 		$('option').removeAttr('selected');
 		$("input.manualAnnotation[type='checkbox']").prop('checked', false);
 
-		$('.manualAnnotation#lemma_input').val(annot_tag.text().split(' ').slice(0,-1).join(' ')).parent().addClass('active');
-		$('.manualAnnotation#form_input').val($('#normalization_input').val()).parent().addClass('active');
+        // parts of current tag
+        var this_form = $('#normalization_input').val();
 		var this_annot_info = annot_tag.text().split(' ');
-		var annot_lst = this_annot_info[this_annot_info.length - 1].split('-');
+		var lemma = this_annot_info.slice(0, -1).join(' ');
+		var tags = this_annot_info[this_annot_info.length - 1].split('-');
 
-		$('option#'+annot_lst[0]).prop('selected', true)
-		$('option#'+annot_lst[0]).parent().parent().addClass('active');
+        // adding lemma
+		$('.manualAnnotation#lemma_input').val(lemma).parent().addClass('active');
+		$('.manualAnnotation#form_input').val(this_form).parent().addClass('active');
 
-		$.each(annot_lst, function(i, el){
-			$('#'+el).prop('selected', true).parent().parent().addClass('active');
-			$('[name="'+el+'"]').prop('checked', true).parent().parent().addClass('active');
-			});
+//		$('option#'+tags[0]).prop('selected', true)
+//		$('option#'+tags[0]).parent().parent().addClass('active');
+
+		$.each(tags, function(i, el){
+		    // for compulsory `select` objects
+			$('#'+el).prop('selected', true)
+			$('#'+el).parent().parent().addClass('active');
+
+			// for checkboxes
+			$('[name="'+el+'"]').prop('checked', true)
+			$('[name="'+el+'"]').parent().parent().addClass('active');
+		});
+
 		activate_annotation_form_fields();
 
 		$('select.manualAnnotation').change(function(e){
-			//activate_annotation_options($(this).val());
 			activate_annotation_form_fields();
 		});
 	};
 
 	function activate_annotation_form_fields() {
+	    // separate function `activate_annotation_form_fields` is needed
+	    // because it's called when content of select.manualAnnotation changes
 		activate_annotation_options();
 		activate_annotation_checkboxes();
 	};
 
 	function activate_annotation_options() {
 		/* SELECT OPTIONS */
+//		$.each($("select.manualAnnotation"), function(i){
+//			var match = false;
+//			var option_tag = $(this);
+//			$.each(option_tag.data('dep'), function(i, dict){
+//				$.each(dict['tags'], function(i, id){
+//					if (id=='ALLFORMS') {
+//						match = true;
+//						return false;
+//					};
+//					match = $('#'+id).prop('selected');
+////					console.log($('#'+id), match);
+//					if (match==false){return false};
+//				});
+//				if (match==true){return false};
+//			});
+//			update_annotation_field_status(option_tag, match);
+//		});
+
 		$.each($("select.manualAnnotation"), function(i){
-			var match = false;
-			var option_tag = $(this);
-			$.each(option_tag.data('dep'), function(i, dict){
-				$.each(dict['tags'], function(i, id){
-					if (id=='ALLFORMS') {
-						match = true;
-						return false;
-					};
-					match = $('#'+id).prop('selected');
-					if (match==false){return false};
-				});
-				if (match==true){return false};
-			});
-			update_annotation_field_status(option_tag, match);
+		    var display_idx = -1;
+            var option_tag = $(this);
+
+		    $.each(option_tag.data('dep'), function(i, dep_dict){
+		        display_idx = dep_dict['index'];
+
+		        $.each(dep_dict['tags'], function(i, tag){
+		            var is_tag_selected = $('#' + tag).prop('selected');
+//		            console.log(tag, is_tag_selected);
+
+		            // if select form must me displayed for all forms
+		            if ( tag == 'ALLFORMS' ) {
+		                display_idx = dep_dict['index'];
+		                return false;
+
+		            // if one of the required tag is not selected,
+		            // do not show this select form
+		            } else if ( !is_tag_selected ) {
+		                display_idx = -1;
+		                console.log(tag, is_tag_selected, display_idx);
+		                return false;
+		            }
+		        });
+		        // stop if one of the requirement sets for select form is satisfied
+		        console.log(display_idx);
+		        if ( display_idx > -1 ) { return false; }
+		    });
+
+//            console.log(display_idx);
+		    update_annotation_field_status(option_tag, display_idx);
 		});
+		sort_annotation_options();
 	};
+
+	function sort_annotation_options(){
+	    var annot_form = '#manual_annotation form';
+	    $(annot_form)
+	        .children()
+	        .sort((a,b) => $(a).attr("idx") - $(b).attr("idx"))
+            .appendTo(annot_form);
+	}
 
 	function activate_annotation_checkboxes() {
 		/* CHECKBOXES */
 		$.each($("input.manualAnnotation[type='checkbox']"), function(i){
-			var match = false;
-			$.each($(this).data('dep'), function(i, id){
-				if (id=='ALLFORMS') {
-					match = true;
+			var match = 1;
+
+			$.each($(this).data('dep'), function(i, tag){
+			    var is_tag_selected = $('#' + tag).prop('selected');
+				if (tag == 'ALLFORMS') {
+					match = 1;
 					return false;
-				}
-				match = $('#'+id).prop('selected');
-				if (match==true){
-					return false;
-				}
+
+				} else if ( !is_tag_selected ) {
+                    match = -1;
+                    return false;
+                }
 			});
+
 			update_annotation_field_status($(this), match);
-			});
+		});
 	};
 
-	function update_annotation_field_status(field, match) {
-		if (match==true) {
+	function update_annotation_field_status(field, display_idx) {
+		if ( display_idx > -1 ) {
 			field.parents('.manualAnnotationContainer').addClass('active');
+			field.parents('.manualAnnotationContainer').attr('idx', display_idx);
 		}
 		else {
 			field.parents('.manualAnnotationContainer').removeClass('active');
+			field.parents('.manualAnnotationContainer').removeAttr('idx');  // for sorting
 		};
 	};
 
