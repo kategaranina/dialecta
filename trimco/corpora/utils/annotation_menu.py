@@ -85,13 +85,13 @@ class AnnotationMenu:
                 options.append(f'<option id="{tag}">{tag}</option>')
 
             select_form = (
-                f'<div class="manualAnnotationContainer">'
-                f'<label for="{category}">{category.title()}</label>'
-                f'<select class="manualAnnotation" '
-                f'id={category} '
-                f'title={category} '
-                f'data-dep={json.dumps(self.order_idxs[category])}>'
-                f'{"".join(options)}'
+                f"<div class='manualAnnotationContainer'>"
+                f"<label for='{category}'>{category.title()}</label>"
+                f"<select class='manualAnnotation' "
+                f"id='{category}' "
+                f"title='{category}' "
+                f"data-dep='{json.dumps(self.order_idxs[category])}'>"
+                f"{''.join(options)}"
                 f'</select></div>'
             )
             main_options.append(select_form)
@@ -105,12 +105,18 @@ class AnnotationMenu:
             tag_html = (
                 f"<div class='manualAnnotationContainer'><label>"
                 f"<input type='checkbox' class='manualAnnotation' "
-                f"name='{tag}' value='{tag}' data-dep='{categories}'>"
+                f"name='{tag}' value='{tag}' data-dep='{json.dumps(categories)}'>"
                 f"{tag_dict['label']}"
                 f"</label></div>"
             )
             facultative_options.append(tag_html)
         return facultative_options
+
+    def build_annotation_menu(self):
+        return [
+            self.menu_html_str_1,
+            self.menu_html_str_2
+        ]
 
     def _get_order(self, pos, tags_dict):
         order_config = self.config['order'][pos]
