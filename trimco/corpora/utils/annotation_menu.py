@@ -49,7 +49,7 @@ class AnnotationMenu:
         order = defaultdict(dict)
         for pos, orders in config['order'].items():
             for k, v in orders.items():
-                k = k.replace(' ', '')
+                k = ','.join(kk.split(':')[-1].strip() for kk in k.split(','))
                 order[pos][k] = {vv: i+1 for i, vv in enumerate(v)}
                 order[pos][k]['part of speech'] = 0
         config['order'] = order

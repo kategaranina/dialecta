@@ -237,7 +237,7 @@
     function get_order_by_tag(pos, tagsDict) {
         var orderConfig = $('#manual_annotation').data('order')[pos];
         var configKeys = Object.keys(orderConfig).map(key => key.split(','));
-        var tagKeyset = new Set(Object.entries(tagsDict).map(([k, v]) => k+':'+v));
+        var tagKeyset = new Set(Object.values(tagsDict));
 
         var orderKey = 'default';
         for (var a of configKeys) {
@@ -258,7 +258,6 @@
             tags_dict[$(this).parent().attr('id')] = $(this).val();
         });
         var order = get_order_by_tag(tags_dict['part of speech'], tags_dict);
-        console.log(order);
 
         $('select.manualAnnotation').each(function() {
             var select_id = $(this).attr('id');
