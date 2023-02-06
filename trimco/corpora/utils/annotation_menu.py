@@ -11,7 +11,6 @@ class AnnotationMenu:
     def __init__(self, json_name):
         self.config = self._read_config(json_name)
         self.surface_tags_by_category = self._get_tags_by_category()
-        self.order_idxs = self._get_order_idxs()
 
         lemma_input_str = (
             '<div class="manualAnnotationContainer">'
@@ -27,11 +26,14 @@ class AnnotationMenu:
         )
 
         self.menu_html_str_1 = (
-            f'<form style="display: table;">'
-            f'{lemma_input_str}'
-            f'{form_input_str}'
-            f'{"".join(self._get_main_options())}'
-            f'</form>'
+            f"<div id='manual_annotation' data-order='{json.dumps(self.config['order'])}'>"
+            f"<span>Manual annotation</span>"
+            f"<form style='display: table;'>"
+            f"{lemma_input_str}"
+            f"{form_input_str}"
+            f"{''.join(self._get_main_options())}"
+            f"</form>"
+            f"</div>"
         )
         self.menu_html_str_2 = (
             f'<form>'
@@ -43,15 +45,15 @@ class AnnotationMenu:
     def _read_config(json_name):
         with open(os.path.join(_STATIC_ROOT, json_name)) as f:
             config = json.load(f)
+
         order = defaultdict(dict)
         for pos, orders in config['order'].items():
             for k, v in orders.items():
-                if k != 'default':
-                    parts = [part.strip() for part in k.split(',')]
-                    k = tuple(sorted(parts))
-                order[pos][k] = v
-
+                k = k.replace(' ', '')
+                order[pos][k] = {vv: i+1 for i, vv in enumerate(v)}
+                order[pos][k]['part of speech'] = 0
         config['order'] = order
+
         return config
 
     def _get_tags_by_category(self):
@@ -61,21 +63,6 @@ class AnnotationMenu:
             if surface_tag not in tags_by_category[tag_dict['category']]:
                 tags_by_category[tag_dict['category']].append(surface_tag)
         return tags_by_category
-
-    def _get_order_idxs(self):
-        order_idxs_by_category = defaultdict(list)
-        for pos, order_dict in self.config['order'].items():
-            for order, categories in order_dict.items():
-                req_tagset = [pos]
-                if order != 'default':
-                    req_tagset.extend([t.split(':', 1)[1] for t in order])
-
-                for i, category in enumerate(categories):
-                    order_idx = {'tags': req_tagset, 'index': i+1}
-                    order_idxs_by_category[category].append(order_idx)
-
-        order_idxs_by_category['part of speech'] = [{'tags': ['ALLFORMS'], 'index': 0}]
-        return order_idxs_by_category
 
     def _get_main_options(self):
         main_options = []
@@ -89,8 +76,7 @@ class AnnotationMenu:
                 f"<label for='{category}'>{category.title()}</label>"
                 f"<select class='manualAnnotation' "
                 f"id='{category}' "
-                f"title='{category}' "
-                f"data-dep='{json.dumps(self.order_idxs[category])}'>"
+                f"title='{category}'>"
                 f"{''.join(options)}"
                 f'</select></div>'
             )
@@ -118,7 +104,7 @@ class AnnotationMenu:
             self.menu_html_str_2
         ]
 
-    def _get_order(self, pos, tags_dict):
+    def get_order_by_tag(self, pos, tags_dict):
         order_config = self.config['order'][pos]
         config_sets = [set(k) for k in order_config.keys()]
         tag_keyset = {f'{k}:{v}' for k, v in tags_dict.items()}
@@ -152,7 +138,7 @@ class AnnotationMenu:
 
         final_tags = [pos]
         if pos in self.config['order']:
-            order_key = self._get_order(pos, tags_dict)
+            order_key = self.get_order_by_tag(pos, tags_dict)
             for key in self.config['order'][pos][order_key]:
                 final_tags.append(tags_dict[key])
 

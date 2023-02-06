@@ -234,44 +234,54 @@
         activate_annotation_checkboxes();
     };
 
+    function get_order_by_tag(pos, tagsDict) {
+        var orderConfig = $('#manual_annotation').data('order')[pos];
+        var configKeys = Object.keys(orderConfig).map(key => key.split(','));
+        var tagKeyset = new Set(Object.entries(tagsDict).map(([k, v]) => k+':'+v));
+
+        var orderKey = 'default';
+        for (var a of configKeys) {
+            var diff = a.filter(x => !tagKeyset.has(x));
+            if (diff.length == 0) {
+                orderKey = a.join(',');
+                break;
+            }
+        }
+        return orderConfig[orderKey];
+    }
+
     function activate_annotation_options() {
         /* SELECT OPTIONS */
-        $.each($("select.manualAnnotation"), function(i){
-            var display_idx = -1;
-            var option_tag = $(this);
-
-            $.each(option_tag.data('dep'), function(i, dep_dict){
-                display_idx = dep_dict['index'];
-
-                $.each(dep_dict['tags'], function(i, tag){
-                    var is_tag_selected = $('#' + tag).prop('selected');
-
-                    // if select form must me displayed for all forms
-                    if ( tag == 'ALLFORMS' ) {
-                        display_idx = dep_dict['index'];
-                        return false;
-
-                    // if one of the required tag is not selected,
-                    // do not show this select form
-                    } else if ( !is_tag_selected ) {
-                        display_idx = -1;
-                        return false;
-                    }
-                });
-                // stop if one of the requirement sets for select form is satisfied
-                if ( display_idx > -1 ) { return false; }
-            });
-
-            update_annotation_field_status(option_tag, display_idx);
+        var tags_dict = {};
+        var options_selector = ".manualAnnotationContainer.active select.manualAnnotation option:selected"
+        $(options_selector).each(function(i, obj) {
+            tags_dict[$(this).parent().attr('id')] = $(this).val();
         });
+        var order = get_order_by_tag(tags_dict['part of speech'], tags_dict);
+        console.log(order);
+
+        $('select.manualAnnotation').each(function() {
+            var select_id = $(this).attr('id');
+            var container = $(this).parent();
+            var blank_option = $(this).find('option#blank');
+            if (select_id in order) {
+                container.addClass('active');
+                container.attr('idx', order[select_id]);
+            } else {
+                container.removeClass('active');
+                container.removeAttr('idx');
+                blank_option.prop('selected', true);
+            };
+        });
+
         sort_annotation_options();
     };
 
     function sort_annotation_options(){
         var annot_form = '#manual_annotation form';
         $(annot_form)
-            .children()
-            .sort((a,b) => $(a).attr("idx") - $(b).attr("idx"))
+            .children('.active[idx]')
+            .sort((a,b) => parseInt($(a).attr("idx")) - parseInt($(b).attr("idx")))
             .appendTo(annot_form);
     }
 
