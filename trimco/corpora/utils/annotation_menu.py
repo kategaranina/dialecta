@@ -8,9 +8,13 @@ from .format_utils import ANNOTATION_TAG_SEP
 
 
 class AnnotationMenu:
+    key_value_sep = ':'
+    tag_sep = ','
+
     def __init__(self, json_name):
         self.config = self._read_config(json_name)
         self.surface_tags_by_category = self._get_tags_by_category()
+        self._parse_config_order()
 
         lemma_input_str = (
             '<div class="manualAnnotationContainer">'
@@ -45,16 +49,25 @@ class AnnotationMenu:
     def _read_config(json_name):
         with open(os.path.join(_STATIC_ROOT, json_name)) as f:
             config = json.load(f)
+        return config
 
-        order = defaultdict(dict)
-        for pos, orders in config['order'].items():
+    def _parse_config_order(self):
+        order = defaultdict(lambda: defaultdict(dict))
+        for pos, orders in self.config['order'].items():
             for k, v in orders.items():
-                k = ','.join(kk.split(':')[-1].strip() for kk in k.split(','))
+                if k != 'default':
+                    tags = k.split(self.tag_sep)
+                    values = [t.split(self.key_value_sep)[-1].strip() for t in tags]
+                    k = self.tag_sep.join(tuple(sorted(values)))
+
                 order[pos][k] = {vv: i+1 for i, vv in enumerate(v)}
                 order[pos][k]['part of speech'] = 0
-        config['order'] = order
 
-        return config
+        for grammeme in self.surface_tags_by_category['part of speech']:
+            if grammeme not in order:
+                order[grammeme]['default']['part of speech'] = 0
+
+        self.config['order'] = order
 
     def _get_tags_by_category(self):
         tags_by_category = defaultdict(list)
@@ -106,13 +119,13 @@ class AnnotationMenu:
 
     def get_order_by_tag(self, pos, tags_dict):
         order_config = self.config['order'][pos]
-        config_sets = [set(k) for k in order_config.keys()]
-        tag_keyset = {f'{k}:{v}' for k, v in tags_dict.items()}
+        config_sets = [set(k.split(self.tag_sep)) for k in order_config.keys()]
+        tag_keyset = set(tags_dict.values())
 
         order_key = 'default'
         for s in config_sets:
             if not s - tag_keyset:
-                order_key = tuple(sorted(s))
+                order_key = self.tag_sep.join(tuple(sorted(s)))
                 break
 
         return order_key
