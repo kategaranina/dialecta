@@ -114,16 +114,14 @@ class ElanObject:
 
         for token in html_annot.xpath('*//token'):
             nrm_lst = token.xpath('nrm/text()')
-            lemma_lst = token.xpath('lemma_full/text()')
-            morph_lst = token.xpath('morph_full/text()')
+            lemma_lst = token.xpath('lemma/text()')
+            morph_lst = token.xpath('morph/text()')
 
             try:
                 if lemma_lst + morph_lst:
-                    annot_value_lst.append(
-                        '%s%s%s%s%s' % (t_counter, ANNOTATION_PART_SEP, lemma_lst[0], ANNOTATION_PART_SEP, morph_lst[0])
-                    )
+                    annot_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), lemma_lst[0], morph_lst[0]]))
                 if nrm_lst:
-                    nrm_value_lst.append('%s%s%s' % (t_counter, ANNOTATION_PART_SEP, nrm_lst[0]))
+                    nrm_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), nrm_lst[0]]))
             except IndexError:
                 print(
                     'Exception while saving. Normalization: %s,'
