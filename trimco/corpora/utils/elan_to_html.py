@@ -73,15 +73,13 @@ class ElanToHTML:
             for token in annotation:
                 nrm = token[0]
                 anns = token[1]
-                lemma = ANNOTATION_OPTION_SEP.join(set([x[0] for x in anns]))
-                morph = ANNOTATION_OPTION_SEP.join([x[0] + ANNOTATION_TAG_SEP + x[1] for x in anns])
+                lemma = anns[0][0] if anns else ''
+                morph = anns[0][1] if anns else ''
                 try:
                     if lemma + morph:
-                        annot_value_lst.append(
-                            '%s%s%s%s%s' % (t_counter, ANNOTATION_PART_SEP, lemma, ANNOTATION_PART_SEP, morph)
-                        )
+                        annot_value_lst.append(ANNOTATION_PART_SEP.join([t_counter, lemma, morph]))
                     if nrm:
-                        nrm_value_lst.append('%s%s%s' % (t_counter, ANNOTATION_PART_SEP, nrm))
+                        nrm_value_lst.append(ANNOTATION_PART_SEP.join([t_counter, nrm]))
                 except IndexError:
                     print(
                         'Exception while saving. Normalization: %s,'
@@ -127,7 +125,7 @@ class ElanToHTML:
             html += '<div class="annot_wrapper %s">%s%s</div>' % (tier_status, audio_div, annot_div)
             i += 1
 
-        self.html = '<div class="eaf_display">%s</div>' %(html)
+        self.html = '<div class="eaf_display">%s</div>' % html
 
     def collect_examples(self):
         """
