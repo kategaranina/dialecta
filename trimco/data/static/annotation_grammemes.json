@@ -153,7 +153,7 @@
     "gent": {
       "surface_tag": "gen",
       "description": "родительный падеж",
-      "example": "",
+      "example": "у нас нет хомяка",
       "category": "case"
     },
     "datv": {
@@ -165,7 +165,7 @@
     "accs": {
       "surface_tag": "acc",
       "description": "винительный падеж",
-      "example": "хомяк читает книгу",
+      "example": "кормить хомяка",
       "category": "case"
     },
     "ablt": {
@@ -177,7 +177,7 @@
     "loct": {
       "surface_tag": "loc",
       "description": "предложный падеж",
-      "example": "",
+      "example": "хомяка несут в корзинке",
       "category": "case"
     },
     "voct": {
@@ -186,22 +186,10 @@
       "example": "Саш, пойдем в кино",
       "category": "case"
     },
-    "gen1": {
-      "surface_tag": "gen",
-      "description": "первый родительный падеж",
-      "example": "у нас нет хомяка",
-      "category": "case"
-    },
     "gen2": {
       "surface_tag": "gen2",
       "description": "второй родительный (частичный) падеж",
       "example": "ложка сахару (gen - производство сахара), стакан яду (gen - нет яда)",
-      "category": "case"
-    },
-    "dat1": {
-      "surface_tag": "dat",
-      "description": "основной дательный падеж",
-      "example": "",
       "category": "case"
     },
     "dat2": {
@@ -210,22 +198,10 @@
       "example": "всем сестрам по серьгам",
       "category": "case"
     },
-    "acc1": {
-      "surface_tag": "acc",
-      "description": "первый винительный падеж",
-      "example": "кормить хомяка",
-      "category": "case"
-    },
     "acc2": {
       "surface_tag": "acc2",
       "description": "второй винительный падеж",
       "example": "записался в солдаты, постричься в монахи, по два человека",
-      "category": "case"
-    },
-    "loc1": {
-      "surface_tag": "loc",
-      "description": "первый предложный падеж",
-      "example": "хомяка несут в корзинке",
       "category": "case"
     },
     "loc2": {
