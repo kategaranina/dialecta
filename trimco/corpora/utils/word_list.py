@@ -28,14 +28,12 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
 
             words['words'][word].append(std)
 
-            anns = annotations.get(i)
-            if anns is None:
+            ann = annotations.get(i)
+            if ann is None:
                 print('WARNING: ' + eaf_filename, 'no ann for word ' + str(i), orig, annotation, '', sep='\n')
                 continue
 
-            anns = anns.split(ANNOTATION_OPTION_SEP)
-            for ann in anns:
-                words['standartizations'][std].append(ann)
+            words['standartizations'][std].append(ann)
 
     return words
 

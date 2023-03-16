@@ -3,7 +3,7 @@ from pympi import Eaf
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.elan_utils import (
-    split_anns_for_db, get_tier_alignment, get_annotation_alignment
+    split_ann_for_db, get_tier_alignment, get_annotation_alignment
 )
 from corpora.utils.format_utils import (
     STANDARTIZATION_REGEX, STANDARTIZATION_NUM_REGEX,
@@ -41,9 +41,9 @@ def process_one_annotation(orig, standartization, annotation):
             word_dict['standartization_view'] = std
             word_dict['standartization'] = std.lower()
 
-        anns = annotations.get(word_num)
-        if anns is not None:
-            word_dict['annotations'] = split_anns_for_db(anns)
+        ann = annotations.get(word_num)
+        if ann is not None:
+            word_dict['annotations'] = split_ann_for_db(ann)
 
         words.append(word_dict)
         word_num += 1

@@ -10,7 +10,7 @@ UNKNOWN_PREFIX = '(unkn)_'
 
 STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')
 STANDARTIZATION_NUM_REGEX = re.compile(r'^(\d+):(.+)')
-ANNOTATION_NUM_REGEX = re.compile(r'(\d+?):.+?:(.+)')
+ANNOTATION_NUM_REGEX = re.compile(r'(\d+?):(.+?):(.+)')
 
 TECH_REGEX = re.compile(r'(?:\.\.\.|\?|\[|]|\.|!|un\'?int\.?)+')
 
@@ -86,22 +86,18 @@ def add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dic
             continue
 
         if i in annot_tokens_dict.keys():
-            raw_morph_tags_full = annot_tokens_dict[i][1].split(ANNOTATION_OPTION_SEP)
-            morph_tags_full = ANNOTATION_OPTION_SEP.join(raw_morph_tags_full)
-            tag.insert(0, etree.fromstring('<morph_full style="display:none">' + morph_tags_full + '</morph_full>'))
+            morph = annot_tokens_dict[i][1]
+            tag.insert(0, etree.fromstring('<morph>' + morph + '</morph>'))
 
-            spl = raw_morph_tags_full[0].split(ANNOTATION_TAG_SEP, 1)
-            moprh_tags = spl[1] if len(spl) > 1 else ''
-            tag.insert(0, etree.fromstring('<morph>' + moprh_tags + '</morph>'))
-
-            lemma_full = annot_tokens_dict[i][0]
-            tag.insert(0, etree.fromstring('<lemma_full style="display:none">' + lemma_full + '</lemma_full>'))
-
-            lemma = lemma_full.split(ANNOTATION_OPTION_SEP)[0]
+            lemma = annot_tokens_dict[i][0]
             tag.insert(0, etree.fromstring('<lemma>' + lemma + '</lemma>'))
+
+            print(lemma, morph)
 
         if i in normz_tokens_dict.keys():
             tag.insert(0, etree.fromstring('<nrm>' + normz_tokens_dict[i][0] + '</nrm>'))
+
+            print(normz_tokens_dict)
 
         i += 1
 

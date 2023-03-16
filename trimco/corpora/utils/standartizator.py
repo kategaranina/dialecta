@@ -93,6 +93,7 @@ class Standartizator:
 
     @staticmethod
     def unify_annotations(annotations):
+        # todo: what is happening here?
         unified_annotations = OrderedDict()
         for raw_annotation in annotations:
             if isinstance(raw_annotation, list):

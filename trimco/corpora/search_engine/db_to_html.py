@@ -8,7 +8,7 @@ from corpora.utils.format_utils import (
     TECH_REGEX, get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
-from corpora.utils.elan_utils import split_anns_for_db
+from corpora.utils.elan_utils import split_ann_for_db
 
 
 def get_transcript_and_tags_dicts(words):
@@ -31,15 +31,14 @@ def get_transcript_and_tags_dicts(words):
 
         lemmata = []
         annots = []
-        for ann in w.get('annotations', []):
+        for ann in w.get('annotations', []):  # todo: 'annotations' will now contain only one element
             if ann['lemma_view'] not in lemmata:
                 lemmata.append(ann['lemma_view'])
-            full_ann = ann['lemma_view'] + ANNOTATION_TAG_SEP + ann['tags_view']
-            annots.append(full_ann)
+            annots.append(ann['tags_view'])
 
         annot_tokens_dict[i] = [
-            ANNOTATION_OPTION_SEP.join(lemmata),
-            ANNOTATION_OPTION_SEP.join(annots)
+            ''.join(lemmata),
+            ''.join(annots)
         ]
 
     return ' '.join(transcript), normz_tokens_dict, annot_tokens_dict
@@ -103,7 +102,8 @@ def process_html_token(token_el):
 
     trt_lst = token_el.xpath('trt/text()')
     nrm_lst = token_el.xpath('nrm/text()')
-    morph_lst = token_el.xpath('morph_full/text()')
+    lemma_lst = token_el.xpath('lemma/text()')
+    morph_lst = token_el.xpath('morph/text()')
 
     if not trt_lst:
         word_dict['transcription_view'] = token_el.text
@@ -117,8 +117,8 @@ def process_html_token(token_el):
         word_dict['standartization_view'] = nrm_lst[0]
         word_dict['standartization'] = nrm_lst[0].lower()
 
-    if morph_lst:
-        word_dict['annotations'] = split_anns_for_db(morph_lst[0])
+    if lemma_lst and morph_lst:
+        word_dict['annotations'] = split_ann_for_db((lemma_lst[0], morph_lst[0]))
 
     return word_dict
 

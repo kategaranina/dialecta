@@ -164,25 +164,23 @@ def get_annotation_alignment(annotation, num_regex):
     annotations = {}
     if annotation is not None:
         for ann in annotation.split(ANNOTATION_WORD_SEP):
-            ann_num, ann = num_regex.search(ann).groups()
+            ann_parts = num_regex.search(ann).groups()
+            ann_num = ann_parts[0]
+            # ann_parts len is 3 for annotations and 2 for standartizations
+            ann = ann_parts[1:] if len(ann_parts) > 2 else ann_parts[1]
             annotations[int(ann_num)] = ann
     return annotations
 
 
-def split_anns_for_db(anns_str):
-    anns = anns_str.split(ANNOTATION_OPTION_SEP)
-    annotations = []
+def split_ann_for_db(ann):
+    lemma_view, tags_view = ann  # should always be a list
+    lemma = lemma_view.lower().replace(UNKNOWN_PREFIX, '')
+    tags = tags_view.lower().split(ANNOTATION_TAG_SEP)
+    annotation = {
+        'lemma': lemma,
+        'tags': tags,
+        'lemma_view': lemma_view,
+        'tags_view': tags_view
+    }
 
-    for ann in anns:
-        lemma_view, tags_view = ann.split(ANNOTATION_TAG_SEP, 1)
-        pp_ann = ann.lower().split(ANNOTATION_TAG_SEP)
-        lemma, tags = pp_ann[0], pp_ann[1:]
-        lemma = lemma.replace(UNKNOWN_PREFIX, '')
-        annotations.append({
-            'lemma': lemma,
-            'tags': tags,
-            'lemma_view': lemma_view,
-            'tags_view': tags_view
-        })
-
-    return annotations
+    return [annotation]  # todo: get rid of list
