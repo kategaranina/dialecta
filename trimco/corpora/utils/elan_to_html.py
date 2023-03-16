@@ -66,6 +66,7 @@ class ElanToHTML:
         transcript = '\n'.join(transcripts)
         annotations = standartizator.get_annotation(transcript)
 
+        # TODO: remove transcripts? t_counter to enumerate?
         for tier_name, start, end, transcript, annotation in zip(tier_names, starts, ends, transcripts, annotations):
             t_counter = 0
             annot_value_lst = []

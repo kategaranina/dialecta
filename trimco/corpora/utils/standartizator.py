@@ -158,14 +158,18 @@ class Standartizator:
         final_list = [x[0] for x in unified_list.values()]
         return final_list
 
-    def get_annotation(self, text):
+    def get_grammar_annotation(self, nrm_list):
         annotations = []
-        nrm_list = self.normalize(text)
         for nrm in nrm_list:
             annotation = []
             for word in nrm:
                 annotation.append((word[1], self.get_annotation_options_list(word)))
             annotations.append(annotation)
+        return annotations
+
+    def get_annotation(self, text):
+        nrm_list = self.normalize(text)
+        annotations = self.get_grammar_annotation(nrm_list)
         return annotations
 
     def make_backup(self):

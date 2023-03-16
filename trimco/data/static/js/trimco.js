@@ -743,6 +743,7 @@
                 'start_page': 1,
                 'total_pages': null  // this meand that backend needs to return them
             }
+            // todo: insert hiding workbench
             $('#search_button').html('<i class="fa fa-spinner fa-spin"></i>');
             // delay is required for spinner icon to load
             setTimeout(function () { ajax_request('search', formdata, search=true); }, 100);
