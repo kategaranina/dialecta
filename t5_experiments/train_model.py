@@ -144,6 +144,9 @@ def main(
         'num_return_sequences': n_generated
     }
 
+    def compute_dev_metrics(eval_preds):
+        return compute_chrf(eval_preds, tokenizer)
+
     # neptune_callback = NeptuneCallback(
     #     tags=[model_name],
     #     project="kategaranina/content-selection"
@@ -189,8 +192,8 @@ def main(
         num_train_epochs=epochs,
         predict_with_generate=True,
         generation_max_length=MAX_LENGTH,
-        metric_for_best_model='eval_loss',
-        greater_is_better=False,
+        metric_for_best_model='eval_chrf',
+        greater_is_better=True,
         load_best_model_at_end=True,
         **eval_params
     )
@@ -202,6 +205,7 @@ def main(
         eval_dataset=ds['dev'],
         tokenizer=tokenizer,
         data_collator=collator,
+        compute_metrics=compute_dev_metrics
         # callbacks=[neptune_callback]
     )
 
