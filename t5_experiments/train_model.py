@@ -21,7 +21,7 @@ from transformers.integrations import NeptuneCallback
 
 
 SEED = 42
-ROOT_DIR = Path(__file__).parent.parent.parent
+ROOT_DIR = Path(__file__).parent
 TMP_DIR = os.environ.get('TMPDIR', ROOT_DIR)
 
 MAX_LENGTH = 512
@@ -129,7 +129,7 @@ def main(
 
     tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-    with open(os.path.join(ROOT_DIR, 'annotation_data.json')) as f:
+    with open(os.path.join(ROOT_DIR, 'data', 'annotation_data.json')) as f:
         data = json.load(f)
 
     ds = Dataset.from_list(data)
