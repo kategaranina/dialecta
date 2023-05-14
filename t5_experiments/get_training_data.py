@@ -4,7 +4,7 @@ import json
 
 from pympi import Eaf
 
-sys.path.append('..')
+sys.path.append('../trimco')
 from corpora.utils.elan_utils import (
     clean_transcription, get_tier_alignment,
     get_annotation_alignment
@@ -14,7 +14,7 @@ from corpora.utils.format_utils import (
 )
 
 
-DATA_DIR = 'data/bel_checked'
+DATA_DIR = 'data'
 SKIPPED_TOK = '<skipped>'
 
 annot_pairs = []
