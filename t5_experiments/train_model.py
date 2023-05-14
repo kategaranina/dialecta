@@ -129,7 +129,7 @@ def main(
 
     tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-    with open(os.path.join(ROOT_DIR, 'data', 'annotation_data.json')) as f:
+    with open(os.path.join(ROOT_DIR, 'annotation_data.json')) as f:
         data = json.load(f)
 
     ds = Dataset.from_list(data)
