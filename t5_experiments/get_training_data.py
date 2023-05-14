@@ -1,8 +1,10 @@
 import os
+import sys
 import json
 
 from pympi import Eaf
 
+sys.path.append('..')
 from corpora.utils.elan_utils import (
     clean_transcription, get_tier_alignment,
     get_annotation_alignment
@@ -12,7 +14,7 @@ from corpora.utils.format_utils import (
 )
 
 
-DATA_DIR = '/Users/kategerasimenko/Desktop/robota/data/dialecta_eafs/bel_checked'
+DATA_DIR = 'data/bel_checked'
 SKIPPED_TOK = '<skipped>'
 
 annot_pairs = []

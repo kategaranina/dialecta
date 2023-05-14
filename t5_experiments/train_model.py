@@ -22,6 +22,7 @@ from transformers.integrations import NeptuneCallback
 
 SEED = 42
 ROOT_DIR = Path(__file__).parent.parent.parent
+TMP_DIR = os.environ.get('TMPDIR', ROOT_DIR)
 
 MAX_LENGTH = 512
 LABEL_PAD_TOKEN_ID = -100
@@ -104,7 +105,7 @@ def compute_chrf(eval_preds, tokenizer):
 @click.option("--do-sample", is_flag=True, help="Whether to do sampling.")
 @click.option("--top-k", default=50, type=int, help="Top k for sampling.")
 @click.option("--n-generated", default=1, type=int, help="Number of sequences to be generated.")
-@click.option("--ckpt-dir", default=os.path.join(ROOT_DIR, "checkpoints"), type=str, help="Directory to store checkpoints")
+@click.option("--ckpt-dir", default=os.path.join(TMP_DIR, "checkpoints"), type=str, help="Directory to store checkpoints")
 @click.option("--output-dir", default=os.path.join(ROOT_DIR, "models"), type=str, help="Directory to store models and their outputs")
 def main(
         # do_train, do_predict, do_ckpt_predict, source,
