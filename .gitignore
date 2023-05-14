@@ -17,3 +17,4 @@ tmp*
 .DS_store
 .python-version
 env/
+annotation_data.json

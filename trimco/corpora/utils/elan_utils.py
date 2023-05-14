@@ -146,16 +146,18 @@ def clean_transcription(transcription):
     return TECH_REGEX.sub('', transcription).strip()
 
 
-def get_tier_alignment(orig_tier, standartization_tier, annotation_tier):
+def get_tier_alignment(orig_tier, standartization_tier=None, annotation_tier=None):
     tier_alignment = {(ann[0], ann[1]): [ann[2], None, None] for ann in orig_tier}
 
-    for ann in standartization_tier:
-        if (ann[0], ann[1]) in tier_alignment:
-            tier_alignment[(ann[0], ann[1])][1] = ann[2]
+    if standartization_tier is not None:
+        for ann in standartization_tier:
+            if (ann[0], ann[1]) in tier_alignment:
+                tier_alignment[(ann[0], ann[1])][1] = ann[2]
 
-    for ann in annotation_tier:
-        if (ann[0], ann[1]) in tier_alignment:
-            tier_alignment[(ann[0], ann[1])][2] = ann[2]
+    if annotation_tier is not None:
+        for ann in annotation_tier:
+            if (ann[0], ann[1]) in tier_alignment:
+                tier_alignment[(ann[0], ann[1])][2] = ann[2]
 
     return tier_alignment
 
