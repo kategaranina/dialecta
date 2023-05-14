@@ -163,6 +163,7 @@ def main(
 
     model = AutoModelForSeq2SeqLM.from_pretrained(base_model)
     ds['train'] = ds['train'].shuffle(seed=SEED)
+    print(ds)
 
     collator = DataCollatorForSeq2Seq(
         tokenizer,
@@ -202,7 +203,7 @@ def main(
         model=model,
         args=training_args,
         train_dataset=ds['train'],
-        eval_dataset=ds['dev'],
+        eval_dataset=ds['test'],
         tokenizer=tokenizer,
         data_collator=collator,
         compute_metrics=compute_dev_metrics
