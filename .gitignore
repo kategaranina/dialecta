@@ -18,3 +18,4 @@ tmp*
 .python-version
 env/
 annotation_data.json
+t5_experiments/data

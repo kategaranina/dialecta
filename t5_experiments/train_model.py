@@ -1,5 +1,4 @@
 import os
-import re
 import json
 import random
 from pathlib import Path
@@ -9,6 +8,8 @@ import torch
 import click
 import evaluate
 import numpy as np
+from tqdm import tqdm
+from torch.utils.data import DataLoader
 from datasets import Dataset, DatasetDict
 from transformers import (
     AutoModelForSeq2SeqLM, AutoTokenizer,
@@ -16,8 +17,6 @@ from transformers import (
     Seq2SeqTrainer, GenerationConfig
 )
 from transformers.integrations import NeptuneCallback
-
-# from predict import run_prediction
 
 
 SEED = 42
@@ -41,12 +40,32 @@ DEV_METRIC = evaluate.load("chrf")
 def preprocess_data(ds, tokenizer):
     def tokenize(examples):
         model_inputs = tokenizer(examples['input'], max_length=MAX_LENGTH, truncation=True)
-        labels = tokenizer(text_target=examples['output'], max_length=MAX_LENGTH, truncation=True)
-        model_inputs['labels'] = labels['input_ids']
+        if 'output' in examples:
+            labels = tokenizer(text_target=examples['output'], max_length=MAX_LENGTH, truncation=True)
+            model_inputs['labels'] = labels['input_ids']
         return model_inputs
 
     ds = ds.map(tokenize, batched=True)
     return ds
+
+
+def decode_preds(preds, tokenizer):
+    decoded_preds = tokenizer.batch_decode(
+        preds,
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=False
+    )
+    return decoded_preds
+
+
+def decode_labels(labels, tokenizer):
+    labels = np.where(labels != LABEL_PAD_TOKEN_ID, labels, tokenizer.pad_token_id)
+    decoded_labels = tokenizer.batch_decode(
+        labels,
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=False
+    )
+    return decoded_labels
 
 
 def postprocess_text(preds, labels):
@@ -55,39 +74,83 @@ def postprocess_text(preds, labels):
     return preds, labels
 
 
-def compute_chrf(eval_preds, tokenizer):
+def evaluate_preds(preds, labels):
+    # Some simple post-processing
+    preds, labels = postprocess_text(preds, labels)
+    result = DEV_METRIC.compute(predictions=preds, references=labels)
+    result = {"chrf": result["score"]}
+    return result
+
+
+def run_eval_step(eval_preds, tokenizer):
     preds, labels = eval_preds
     if isinstance(preds, tuple):
         preds = preds[0]
 
-    decoded_preds = tokenizer.batch_decode(
-        preds,
-        skip_special_tokens=True,
-        clean_up_tokenization_spaces=False
+    decoded_preds = decode_preds(preds, tokenizer)
+    decoded_labels = decode_labels(labels, tokenizer)
+    score = evaluate_preds(decoded_preds, decoded_labels)
+
+    # for p, l in zip(decoded_preds[:10], decoded_labels[:10]):
+    #     print(l)
+    #     print(p)
+    #     print()
+
+    return score
+
+
+def run_prediction(dataset, model, tokenizer, model_dir, batch_size, data_part, generation_params):
+    model.eval()
+
+    collator = DataCollatorForSeq2Seq(
+        tokenizer,
+        model=model,
+        label_pad_token_id=LABEL_PAD_TOKEN_ID
     )
-    labels = np.where(labels != LABEL_PAD_TOKEN_ID, labels, tokenizer.pad_token_id)
-    decoded_labels = tokenizer.batch_decode(
-        labels,
-        skip_special_tokens=True,
-        clean_up_tokenization_spaces=False
-    )
 
-    # Some simple post-processing
-    decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+    if generation_params['do_sample']:
+        batch_size = 1  # for deterministic generation when sampling
 
-    result = DEV_METRIC.compute(predictions=decoded_preds, references=decoded_labels)
-    result = {"chrf": result["score"]}
+    tokens = dataset.remove_columns([c for c in dataset.column_names if c not in tokenizer.model_input_names])
+    test_dataloader = DataLoader(tokens, batch_size=batch_size, collate_fn=collator)
 
-    prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-    result["gen_len"] = np.mean(prediction_lens)
-    result = {k: round(v, 4) for k, v in result.items()}
+    all_preds = []
 
-    for p, l in zip(decoded_preds[:10], decoded_labels[:10]):
-        print(l)
-        print(p)
-        print()
+    with torch.no_grad():
+        for batch in tqdm(test_dataloader):
+            # for deterministic generation when sampling
+            random.seed(SEED)
+            np.random.seed(SEED)
+            torch.manual_seed(SEED)
 
-    return result
+            batch = {k: v.to(DEVICE) for k, v in batch.items()}
+            preds = model.generate(
+                **batch,
+                **generation_params,
+                max_length=MAX_LENGTH
+            )
+            decoded_preds = decode_preds(preds, tokenizer)
+            all_preds.extend(decoded_preds)
+
+    assert len(all_preds) == len(dataset['recording'])
+
+    preds_by_recording = defaultdict(list)
+    for pred, dataset_item in zip(all_preds, dataset):
+        preds_by_recording[dataset_item['recording']].append({
+            'speaker': dataset_item['speaker'],
+            'input': dataset_item['input'].replace(' | ', ' '),
+            'pred': pred.replace(' | ', ' '),
+            'old_output': dataset_item.get('old_output')
+        })
+
+    params_str = '_'.join(f'{k.replace("_", "-")}{v}' for k, v in generation_params.items())
+    with open(os.path.join(model_dir, 'preds', f'preds_{params_str}_{data_part}.jsonl'), 'w') as f:
+        json.dump(preds_by_recording, f, ensure_ascii=False, indent=2)
+
+    if 'output' in dataset:
+        scores = evaluate_preds(all_preds, [[v] for v in dataset['output']])
+        str_scores = '\n'.join(f'{k}: {v}' for k, v in scores.items())
+        print('FINAL SCORE', str_scores)
 
 
 @click.command()
@@ -104,14 +167,13 @@ def compute_chrf(eval_preds, tokenizer):
 @click.option("--temperature", default=1.0, type=float, help="Generation temperature.")
 @click.option("--do-sample", is_flag=True, help="Whether to do sampling.")
 @click.option("--top-k", default=50, type=int, help="Top k for sampling.")
-@click.option("--n-generated", default=1, type=int, help="Number of sequences to be generated.")
 @click.option("--ckpt-dir", default=os.path.join(TMP_DIR, "checkpoints"), type=str, help="Directory to store checkpoints")
 @click.option("--output-dir", default=os.path.join(ROOT_DIR, "models"), type=str, help="Directory to store models and their outputs")
 def main(
         # do_train, do_predict, do_ckpt_predict, source,
         base_model,
         epochs, batch_size, learning_rate, eval_steps,
-        num_beams, temperature, do_sample, top_k, n_generated,
+        num_beams, temperature, do_sample, top_k,
         ckpt_dir, output_dir
 ):
     os.makedirs(ckpt_dir, exist_ok=True)
@@ -132,20 +194,24 @@ def main(
     with open(os.path.join(ROOT_DIR, 'annotation_data.json')) as f:
         data = json.load(f)
 
-    ds = Dataset.from_list(data)
+    ds = DatasetDict({
+        part: Dataset.from_list(items)
+        for part, items in data.items()
+    })
     ds = preprocess_data(ds, tokenizer)
-    ds = ds.train_test_split(test_size=0.1, seed=SEED)
+    ds_train = ds['train'].train_test_split(test_size=0.1, seed=SEED)
+    ds['train'] = ds_train['train']
+    ds['dev'] = ds_train['test']
 
     generation_params = {
         'num_beams': num_beams,
         'temperature': temperature,
         'do_sample': do_sample,
-        'top_k': top_k,
-        'num_return_sequences': n_generated
+        'top_k': top_k
     }
 
     def compute_dev_metrics(eval_preds):
-        return compute_chrf(eval_preds, tokenizer)
+        return run_eval_step(eval_preds, tokenizer)
 
     # neptune_callback = NeptuneCallback(
     #     tags=[model_name],
@@ -203,7 +269,7 @@ def main(
         model=model,
         args=training_args,
         train_dataset=ds['train'],
-        eval_dataset=ds['test'],
+        eval_dataset=ds['dev'],
         tokenizer=tokenizer,
         data_collator=collator,
         compute_metrics=compute_dev_metrics
@@ -212,6 +278,16 @@ def main(
 
     trainer.train()
     trainer.save_model(model_save_dir)
+
+    run_prediction(
+        dataset=ds['test'],
+        model=trainer.model,
+        tokenizer=tokenizer,
+        model_dir=save_dir,
+        batch_size=batch_size,
+        data_part='test',
+        generation_params=generation_params
+    )
 
 
 if __name__ == '__main__':
