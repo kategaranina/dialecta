@@ -19,15 +19,13 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
         query_parts['standartization'] = standartization.lower()
 
     if annotation:
-        # todo: change, check for lemmata with spaces
+        # todo: check for lemmata with spaces
         annotation = annotation.lower().replace(ANNOTATION_TAG_SEP, ' ')
         ann_parts = annotation.split()
-        query_parts['annotations'] = {'$elemMatch': {'tags': {'$all': ann_parts}}}
+        query_parts['annotation.tags'] = {'$all': ann_parts}
 
     if lemma:
-        if 'annotations' not in query_parts:
-            query_parts['annotations'] = {'$elemMatch': {}}
-        query_parts['annotations']['$elemMatch']['lemma'] = lemma.lower()
+        query_parts['annotation.lemma'] = lemma.lower()
 
     query = {'words': {'$elemMatch': query_parts}}
 

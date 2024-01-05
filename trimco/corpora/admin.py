@@ -295,6 +295,7 @@ class RecordingAdmin(VersionAdmin):
                     response['result'] = manual_words or [request.POST['request_data[nrm]']]
 
                 elif request.POST['request_data[mode]'] == 'auto':
+                    # todo: why standartization here, should be annotation?
                     response['result'] = current_standartizator.get_auto_standartization(request.POST['request_data[trt]'])
 
             elif request.POST['request_type'] == 'annot_suggest_req':

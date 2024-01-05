@@ -4,7 +4,6 @@ from lxml import etree
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import (
-    ANNOTATION_OPTION_SEP, ANNOTATION_TAG_SEP,
     TECH_REGEX, get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
@@ -29,17 +28,10 @@ def get_transcript_and_tags_dicts(words):
 
         normz_tokens_dict[i] = [standartization]
 
-        lemmata = []
-        annots = []
-        for ann in w.get('annotations', []):  # todo: 'annotations' will now contain only one element
-            if ann['lemma_view'] not in lemmata:
-                lemmata.append(ann['lemma_view'])
-            annots.append(ann['tags_view'])
-
-        annot_tokens_dict[i] = [
-            ''.join(lemmata),
-            ''.join(annots)
-        ]
+        ann = w.get('annotation')
+        lemma = ann['lemma_view'] if ann is not None else ''
+        annot = ann['tags_view'] if ann is not None else ''
+        annot_tokens_dict[i] = [lemma, annot]
 
     return ' '.join(transcript), normz_tokens_dict, annot_tokens_dict
 
@@ -118,7 +110,7 @@ def process_html_token(token_el):
         word_dict['standartization'] = nrm_lst[0].lower()
 
     if lemma_lst and morph_lst:
-        word_dict['annotations'] = split_ann_for_db((lemma_lst[0], morph_lst[0]))
+        word_dict['annotation'] = split_ann_for_db((lemma_lst[0], morph_lst[0]))
 
     return word_dict
 

@@ -3,7 +3,6 @@ from lxml import etree
 
 
 ANNOTATION_WORD_SEP = '|'
-ANNOTATION_OPTION_SEP = '/'
 ANNOTATION_PART_SEP = ':'
 ANNOTATION_TAG_SEP = '-'
 UNKNOWN_PREFIX = '(unkn)_'

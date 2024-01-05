@@ -43,7 +43,7 @@ def process_one_annotation(orig, standartization, annotation):
 
         ann = annotations.get(word_num)
         if ann is not None:
-            word_dict['annotations'] = split_ann_for_db(ann)
+            word_dict['annotation'] = split_ann_for_db(ann)
 
         words.append(word_dict)
         word_num += 1

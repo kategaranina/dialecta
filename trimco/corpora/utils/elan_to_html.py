@@ -6,8 +6,7 @@ from django.conf import settings
 from .standartizator import Standartizator
 from .elan_utils import ElanObject, clean_transcription
 from .format_utils import (
-    ANNOTATION_WORD_SEP, ANNOTATION_OPTION_SEP,
-    ANNOTATION_TAG_SEP, ANNOTATION_PART_SEP,
+    ANNOTATION_WORD_SEP, ANNOTATION_PART_SEP,
     get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )

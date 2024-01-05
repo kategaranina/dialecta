@@ -2,8 +2,8 @@ import os
 from decimal import Decimal
 from pympi import Eaf, Elan
 from .format_utils import (
-    TECH_REGEX, ANNOTATION_WORD_SEP, ANNOTATION_OPTION_SEP,
-    ANNOTATION_PART_SEP, ANNOTATION_TAG_SEP, UNKNOWN_PREFIX
+    TECH_REGEX, ANNOTATION_WORD_SEP, ANNOTATION_PART_SEP,
+    ANNOTATION_TAG_SEP, UNKNOWN_PREFIX
 )
 
 
@@ -183,4 +183,4 @@ def split_ann_for_db(ann):
         'tags_view': tags_view
     }
 
-    return [annotation]  # todo: get rid of list
+    return annotation
