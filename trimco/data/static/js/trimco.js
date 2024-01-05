@@ -48,6 +48,7 @@
                             list_normlz_suggestions(result.result)
                         }
                         if (req_data['mode'] == 'auto') {
+                            // todo: is it actually broken?
                             if (result.result!=null) {
                                 apply_auto_annotation(result.result[0],result.result[1],result.result[2])
                             }
@@ -122,18 +123,12 @@
     };
 
     function apply_auto_annotation(token, normalization, annotation) {
-
         console.log($.now(), token, normalization, annotation);
 
-        var full_ann = annotation.map(x => x[0]+'-'+x[1]).join('/');
-        var full_lemma = Array.from(new Set(annotation.map(x => x[0]))).join('/');
-
         var norm_tag = $('<nrm>'+normalization+'</nrm>');
-        var lemma_full_tag = $('<lemma_full style="display:none">'+full_lemma+'</lemma_full>');
         var lemma_tag = $('<lemma>'+annotation[0][0]+'</lemma>');
-        var morph_full_tag = $('<morph_full style="display:none">'+full_ann+'</morph_full>');
         var morph_tag = $('<morph>'+annotation[0][1]+'</morph></info>');
-        set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'auto')
+        set_annotation(norm_tag, lemma_tag, morph_tag, 'auto')
 
         /* FROM TAG */
         //var norm_tag = $('<nrm>'+$('#normalization_input').val()+'</nrm>');
@@ -372,16 +367,14 @@
 
     /* ANNOTATION TO DOM: FINAL */
 
-    function set_annotation (norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, mode) {
+    function set_annotation (norm_tag, lemma_tag, morph_tag, mode) {
 
         /* adding normalization, lemma and morphology tags to DOM */
 
-        $('trt.focused').parent().children('nrm, lemma_full, lemma, morph_full, morph').remove();
+        $('trt.focused').parent().children('nrm, lemma, morph').remove();
 
         $('trt.focused').parent().prepend(morph_tag);
-        $('trt.focused').parent().prepend(morph_full_tag);
         $('trt.focused').parent().prepend(lemma_tag);
-        $('trt.focused').parent().prepend(lemma_full_tag);
         $('trt.focused').parent().prepend(norm_tag);
 
         /* adjusting spacing*/
@@ -509,15 +502,6 @@
             var value = $('input[name="' + el_name + '"]').val();
             if (value) {
                 token.find(tag).html(value);
-                if (tag == "lemma") {
-                    token.find("lemma_full").html(value);
-                    var full_value = value + '-' + token.find("morph").html();
-                    token.find("morph_full").html(full_value);
-                };
-                if (tag == "morph") {
-                    var full_value = token.find("lemma").html() + '-' + value;
-                    token.find("morph_full").html(full_value);
-                };
             };
         };
     }
@@ -712,9 +696,7 @@
             var morph = annot_to_str();
 
             var norm_tag = $('<nrm>' + norm + '</nrm>');
-            var lemma_full_tag = $('<lemma_full style="display:none">' + lemma + '</lemma_full>');
             var lemma_tag = $('<lemma>' + lemma + '</lemma>');
-            var morph_full_tag = $('<morph_full style="display:none">' + lemma + '-' + morph + '</morph_full>');
             var morph_tag = $('<morph>' + morph + '</morph></info>');
 
             var save_annotation_params = {
@@ -730,7 +712,7 @@
             };
             ajax_request('save_annotation', save_annotation_params, search=search_mode);
 
-            set_annotation(norm_tag, lemma_full_tag, lemma_tag, morph_full_tag, morph_tag, 'manual');
+            set_annotation(norm_tag, lemma_tag, morph_tag, 'manual');
         });
 
         $('#search_button').click(function(e) {
