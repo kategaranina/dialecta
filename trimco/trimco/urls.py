@@ -17,14 +17,14 @@ Including another URLconf
 
 from django.conf.urls import include, url
 from django.contrib import admin
-from queries import urls as queries_urls
+# from queries import urls as queries_urls
 
 import django
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
     url(r'^admin/', include(admin.site.urls)), # admin site
-    url(r'^admin/', include(queries_urls)), # admin site
+    # url(r'^admin/', include(queries_urls)), # admin site
 ]
 
 from django.conf import settings

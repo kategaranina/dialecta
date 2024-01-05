@@ -48,7 +48,7 @@ INSTALLED_APPS = (
     'corpora',
     'morphology',
     'normalization',
-    'queries',
+    # 'queries',
 
     # ADDITIONAL
     'django_ajax',
