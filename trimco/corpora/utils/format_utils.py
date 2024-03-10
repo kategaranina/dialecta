@@ -91,12 +91,8 @@ def add_annotation_to_transcript(transcript, normz_tokens_dict, annot_tokens_dic
             lemma = annot_tokens_dict[i][0]
             tag.insert(0, etree.fromstring('<lemma>' + lemma + '</lemma>'))
 
-            print(lemma, morph)
-
         if i in normz_tokens_dict.keys():
             tag.insert(0, etree.fromstring('<nrm>' + normz_tokens_dict[i][0] + '</nrm>'))
-
-            print(normz_tokens_dict)
 
         i += 1
 

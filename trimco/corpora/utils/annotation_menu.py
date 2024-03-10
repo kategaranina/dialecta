@@ -8,7 +8,6 @@ from .format_utils import ANNOTATION_TAG_SEP
 
 
 class AnnotationMenu:
-    key_value_sep = ':'
     tag_sep = ','
 
     def __init__(self, json_name):
@@ -30,7 +29,7 @@ class AnnotationMenu:
         )
 
         self.menu_html_str_1 = (
-            f"<div id='manual_annotation' data-order='{json.dumps(self.config['order'])}'>"
+            f"<div id='manual_annotation' data-order='{self._serialize_config_order()}'>"
             f"<span>Manual annotation</span>"
             f"<form style='display: table;'>"
             f"{lemma_input_str}"
@@ -52,22 +51,17 @@ class AnnotationMenu:
         return config
 
     def _parse_config_order(self):
-        order = defaultdict(lambda: defaultdict(dict))
+        order = defaultdict(dict)
         for pos, orders in self.config['order'].items():
-            for k, v in orders.items():
-                if k != 'default':
-                    tags = k.split(self.tag_sep)
-                    values = [t.split(self.key_value_sep)[-1].strip() for t in tags]
-                    k = self.tag_sep.join(tuple(sorted(values)))
-
-                order[pos][k] = {vv: i+1 for i, vv in enumerate(v)}
-                order[pos][k]['part of speech'] = 0
-
-        for grammeme in self.surface_tags_by_category['part of speech']:
-            if grammeme not in order:
-                order[grammeme]['default']['part of speech'] = 0
-
+            order[pos] = {tuple(k.split(self.tag_sep)): v for k, v in orders.items()}
         self.config['order'] = order
+
+    def _serialize_config_order(self):
+        serialized = {}
+        for pos, orders in self.config['order'].items():
+            serialized[pos] = {self.tag_sep.join(k): v for k, v in orders.items()}
+
+        return json.dumps(serialized)
 
     def _get_tags_by_category(self):
         tags_by_category = defaultdict(list)
@@ -119,16 +113,15 @@ class AnnotationMenu:
 
     def get_order_by_tag(self, pos, tags_dict):
         order_config = self.config['order'][pos]
-        config_sets = [set(k.split(self.tag_sep)) for k in order_config.keys()]
         tag_keyset = set(tags_dict.values())
 
-        order_key = 'default'
-        for s in config_sets:
-            if not s - tag_keyset:
-                order_key = self.tag_sep.join(tuple(sorted(s)))
+        order_key = ('default',)
+        for config_order_k in order_config:
+            if not set(config_order_k) - tag_keyset:
+                order_key = config_order_k
                 break
 
-        return order_key
+        return order_config[order_key]
 
     def override_abbreviations(self, tag_str):
         tags_lst = [t for t in re.split(r'[, \-]', tag_str) if t]
@@ -140,21 +133,20 @@ class AnnotationMenu:
             for t in tags_lst if t in self.config['grammemes']
         }
 
-        facultative = [  # todo: finalize list
-            t for t in self.config['facultative'].keys()  # iterating through config to keep the order fixed
-            if t in tags_lst
-        ]
-
         pos = tags_dict.get('part of speech')
         if pos is None:  # UNKN, LATIN, PNCT
             return tag_str
 
         final_tags = [pos]
         if pos in self.config['order']:
-            order_key = self.get_order_by_tag(pos, tags_dict)
-            for key in self.config['order'][pos][order_key]:
+            order = self.get_order_by_tag(pos, tags_dict)
+            for key in order:
                 final_tags.append(tags_dict[key])
 
+        facultative = [
+            t for t in self.config['facultative'].keys()  # iterating through config to keep the order fixed
+            if t in tags_lst
+        ]
         final_tags.extend(facultative)
 
         final_tags = ANNOTATION_TAG_SEP.join(final_tags).replace(';-', '; ')  # todo: wtf
