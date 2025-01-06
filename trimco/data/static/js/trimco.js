@@ -253,12 +253,13 @@
             tags_dict[$(this).parent().attr('id')] = $(this).val();
         });
         var order = get_order_by_tag(tags_dict['part of speech'], tags_dict);
+        order.unshift('part of speech');
 
         $('select.manualAnnotation').each(function() {
             var select_id = $(this).attr('id');
             var container = $(this).parent();
             var blank_option = $(this).find('option#blank');
-            if (select_id in order) {
+            if (order.includes(select_id)) {
                 container.addClass('active');
                 container.attr('idx', order[select_id]);
             } else {
@@ -285,7 +286,8 @@
             var match = 1;
 
             $.each($(this).data('dep'), function(i, tag){
-                var is_tag_selected = $('#' + tag).prop('selected');
+                var parts = tag.split('.');
+                var is_tag_selected = parts.every(part => $('#' + part).is(':checked'));
                 if (tag == 'ALLFORMS') {
                     match = 1;
                     return false;

@@ -17,6 +17,7 @@ from .settings_local import SECRET_KEY, GEOPOSITION_GOOGLE_MAPS_API_KEY
 
 SITE_ID = 1
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -145,13 +146,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-_STATIC_ROOT = os.path.join(BASE_DIR, 'data', STATIC_URL.strip("/"))
+_STATIC_ROOT = os.path.join(DATA_DIR, STATIC_URL.strip("/"))
 STATICFILES_DIRS = [_STATIC_ROOT]
 
 if 'OPENSHIFT_REPO_DIR' in os.environ:
     MEDIA_ROOT = os.path.join(os.environ.get('OPENSHIFT_REPO_DIR'), 'trimco', 'data', 'media')
 else:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'data', MEDIA_URL.strip("/"))
+    MEDIA_ROOT = os.path.join(DATA_DIR, MEDIA_URL.strip("/"))
 
 GRAPPELLI_ADMIN_TITLE = 'BaltSlavDialects 0.1'
 

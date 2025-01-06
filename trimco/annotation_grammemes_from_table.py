@@ -5,7 +5,7 @@ from collections import defaultdict
 import pandas as pd
 
 
-table_path = 'dialecta_tags_240310.xlsx'
+table_path = 'dialecta_tags_20250106.xlsx'
 tables = pd.read_excel(
     table_path,
     engine='openpyxl',
@@ -21,7 +21,7 @@ compulsory = {}
 for i, row in tables['compulsory'].iterrows():
     row = row.fillna('')
     compulsory[row['auto_ann_tag']] = {
-        'surface_tag': row['tag'],
+        'surface_tag': str(row['tag']),
         'description': row['description'],
         'category': row['type'],
         'example': row['example'],

@@ -94,7 +94,7 @@ class AnnotationMenu:
     def _get_facultative_options(self):
         facultative_options = []
         for tag, tag_dict in self.config['facultative'].items():
-            categories = [cat.strip() for cat in tag_dict['categories'].split(',')]
+            categories = tag_dict['categories']
             tag_html = (
                 f"<div class='manualAnnotationContainer'><label>"
                 f"<input type='checkbox' class='manualAnnotation' "
@@ -160,8 +160,8 @@ if __name__ == '__main__':
     from pymorphy2 import MorphAnalyzer
 
     test_config = {
-        'долг': 'NOUN-m-nom-sg',
-        'долгу': 'NOUN-m-gen2-sg',
+        'долг': 'NOUN-m-nom-sg-inan',
+        'долгу': 'NOUN-m-gen2-sg-inan',
         'красивая': 'ADJF-f-nom-sg',
         'красивые': 'ADJF-nom-pl',
         'идут': 'VERB-ipfv-prs-ind-3-pl',
@@ -171,10 +171,10 @@ if __name__ == '__main__':
         'шла': 'VERB-ipfv-pst-ind-sg-f',
         'пятидесяти': 'NUMR-gen',
         'идти': 'INF-ipfv',
-        'Новгород': 'NOUN-m-acc-sg-Geox',
+        'Новгород': 'NOUN-m-acc-sg-inan-Geox',
         'Пети': 'NOUN-m-gen-sg-anim-Name',
-        'МВД': 'NOUN-n-gen-sg-Abbr',
-        'ВШЭ': 'UNKN'
+        'МВД': 'NOUN-n-gen-sg-inan-Abbr',
+        'ВШЭ': 'UNKN',
     }
 
     m = MorphAnalyzer()

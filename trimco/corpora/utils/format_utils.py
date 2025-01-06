@@ -5,6 +5,7 @@ from lxml import etree
 ANNOTATION_WORD_SEP = '|'
 ANNOTATION_PART_SEP = ':'
 ANNOTATION_TAG_SEP = '-'
+LEMMA_ANN_SEP = '&'
 UNKNOWN_PREFIX = '(unkn)_'
 
 STANDARTIZATION_REGEX = re.compile(r'^(.+?)_standartization$')

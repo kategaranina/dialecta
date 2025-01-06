@@ -2,11 +2,14 @@ import os
 import pymorphy2
 import datetime
 from collections import defaultdict, OrderedDict, Counter
+
 from django.conf import settings
+
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
 from .annotation_menu import annotation_menu
-from .format_utils import UNKNOWN_PREFIX, ANNOTATION_TAG_SEP
+from .format_utils import UNKNOWN_PREFIX, ANNOTATION_TAG_SEP, LEMMA_ANN_SEP
+from .annotation_utils import correct_reflexive, correct_antp, check_for_pred
 
 
 class Standartizator:
@@ -24,17 +27,8 @@ class Standartizator:
         self.path = settings.NORMALIZER_PATH  # specified in the last line of trimco.settings.py
         self.morph_rus = pymorphy2.MorphAnalyzer()  # TODO: replace with some context-dependent analyser, i.e. mystem
 
-    # TODO: move somewhere else
-    def correct_reflexive(self, norm):
-        vowels = set('аеёиоуыэюя')
-        if len(norm) > 2 and norm[-3] in vowels:
-            if len(norm) > 3 and norm[-4] not in vowels: # participles
-                new_norm = norm[:-1]+'ь'
-                ann = self.morph_rus.parse(new_norm)[0]
-                ann_methods = {str(x[0]) for x in ann.methods_stack}
-                if ann.tag.POS == 'VERB' or ann_methods != {'<DictionaryAnalyzer>'}:
-                    return new_norm
-        return norm
+        with open(os.path.join(settings.DATA_DIR, 'static', 'words_PRED.txt')) as f:
+            self.words_pred = f.read().split('\n')
 
     def get_manual_standartizations(self, orig):
         orig = orig.lower()
@@ -54,8 +48,8 @@ class Standartizator:
         if manual_standartizations is not None:
             standartization = manual_standartizations[0]
 
-        elif standartization.lower().endswith('ся'):
-            standartization = self.correct_reflexive(standartization.lower())
+        else:
+            standartization = correct_reflexive(standartization.lower(), parser=self.morph_rus)
 
         return orig, standartization.lower()
 
@@ -93,17 +87,24 @@ class Standartizator:
 
     @staticmethod
     def unify_annotations(annotations):
-        # todo: what is happening here?
+        """
+        remove tag duplicates from different sources.
+        preserves original order of unique annotations
+        but counts occurrences of each so it's possible to sort by them later
+        """
         unified_annotations = OrderedDict()
         for raw_annotation in annotations:
-            if isinstance(raw_annotation, list):
-                annotation = raw_annotation[0] + ANNOTATION_TAG_SEP + raw_annotation[1]
+            if not isinstance(raw_annotation, list):
+                # from db, where ann is in form lemma,LEMMA_ANN_SEP,tags
+                lemma, annotation = raw_annotation.split(LEMMA_ANN_SEP, 1)
             else:
-                annotation = raw_annotation
+                # from other sources
+                # raw_annotation can include score or not, first two elements are lemma and ann
+                lemma, annotation = raw_annotation[:2]
 
-            spl_annotation = tuple(sorted(set(annotation.split(ANNOTATION_TAG_SEP))))
+            spl_annotation = tuple([lemma] + sorted(set(annotation.split(ANNOTATION_TAG_SEP))))
             if spl_annotation not in unified_annotations:
-                unified_annotations[spl_annotation] = [raw_annotation, 0]
+                unified_annotations[spl_annotation] = [[lemma, annotation], 0]
             unified_annotations[spl_annotation][1] += 1
 
         return unified_annotations
@@ -114,7 +115,7 @@ class Standartizator:
         result_list = []
 
         for full_tag, count in sorted(unique_anns.values(), key=lambda x: x[1], reverse=True):
-            lemma, tag = full_tag.split(ANNOTATION_TAG_SEP, 1)
+            lemma, tag = full_tag
             score = count / total_anns
             result_list.append([lemma, tag, score])
 
@@ -129,13 +130,12 @@ class Standartizator:
 
             tag = annotation_menu.override_abbreviations(str(annot.tag))
 
-            # TODO: move somewhere
-            if self.model.name == 'be' and (orig.endswith('ṷšy') or orig.endswith('ṷši')) and tag.startswith('GER-'):
-                tag = 'ANTP' + ANNOTATION_TAG_SEP + tag[4:]
-
             # pymorphy2 specific
             methods = {str(x[0]) for x in annot.methods_stack}
             lemma = annot.normal_form if methods == {'<DictionaryAnalyzer>'} else UNKNOWN_PREFIX + annot.normal_form
+
+            tag = correct_antp(self.model.name, orig, tag)
+            tag = check_for_pred(standartization, tag, self.words_pred)
 
             result_list.append([lemma, tag, annot.score])
 

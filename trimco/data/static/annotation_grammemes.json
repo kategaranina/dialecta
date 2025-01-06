@@ -267,21 +267,21 @@
       "comment": ""
     },
     "1per": {
-      "surface_tag": 1,
+      "surface_tag": "1",
       "description": "1 лицо",
       "category": "person",
       "example": "украшаю",
       "comment": ""
     },
     "2per": {
-      "surface_tag": 2,
+      "surface_tag": "2",
       "description": "2 лицо",
       "category": "person",
       "example": "украшаешь",
       "comment": ""
     },
     "3per": {
-      "surface_tag": 3,
+      "surface_tag": "3",
       "description": "3 лицо",
       "category": "person",
       "example": "украшает",
@@ -362,21 +362,21 @@
     },
     "ADJF": {
       "default": [
+        "gender",
         "case",
         "number"
       ],
       "pl": [
-        "gender",
         "case",
         "number"
       ]
     },
     "ADJS": {
       "default": [
+        "gender",
         "number"
       ],
       "pl": [
-        "gender",
         "number"
       ]
     },
@@ -384,13 +384,13 @@
       "default": [
         "aspect",
         "voice",
+        "gender",
         "case",
         "number"
       ],
       "pl": [
         "aspect",
         "voice",
-        "gender",
         "case",
         "number"
       ]
@@ -398,21 +398,21 @@
     "PRTS": {
       "default": [
         "voice",
+        "gender",
         "number"
       ],
       "pl": [
         "voice",
-        "gender",
         "number"
       ]
     },
     "NPRO": {
       "default": [
+        "gender",
         "case",
         "number"
       ],
       "pl": [
-        "gender",
         "case",
         "number"
       ]
@@ -434,14 +434,14 @@
         "aspect",
         "tense",
         "mood",
-        "number"
+        "number",
+        "gender"
       ],
       "pst,pl": [
         "aspect",
         "tense",
         "mood",
-        "number",
-        "gender"
+        "number"
       ],
       "imp": [
         "aspect",
@@ -491,7 +491,7 @@
       "categories": [
         "NPRO",
         "ADJF.Apro",
-        "ADVB.Apro"
+        "ADV.Apro"
       ],
       "examples": "NPRO: кто, ADJF.Apro: какой, ADVB.Apro: где"
     },
@@ -501,7 +501,7 @@
       "categories": [
         "NPRO",
         "ADJF.Apro",
-        "ADVB.Apro"
+        "ADV.Apro"
       ],
       "examples": "NPRO: кто, ADJF.Apro: какой, ADVB.Apro: где"
     },
@@ -522,7 +522,7 @@
       "examples": "Толстой"
     },
     "Patr": {
-      "label": "Patronimic Name",
+      "label": "Patronymic Name",
       "description": "отчество",
       "categories": [
         "NOUN"
@@ -543,7 +543,7 @@
       "categories": [
         "ADJF",
         "ADJS",
-        "ADVB",
+        "ADV",
         "NUMR"
       ],
       "examples": "ADJF: такой, ADJS: таков, ADVB: там, NUMR: сколько"
@@ -557,11 +557,11 @@
       "examples": "первый"
     },
     "dmns": {
-      "label": "demonstrative",
+      "label": "Demonstrative",
       "description": "указательное",
       "categories": [
         "ADJF.Apro",
-        "ADVB.Apro",
+        "ADV.Apro",
         "NUMR"
       ],
       "examples": "ADJF.Apro: этот, ADVB.Apro: там, NUMR.Apro: столько"
@@ -605,6 +605,14 @@
         "NPRO"
       ],
       "examples": "мя (сокр. меня); тя (сокр. тебя)"
+    },
+    "ANTP": {
+      "label": "Anteriority participle",
+      "description": "деепричастие на -ши",
+      "categories": [
+        "GER"
+      ],
+      "examples": "сделавши"
     },
     "Cmp2": {
       "label": "Po- Comparative",
@@ -731,13 +739,13 @@
       "label": "Inclusive",
       "description": "говорящий включён в действие",
       "categories": [
-        "VERB.impr",
+        "VERB.imp",
         "NPRO"
       ],
       "examples": "VERB.impr: пойдемте, NPRO: мы"
     },
     "dist": {
-      "label": "distortion",
+      "label": "Distortion",
       "description": "искажение",
       "categories": [
         "ALLFORMS"
