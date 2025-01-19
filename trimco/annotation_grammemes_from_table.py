@@ -5,7 +5,7 @@ from collections import defaultdict
 import pandas as pd
 
 
-table_path = 'dialecta_tags_20250106.xlsx'
+table_path = 'dialecta_tags_20250111.xlsx'
 tables = pd.read_excel(
     table_path,
     engine='openpyxl',

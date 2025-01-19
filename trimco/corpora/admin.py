@@ -74,7 +74,7 @@ class RecordingAdmin(VersionAdmin):
     save_as = True
 
     class Media:
-        js = ("js/ustie_id.js", "js/search_button.js")
+        js = ("js/ustie_id.js", "js/search_button.js", "js/reannotate_all_button.js")
         css = {'all': ("css/search_button.css",)}
 
     def speakerlist(self, obj):
@@ -86,6 +86,7 @@ class RecordingAdmin(VersionAdmin):
         my_urls = [
             url(r'\d+/edit/$', self.admin_site.admin_view(self.edit)),
             url(r'\d+/auto/$', self.admin_site.admin_view(self.auto_annotate)),
+            url(r'^reannotate_grammar_all/$', self.admin_site.admin_view(self.reannotate_grammar_all_unchecked)),
             url(r'^search/$', self.admin_site.admin_view(self.search)),
             url(r'^ajax/$', self.ajax_dispatcher, name='ajax'),
             url(r'^ajax_search/$', self.ajax_search_dispatcher, name='ajax_search')
@@ -183,6 +184,20 @@ class RecordingAdmin(VersionAdmin):
 
         self.processing_request = False
         return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
+
+    def reannotate_grammar_all_unchecked(self, _):
+        unchecked_recs = Recording.objects.filter(auto_annotated=True, checked=False)
+        reannotated = []
+
+        for rec in unchecked_recs:
+            elan_converter = ElanToHTML(rec)
+            elan_converter.make_backup()
+            elan_converter.reannotate_elan(do_standartization=False)
+            elan_converter.change_status_and_save()
+            print('Reannotated and saved', rec.data.path)
+            reannotated.append(rec.data.path.rsplit('/', 1)[-1])
+
+        return HttpResponse('Reannotated:\n' + '\n'.join(reannotated))
 
     @csrf_exempt
     def ajax_dispatcher(self, request):

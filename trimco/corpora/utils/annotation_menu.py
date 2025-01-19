@@ -124,7 +124,7 @@ class AnnotationMenu:
         return order_config[order_key]
 
     def override_abbreviations(self, tag_str):
-        tags_lst = [t for t in re.split(r'[, \-]', tag_str) if t]
+        tags_lst = [t for t in re.split(r'[, ]', tag_str) if t]
         if not tags_lst:
             return ''
 
@@ -141,6 +141,10 @@ class AnnotationMenu:
         if pos in self.config['order']:
             order = self.get_order_by_tag(pos, tags_dict)
             for key in order:
+                if key not in tags_dict:
+                    print('WARNING', key + ' not in tags ' + tag_str)
+                    final_tags.append('')
+                    continue
                 final_tags.append(tags_dict[key])
 
         facultative = [

@@ -408,11 +408,11 @@
     },
     "NPRO": {
       "default": [
-        "gender",
         "case",
         "number"
       ],
-      "pl": [
+      "sg,3": [
+        "gender",
         "case",
         "number"
       ]

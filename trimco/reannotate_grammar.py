@@ -1,19 +1,31 @@
 import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "trimco.settings")
+
+import django
+django.setup()
+
+from pathlib import Path
+
 import sqlite3
 
 from corpora.utils.elan_to_html import ElanToHTML
-from corpora.utils.elan_utils import clean_transcription
+from corpora.utils.elan_utils import clean_transcription, ElanObject
 from corpora.utils.standartizator import Standartizator
 from corpora.utils.format_utils import ANNOTATION_PART_SEP, ANNOTATION_WORD_SEP
 
 
-conn = sqlite3.connect('db.sqlite3')
+conn = sqlite3.connect('db_20250111.sqlite3')
 c = conn.cursor()
 
-media_dir = 'data/media/'
+media_dir = 'data/media/all/'
 
 
-def get_recordings():
+class Annotator(ElanToHTML):
+    def __init__(self, elan_path):
+        self.elan_obj = ElanObject(elan_path)
+
+
+def get_recordings_from_db():
     recs = c.execute("""
         SELECT data, to_dialect_id 
         FROM corpora_recording 
@@ -65,12 +77,15 @@ def reannotate_grammar_in_rec(annotator, standartizator):
         write_anns(annotator, annotation, tier_name, start, end)
 
 
-def reannotate_rec(rec):
-    annotator = ElanToHTML(rec)
-    standartizator = Standartizator(rec.to_dialect)
+def reannotate_rec(rec, to_dialect):
+    full_rec_path = Path(Path().resolve(), media_dir, rec)
+    annotator = Annotator(full_rec_path)
+    standartizator = Standartizator(to_dialect)
     reannotate_grammar_in_rec(annotator, standartizator)
 
 
 if __name__ == '__main__':
-    recs = get_recordings()
-    a = 5
+    recs = get_recordings_from_db()
+    for rec, to_dialect in recs:
+        print('reannotating', rec)
+        reannotate_rec(rec, to_dialect)

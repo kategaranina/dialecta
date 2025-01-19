@@ -6,7 +6,7 @@ form#grp-changelist-search-form {
     display: inline-block;
 }
 
-#search_button {
+#search_button #reannotate_button {
     float: left;
     margin-right: 10px;
 }

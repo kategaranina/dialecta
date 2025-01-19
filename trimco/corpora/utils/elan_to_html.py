@@ -41,16 +41,24 @@ class ElanToHTML:
         os.system('cp {} {}/backups/{}'.format(self.path, settings.MEDIA_ROOT, new_file))
 
     def change_status_and_save(self):
+        self.elan_obj.save()
         self.file_obj.auto_annotated = True
         self.file_obj.save()
 
-    def reannotate_elan(self):
+    def _get_standartization_for_annot(self, tier_name, annot_data):
+        normz_tokens_dict = self.get_additional_tags_dict(tier_name + '_standartization', annot_data[0], annot_data[1])
+        normz_sorted = sorted(normz_tokens_dict.items())
+        standartization = [item[1][0] for item in normz_sorted]
+        return standartization
+
+    def reannotate_elan(self, do_standartization=True):
         standartizator = Standartizator(self.dialect)
 
         tier_names = []
         starts = []
         ends = []
         transcripts = []
+        standartizations = []
 
         for annot_data in self.elan_obj.annot_data_lst:
             tier_name = annot_data[3]
@@ -62,12 +70,17 @@ class ElanToHTML:
                 ends.append(end)
                 transcripts.append(transcript)
 
-        transcript = '\n'.join(transcripts)
-        annotations = standartizator.get_annotation(transcript)
+                if not do_standartization:
+                    spl_text = transcript.split()
+                    standartization = self._get_standartization_for_annot(tier_name, annot_data)
+                    assert standartization, 'do_standartization is False, but no standartizations in eaf'
+                    assert len(standartization) == len(spl_text), 'transcript and standartizations do not match'
+                    standartizations.append(list(zip(spl_text, standartization)))
 
-        # TODO: remove transcripts? t_counter to enumerate?
-        for tier_name, start, end, transcript, annotation in zip(tier_names, starts, ends, transcripts, annotations):
-            t_counter = 0
+        transcript = '\n'.join(transcripts)
+        annotations = standartizator.get_annotation(transcript, standartizations=standartizations or None)
+
+        for t_counter, (tier_name, start, end, annotation) in enumerate(zip(tier_names, starts, ends, annotations)):
             annot_value_lst = []
             nrm_value_lst = []
             for token in annotation:
@@ -77,15 +90,14 @@ class ElanToHTML:
                 morph = anns[0][1] if anns else ''
                 try:
                     if lemma + morph:
-                        annot_value_lst.append(ANNOTATION_PART_SEP.join([t_counter, lemma, morph]))
+                        annot_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), lemma, morph]))
                     if nrm:
-                        nrm_value_lst.append(ANNOTATION_PART_SEP.join([t_counter, nrm]))
+                        nrm_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), nrm]))
                 except IndexError:
                     print(
                         'Exception while saving. Normalization: %s,'
                         'Lemmata: %s, Morphology: %s, Counter: %s' % (nrm, lemma, morph, t_counter)
                     )
-                t_counter += 1
 
             # TODO: copypaste from elan_utils:135
             if annot_value_lst:
@@ -140,9 +152,7 @@ class ElanToHTML:
             tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
             if tier_obj.attributes['TIER_ID'] != 'comment':
                 transcription = annot_data[2]
-                normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
-                normz_sorted = sorted(normz_tokens_dict.items())
-                normalization = ' '.join(item[1][0] for item in normz_sorted)
+                normalization = ' '.join(self._get_standartization_for_annot(tier_name, annot_data))
                 examples.append((transcription, normalization))
 
         return examples

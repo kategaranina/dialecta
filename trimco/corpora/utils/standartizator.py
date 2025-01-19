@@ -60,7 +60,7 @@ class Standartizator:
         os.system('python2 ' + self.path + 'normalise.py ' + os.path.join(settings.BASE_DIR, 'tmp') + ' ' + str(self.model))
 
         try:
-            # clauses are separated by '\n\n', words inside clause are separeted by '\n'
+            # clauses are separated by '\n\n', words inside clause are separated by '\n'
             clauses = open(os.path.join(settings.BASE_DIR, 'tmp.norm'), encoding='utf-8').read().split('\n\n')
             lines = [clause.split('\n') for clause in clauses if clause]
             # an element of lines looks like:
@@ -168,9 +168,10 @@ class Standartizator:
             annotations.append(annotation)
         return annotations
 
-    def get_annotation(self, text):
-        nrm_list = self.normalize(text)
-        annotations = self.get_grammar_annotation(nrm_list)
+    def get_annotation(self, text, standartizations=None):
+        if standartizations is None:
+            standartizations = self.normalize(text)
+        annotations = self.get_grammar_annotation(standartizations)
         return annotations
 
     def make_backup(self):
