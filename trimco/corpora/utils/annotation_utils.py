@@ -31,3 +31,8 @@ def check_for_pred(norm, tag, words_pred):
         tag += ANNOTATION_TAG_SEP + 'orPRED'
     return tag
 
+
+def override_tag(norm, tag, overrides_dict):
+    if norm in overrides_dict:
+        tag = overrides_dict[norm]
+    return tag

@@ -9,7 +9,12 @@ from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
 from .annotation_menu import annotation_menu
 from .format_utils import UNKNOWN_PREFIX, ANNOTATION_TAG_SEP, LEMMA_ANN_SEP
-from .annotation_utils import correct_reflexive, correct_antp, check_for_pred
+from .annotation_utils import (
+    correct_reflexive,
+    correct_antp,
+    check_for_pred,
+    override_tag
+)
 
 
 class Standartizator:
@@ -29,6 +34,9 @@ class Standartizator:
 
         with open(os.path.join(settings.DATA_DIR, 'static', 'words_PRED.txt')) as f:
             self.words_pred = f.read().split('\n')
+
+        with open(os.path.join(settings.DATA_DIR, 'static', 'automatic_overriden.csv')) as f:
+            self.automatic_overriden = {line.split()[0]: line.split()[1] for line in f}
 
     def get_manual_standartizations(self, orig):
         orig = orig.lower()
@@ -136,6 +144,7 @@ class Standartizator:
 
             tag = correct_antp(self.model.name, orig, tag)
             tag = check_for_pred(standartization, tag, self.words_pred)
+            tag = override_tag(standartization, tag, self.automatic_overriden)
 
             result_list.append([lemma, tag, annot.score])
 
