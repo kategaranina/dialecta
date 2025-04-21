@@ -1,8 +1,0 @@
-# set path
-export PATH=$OPENSHIFT_DATA_DIR/bin:$PATH
-
-echo "Executing 'python ${OPENSHIFT_REPO_DIR}trimco/manage.py migrate --noinput'"
-python3 "$OPENSHIFT_REPO_DIR"trimco/manage.py migrate --noinput
-
-echo "Executing 'python ${OPENSHIFT_REPO_DIR}trimco/manage.py collectstatic --noinput# -v0'"
-python3 "$OPENSHIFT_REPO_DIR"trimco/manage.py collectstatic --noinput
