@@ -1,17 +1,19 @@
+import sys
+sys.path.append('..')
+
 import sqlite3
 
 from corpora.search_engine.elan_to_db import process_one_elan, insert_sentences_in_mongo
 
 
-conn = sqlite3.connect('db.sqlite3')
+conn = sqlite3.connect('../db.sqlite3')
 c = conn.cursor()
 
 
 def get_recordings():
     recs = c.execute("""
         SELECT data, audio, to_dialect_id 
-        FROM corpora_recording 
-
+        FROM corpora_recording
     """).fetchall()
     return recs
 

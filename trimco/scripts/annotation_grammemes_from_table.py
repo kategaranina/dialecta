@@ -5,7 +5,7 @@ from collections import defaultdict
 import pandas as pd
 
 
-table_path = 'data/auxiliary/dialecta_tags_20250323.xlsx'
+table_path = '../data/auxiliary/dialecta_tags_20250323.xlsx'
 tables = pd.read_excel(
     table_path,
     engine='openpyxl',
@@ -54,7 +54,7 @@ annotation_info = {
     'facultative': facultative
 }
 
-with open(os.path.join('data', 'static', 'annotation_grammemes.json'), 'w') as f:
+with open(os.path.join('..', 'data', 'static', 'annotation_grammemes.json'), 'w') as f:
     json.dump(annotation_info, f, indent=2, ensure_ascii=False)
 
 

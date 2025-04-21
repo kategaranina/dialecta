@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 import re
 import os
 import json
@@ -12,8 +15,6 @@ import pymorphy2
 from pympi import Eaf
 
 from corpora.utils.format_utils import (
-    ANNOTATION_PART_SEP,
-    ANNOTATION_WORD_SEP,
     ANNOTATION_TAG_SEP,
     STANDARTIZATION_REGEX,
     STANDARTIZATION_NUM_REGEX,
@@ -27,14 +28,14 @@ from corpora.utils.elan_utils import (
 from corpora.utils.annotation_menu import AnnotationMenu
 
 
-with open('data/static/legacy_manual_anns.json') as f:
+with open('../data/auxiliary/legacy_manual_anns.json') as f:
     legacy_manual_anns = json.load(f)
 
 grammemes_config_path = 'annotation_grammemes.json'
-with open('data/static/' + grammemes_config_path) as f:
+with open('../data/static/' + grammemes_config_path) as f:
     grammeme_config = json.load(f)
 
-conn = sqlite3.connect('db_20250111.sqlite3')
+conn = sqlite3.connect('../db_20250111.sqlite3')
 c = conn.cursor()
 
 m = pymorphy2.MorphAnalyzer()
@@ -61,7 +62,7 @@ def reverse_tags():
 
 def get_correct_rec_path(rec):
     clean_rec = rec[0].rsplit('/', 1)[-1]
-    rec_full_path = "data/media/all/" + clean_rec
+    rec_full_path = "../data/media/all/" + clean_rec
     return clean_rec, rec_full_path
 
 

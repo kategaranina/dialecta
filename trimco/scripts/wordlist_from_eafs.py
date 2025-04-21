@@ -1,13 +1,16 @@
+import sys
+sys.path.append('..')
+
 import os
 import sqlite3
 
 from corpora.utils.word_list import process_one_elan, insert_words_in_mongo
 
 
-conn = sqlite3.connect('db.sqlite3')
+conn = sqlite3.connect('../db.sqlite3')
 c = conn.cursor()
 
-media_dir = 'data/media/'
+media_dir = '../data/media/'
 
 
 def get_recordings():
@@ -41,6 +44,7 @@ def insert_wordlist():
     dialect_to_model_mapping = get_dialect_to_model_mapping()
 
     for rec in recs:
+        print(rec)
         rec_path = os.path.join(media_dir, rec[0])
 
         model_id = dialect_to_model_mapping.get(rec[1])
