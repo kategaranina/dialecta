@@ -293,7 +293,7 @@ def reorder_tags_for_recs(annotation_menu, recs):
         # elan_obj.update_anns(tier_names, starts, ends, all_anns)
         # elan_obj.save()
 
-    print_errors(errors)
+    # print_errors(errors)
 
 
 def get_undefined_tags(recs):
