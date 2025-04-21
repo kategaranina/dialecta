@@ -123,6 +123,50 @@ class AnnotationMenu:
 
         return order_config[order_key]
 
+    def order_compulsory_tags(self, pos, tags_dict, tag_str):
+        final_tags = [pos]
+
+        if pos in self.config['order']:
+            order = self.get_order_by_tag(pos, tags_dict)
+            for key in order:
+                key_always_required = True
+                if key.startswith('*'):
+                    key_always_required = False
+                    key = key[1:]
+
+                if key not in tags_dict and key_always_required:
+                    print('WARNING', key + ' not in tags ' + tag_str)
+                    final_tags.append('')
+                    continue
+
+                if key in tags_dict or key_always_required:
+                    final_tags.append(tags_dict[key])
+
+        return final_tags
+
+    def order_facultative_tags(self, facultative_tags, compulsory_tags, word=None):
+        all_tags = compulsory_tags + facultative_tags
+
+        def tag_suitable(tag, v):
+            if tag not in facultative_tags:
+                return False
+
+            is_for_all = v['categories'][0] == "ALLFORMS"
+            is_in_category = any(
+                all(cat in all_tags for cat in cats.split('.'))
+                for cats in v['categories']
+            )
+            if not (is_for_all or is_in_category):
+                print("facultative present but is not allowed by category\n", tag, all_tags, word, "\n")
+
+            return is_for_all or is_in_category
+
+        facultative = [
+            t for t, v in self.config['facultative'].items()  # iterating through config to keep the order fixed
+            if tag_suitable(t, v)
+        ]
+        return facultative
+
     def override_abbreviations(self, tag_str):
         tags_lst = [t for t in re.split(r'[, ]', tag_str) if t]
         if not tags_lst:
@@ -132,25 +176,14 @@ class AnnotationMenu:
             self.config['grammemes'][t]['category']: self.config['grammemes'][t]['surface_tag']
             for t in tags_lst if t in self.config['grammemes']
         }
+        facultative_lst = [t for t in tags_lst if t in self.config['facultative']]
 
         pos = tags_dict.get('part of speech')
         if pos is None:  # UNKN, LATIN, PNCT
             return tag_str
 
-        final_tags = [pos]
-        if pos in self.config['order']:
-            order = self.get_order_by_tag(pos, tags_dict)
-            for key in order:
-                if key not in tags_dict:
-                    print('WARNING', key + ' not in tags ' + tag_str)
-                    final_tags.append('')
-                    continue
-                final_tags.append(tags_dict[key])
-
-        facultative = [
-            t for t in self.config['facultative'].keys()  # iterating through config to keep the order fixed
-            if t in tags_lst
-        ]
+        final_tags = self.order_compulsory_tags(pos, tags_dict, tag_str)
+        facultative = self.order_facultative_tags(facultative_lst, final_tags)
         final_tags.extend(facultative)
 
         final_tags = ANNOTATION_TAG_SEP.join(final_tags).replace(';-', '; ')  # todo: wtf
@@ -174,10 +207,13 @@ if __name__ == '__main__':
         'смотри': 'VERB-ipfv-imp-sg',
         'шла': 'VERB-ipfv-pst-ind-sg-f',
         'пятидесяти': 'NUMR-gen',
+        'обе': 'NUMR-f-nom',
         'идти': 'INF-ipfv',
+        'она': 'NPRO-f-nom-3-sg',
+        'я': 'NPRO-nom-1-sg',
         'Новгород': 'NOUN-m-acc-sg-inan-Geox',
         'Пети': 'NOUN-m-gen-sg-anim-Name',
-        'МВД': 'NOUN-n-gen-sg-inan-Abbr',
+        'МВД': 'NOUN-n-gen-sg-inan-Abbr-Sgtm-Fixd',
         'ВШЭ': 'UNKN',
     }
 

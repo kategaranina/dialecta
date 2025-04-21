@@ -5,7 +5,7 @@ from collections import defaultdict
 import pandas as pd
 
 
-table_path = 'dialecta_tags_20250111.xlsx'
+table_path = 'dialecta_tags_20250323.xlsx'
 tables = pd.read_excel(
     table_path,
     engine='openpyxl',
@@ -20,7 +20,11 @@ tables = pd.read_excel(
 compulsory = {}
 for i, row in tables['compulsory'].iterrows():
     row = row.fillna('')
+    if not row['auto_ann_tag']:
+        continue
+
     compulsory[row['auto_ann_tag']] = {
+        'pymorphy_tag': row['auto_ann_tag'],
         'surface_tag': str(row['tag']),
         'description': row['description'],
         'category': row['type'],
@@ -32,8 +36,6 @@ compulsory_order = defaultdict(dict)
 for i, row in tables['compulsory_order'].iterrows():
     compulsory_order[row['part of speech']][row['restrictions'].lower()] = row['order'].split('-')
 
-
-# facultative_order = list(tables['facultative_order']['name'])
 facultative_table = tables['facultative'].dropna(subset=['num in order (auto)']).sort_values('num in order (auto)')
 facultative_table = facultative_table.fillna('')
 

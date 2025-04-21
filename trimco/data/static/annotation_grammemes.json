@@ -1,6 +1,7 @@
 {
   "grammemes": {
     "NOUN": {
+      "pymorphy_tag": "NOUN",
       "surface_tag": "NOUN",
       "description": "имя существительное",
       "category": "part of speech",
@@ -8,6 +9,7 @@
       "comment": ""
     },
     "ADJF": {
+      "pymorphy_tag": "ADJF",
       "surface_tag": "ADJF",
       "description": "имя прилагательное (полное)",
       "category": "part of speech",
@@ -15,6 +17,7 @@
       "comment": ""
     },
     "ADJS": {
+      "pymorphy_tag": "ADJS",
       "surface_tag": "ADJS",
       "description": "имя прилагательное (краткое)",
       "category": "part of speech",
@@ -22,6 +25,7 @@
       "comment": ""
     },
     "COMP": {
+      "pymorphy_tag": "COMP",
       "surface_tag": "COMP",
       "description": "компаратив",
       "category": "part of speech",
@@ -29,6 +33,7 @@
       "comment": "only single words"
     },
     "VERB": {
+      "pymorphy_tag": "VERB",
       "surface_tag": "VERB",
       "description": "глагол (личная форма)",
       "category": "part of speech",
@@ -36,6 +41,7 @@
       "comment": ""
     },
     "INFN": {
+      "pymorphy_tag": "INFN",
       "surface_tag": "INF",
       "description": "глагол (инфинитив)",
       "category": "part of speech",
@@ -43,6 +49,7 @@
       "comment": ""
     },
     "PRTF": {
+      "pymorphy_tag": "PRTF",
       "surface_tag": "PRTF",
       "description": "причастие (полное)",
       "category": "part of speech",
@@ -50,6 +57,7 @@
       "comment": ""
     },
     "PRTS": {
+      "pymorphy_tag": "PRTS",
       "surface_tag": "PRTS",
       "description": "причастие (краткое)",
       "category": "part of speech",
@@ -57,6 +65,7 @@
       "comment": ""
     },
     "GRND": {
+      "pymorphy_tag": "GRND",
       "surface_tag": "GER",
       "description": "деепричастие",
       "category": "part of speech",
@@ -64,6 +73,7 @@
       "comment": ""
     },
     "NUMR": {
+      "pymorphy_tag": "NUMR",
       "surface_tag": "NUMR",
       "description": "числительное",
       "category": "part of speech",
@@ -71,6 +81,7 @@
       "comment": ""
     },
     "ADVB": {
+      "pymorphy_tag": "ADVB",
       "surface_tag": "ADV",
       "description": "наречие",
       "category": "part of speech",
@@ -78,6 +89,7 @@
       "comment": ""
     },
     "NPRO": {
+      "pymorphy_tag": "NPRO",
       "surface_tag": "NPRO",
       "description": "местоимение-существительное",
       "category": "part of speech",
@@ -85,6 +97,7 @@
       "comment": ""
     },
     "PRED": {
+      "pymorphy_tag": "PRED",
       "surface_tag": "PRED",
       "description": "предикатив",
       "category": "part of speech",
@@ -92,6 +105,7 @@
       "comment": "almost never the first option in automatic annotator"
     },
     "PREP": {
+      "pymorphy_tag": "PREP",
       "surface_tag": "PREP",
       "description": "предлог",
       "category": "part of speech",
@@ -99,6 +113,7 @@
       "comment": ""
     },
     "CONJ": {
+      "pymorphy_tag": "CONJ",
       "surface_tag": "CONJ",
       "description": "союз",
       "category": "part of speech",
@@ -106,6 +121,7 @@
       "comment": ""
     },
     "PRCL": {
+      "pymorphy_tag": "PRCL",
       "surface_tag": "PRCL",
       "description": "частица",
       "category": "part of speech",
@@ -113,13 +129,31 @@
       "comment": ""
     },
     "INTJ": {
+      "pymorphy_tag": "INTJ",
       "surface_tag": "INTJ",
       "description": "междометие",
       "category": "part of speech",
       "example": "эх",
       "comment": ""
     },
+    "UNKN": {
+      "pymorphy_tag": "UNKN",
+      "surface_tag": "UNKN",
+      "description": "Слово написано латинскими буквами",
+      "category": "part of speech",
+      "example": "hello",
+      "comment": ""
+    },
+    "LATN": {
+      "pymorphy_tag": "LATN",
+      "surface_tag": "LATN",
+      "description": "Не удалось разобрать слово",
+      "category": "part of speech",
+      "example": "",
+      "comment": ""
+    },
     "masc": {
+      "pymorphy_tag": "masc",
       "surface_tag": "m",
       "description": "мужской род",
       "category": "gender",
@@ -127,6 +161,7 @@
       "comment": ""
     },
     "femn": {
+      "pymorphy_tag": "femn",
       "surface_tag": "f",
       "description": "женский род",
       "category": "gender",
@@ -134,6 +169,7 @@
       "comment": ""
     },
     "neut": {
+      "pymorphy_tag": "neut",
       "surface_tag": "n",
       "description": "средний род",
       "category": "gender",
@@ -141,6 +177,7 @@
       "comment": ""
     },
     "Ms-f": {
+      "pymorphy_tag": "Ms-f",
       "surface_tag": "mf",
       "description": "общий род",
       "category": "gender",
@@ -148,6 +185,7 @@
       "comment": ""
     },
     "sing": {
+      "pymorphy_tag": "sing",
       "surface_tag": "sg",
       "description": "единственное число",
       "category": "number",
@@ -155,6 +193,7 @@
       "comment": ""
     },
     "plur": {
+      "pymorphy_tag": "plur",
       "surface_tag": "pl",
       "description": "множественное число",
       "category": "number",
@@ -162,6 +201,7 @@
       "comment": ""
     },
     "nomn": {
+      "pymorphy_tag": "nomn",
       "surface_tag": "nom",
       "description": "именительный падеж",
       "category": "case",
@@ -169,6 +209,7 @@
       "comment": ""
     },
     "gent": {
+      "pymorphy_tag": "gent",
       "surface_tag": "gen",
       "description": "родительный падеж",
       "category": "case",
@@ -176,6 +217,7 @@
       "comment": ""
     },
     "datv": {
+      "pymorphy_tag": "datv",
       "surface_tag": "dat",
       "description": "дательный падеж",
       "category": "case",
@@ -183,6 +225,7 @@
       "comment": ""
     },
     "accs": {
+      "pymorphy_tag": "accs",
       "surface_tag": "acc",
       "description": "винительный падеж",
       "category": "case",
@@ -190,6 +233,7 @@
       "comment": ""
     },
     "ablt": {
+      "pymorphy_tag": "ablt",
       "surface_tag": "ins",
       "description": "творительный падеж",
       "category": "case",
@@ -197,6 +241,7 @@
       "comment": ""
     },
     "loct": {
+      "pymorphy_tag": "loct",
       "surface_tag": "loc",
       "description": "предложный падеж",
       "category": "case",
@@ -204,6 +249,7 @@
       "comment": ""
     },
     "voct": {
+      "pymorphy_tag": "voct",
       "surface_tag": "voc",
       "description": "звательный падеж",
       "category": "case",
@@ -211,6 +257,7 @@
       "comment": ""
     },
     "gen2": {
+      "pymorphy_tag": "gen2",
       "surface_tag": "gen2",
       "description": "второй родительный (частичный) падеж",
       "category": "case",
@@ -218,6 +265,7 @@
       "comment": ""
     },
     "dat2": {
+      "pymorphy_tag": "dat2",
       "surface_tag": "dat2",
       "description": "дистрибутивный дательный падеж",
       "category": "case",
@@ -225,6 +273,7 @@
       "comment": ""
     },
     "acc2": {
+      "pymorphy_tag": "acc2",
       "surface_tag": "acc2",
       "description": "второй винительный падеж",
       "category": "case",
@@ -232,6 +281,7 @@
       "comment": ""
     },
     "loc2": {
+      "pymorphy_tag": "loc2",
       "surface_tag": "loc2",
       "description": "второй предложный (местный) падеж",
       "category": "case",
@@ -239,6 +289,7 @@
       "comment": ""
     },
     "anim": {
+      "pymorphy_tag": "anim",
       "surface_tag": "anim",
       "description": "одушевленное",
       "category": "animacy",
@@ -246,6 +297,7 @@
       "comment": ""
     },
     "inan": {
+      "pymorphy_tag": "inan",
       "surface_tag": "inan",
       "description": "неодушевленное",
       "category": "animacy",
@@ -253,6 +305,7 @@
       "comment": ""
     },
     "perf": {
+      "pymorphy_tag": "perf",
       "surface_tag": "pfv",
       "description": "совершенный вид",
       "category": "aspect",
@@ -260,6 +313,7 @@
       "comment": ""
     },
     "impf": {
+      "pymorphy_tag": "impf",
       "surface_tag": "ipfv",
       "description": "несовершенный вид",
       "category": "aspect",
@@ -267,6 +321,7 @@
       "comment": ""
     },
     "1per": {
+      "pymorphy_tag": "1per",
       "surface_tag": "1",
       "description": "1 лицо",
       "category": "person",
@@ -274,6 +329,7 @@
       "comment": ""
     },
     "2per": {
+      "pymorphy_tag": "2per",
       "surface_tag": "2",
       "description": "2 лицо",
       "category": "person",
@@ -281,6 +337,7 @@
       "comment": ""
     },
     "3per": {
+      "pymorphy_tag": "3per",
       "surface_tag": "3",
       "description": "3 лицо",
       "category": "person",
@@ -288,6 +345,7 @@
       "comment": ""
     },
     "pres": {
+      "pymorphy_tag": "pres",
       "surface_tag": "prs",
       "description": "настоящее время",
       "category": "tense",
@@ -295,6 +353,7 @@
       "comment": ""
     },
     "past": {
+      "pymorphy_tag": "past",
       "surface_tag": "pst",
       "description": "прошедшее время",
       "category": "tense",
@@ -302,6 +361,7 @@
       "comment": ""
     },
     "futr": {
+      "pymorphy_tag": "futr",
       "surface_tag": "fut",
       "description": "будущее время",
       "category": "tense",
@@ -309,6 +369,7 @@
       "comment": ""
     },
     "indc": {
+      "pymorphy_tag": "indc",
       "surface_tag": "ind",
       "description": "изъявительное наклонение",
       "category": "mood",
@@ -316,6 +377,7 @@
       "comment": ""
     },
     "impr": {
+      "pymorphy_tag": "impr",
       "surface_tag": "imp",
       "description": "повелительное наклонение",
       "category": "mood",
@@ -323,6 +385,7 @@
       "comment": ""
     },
     "irrl": {
+      "pymorphy_tag": "irrl",
       "surface_tag": "irr",
       "description": "сослагательное наконение",
       "category": "mood",
@@ -330,6 +393,7 @@
       "comment": "not parsed by automatic annotator (no surprise)"
     },
     "actv": {
+      "pymorphy_tag": "actv",
       "surface_tag": "PA",
       "description": "действительный залог",
       "category": "voice",
@@ -337,17 +401,11 @@
       "comment": ""
     },
     "pssv": {
+      "pymorphy_tag": "pssv",
       "surface_tag": "PP",
       "description": "страдательный залог",
       "category": "voice",
       "example": "написанный",
-      "comment": ""
-    },
-    "": {
-      "surface_tag": "",
-      "description": "",
-      "category": "",
-      "example": "",
       "comment": ""
     }
   },
@@ -408,17 +466,15 @@
     },
     "NPRO": {
       "default": [
+        "*gender",
         "case",
-        "number"
-      ],
-      "sg,3": [
-        "gender",
-        "case",
+        "*person",
         "number"
       ]
     },
     "NUMR": {
       "default": [
+        "*gender",
         "case"
       ]
     },
@@ -493,7 +549,7 @@
         "ADJF.Apro",
         "ADV.Apro"
       ],
-      "examples": "NPRO: кто, ADJF.Apro: какой, ADVB.Apro: где"
+      "examples": "NPRO: кто, ADJF.Apro: какой, ADV.Apro: где"
     },
     "rel": {
       "label": "Relative",
@@ -503,7 +559,7 @@
         "ADJF.Apro",
         "ADV.Apro"
       ],
-      "examples": "NPRO: кто, ADJF.Apro: какой, ADVB.Apro: где"
+      "examples": "NPRO: кто, ADJF.Apro: какой, ADV.Apro: где"
     },
     "Abbr": {
       "label": "Abbreviation",
@@ -537,6 +593,30 @@
       ],
       "examples": "Ярославль"
     },
+    "Sgtm": {
+      "label": "Singularia tantum",
+      "description": "только единственное число",
+      "categories": [
+        "NOUN"
+      ],
+      "examples": "электричество, мороженое"
+    },
+    "Pltm": {
+      "label": "Pluralia tantum",
+      "description": "только множественное число",
+      "categories": [
+        "NOUN"
+      ],
+      "examples": "ножницы"
+    },
+    "Fixd": {
+      "label": "Fixed form",
+      "description": "неизменяемое",
+      "categories": [
+        "NOUN"
+      ],
+      "examples": "манго"
+    },
     "Apro": {
       "label": "Pronominal",
       "description": "местоименное",
@@ -546,7 +626,7 @@
         "ADV",
         "NUMR"
       ],
-      "examples": "ADJF: такой, ADJS: таков, ADVB: там, NUMR: сколько"
+      "examples": "ADJF: такой, ADJS: таков, ADV: там, NUMR: сколько"
     },
     "Anum": {
       "label": "Ordinal",
@@ -564,7 +644,7 @@
         "ADV.Apro",
         "NUMR"
       ],
-      "examples": "ADJF.Apro: этот, ADVB.Apro: там, NUMR.Apro: столько"
+      "examples": "ADJF.Apro: этот, ADV.Apro: там, NUMR.Apro: столько"
     },
     "Poss": {
       "label": "Possessive",
@@ -598,6 +678,14 @@
       ],
       "examples": ""
     },
+    "Afp": {
+      "label": "Form after prepositions",
+      "description": "Форма после предлогов",
+      "categories": [
+        "NPRO"
+      ],
+      "examples": "ней, ним"
+    },
     "short": {
       "label": "Short Form",
       "description": "краткая форма",
@@ -622,7 +710,7 @@
       ],
       "examples": "получше"
     },
-    "Cmp-ej": {
+    "Cmp.ej": {
       "label": "V-oj Comparative",
       "description": "форма компаратива на -ей",
       "categories": [
@@ -695,7 +783,7 @@
       ],
       "examples": "NOUN: ключик, ADJF: лёгенькая"
     },
-    "V-be": {
+    "V.be": {
       "label": "V-be Ending",
       "description": "форма на -ье",
       "categories": [
@@ -703,7 +791,7 @@
       ],
       "examples": "уменье"
     },
-    "V-en": {
+    "V.en": {
       "label": "V-en Ending",
       "description": "форма на -енен",
       "categories": [
@@ -711,7 +799,7 @@
       ],
       "examples": "совершенен"
     },
-    "V-bi": {
+    "V.bi": {
       "label": "V-bi Ending",
       "description": "форма на -ьи",
       "categories": [
@@ -719,7 +807,7 @@
       ],
       "examples": ""
     },
-    "V-ey": {
+    "V.ey": {
       "label": "V-ey",
       "description": "форма на -ею",
       "categories": [
@@ -727,7 +815,7 @@
       ],
       "examples": "неделею"
     },
-    "V-oy": {
+    "V.oy": {
       "label": "V-oy",
       "description": "форма на -ою",
       "categories": [
@@ -843,22 +931,6 @@
     "dial.pref": {
       "label": "Dial. Prefix",
       "description": "наличие префикса",
-      "categories": [
-        "ALLFORMS"
-      ],
-      "examples": ""
-    },
-    "LATN": {
-      "label": "Word written in latin script",
-      "description": "Слово написано латинскими буквами",
-      "categories": [
-        "ALLFORMS"
-      ],
-      "examples": ""
-    },
-    "UNKN": {
-      "label": "Could not annotate the word",
-      "description": "Не удалось разобрать слово",
       "categories": [
         "ALLFORMS"
       ],

@@ -8,7 +8,7 @@ from django.conf import settings
 from normalization.models import Model, Word
 from .word_list import find_word, find_standartization
 from .annotation_menu import annotation_menu
-from .format_utils import UNKNOWN_PREFIX, ANNOTATION_TAG_SEP, LEMMA_ANN_SEP
+from .format_utils import UNKNOWN_PREFIX, ANNOTATION_TAG_SEP, ANNOTATION_PART_SEP
 from .annotation_utils import (
     correct_reflexive,
     correct_antp,
@@ -103,8 +103,7 @@ class Standartizator:
         unified_annotations = OrderedDict()
         for raw_annotation in annotations:
             if not isinstance(raw_annotation, list):
-                # from db, where ann is in form lemma,LEMMA_ANN_SEP,tags
-                lemma, annotation = raw_annotation.split(LEMMA_ANN_SEP, 1)
+                lemma, annotation = raw_annotation.split(ANNOTATION_PART_SEP, 1)
             else:
                 # from other sources
                 # raw_annotation can include score or not, first two elements are lemma and ann

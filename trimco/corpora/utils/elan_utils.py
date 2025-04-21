@@ -102,6 +102,16 @@ class ElanObject:
         Elan.to_eaf(self.path, self.Eaf, pretty=True)
         os.remove(self.path + '.bak')
 
+    def _update_ann(self, tier_name, start, end, annot_value_lst, nrm_value_lst):
+        if annot_value_lst:
+            self.add_extra_tags(
+                tier_name, start, end, ANNOTATION_WORD_SEP.join(annot_value_lst), 'annotation'
+            )
+        if nrm_value_lst:
+            self.add_extra_tags(
+                tier_name, start, end, ANNOTATION_WORD_SEP.join(nrm_value_lst), 'standartization'
+            )
+
     def process_html_annot(self, html_annot):
         tier_name = html_annot.xpath('*[@class="annot"]/@tier_name')[0]
         raw_start = html_annot.xpath('*[@class="audiofragment"]/@starttime')[0]
@@ -131,15 +141,29 @@ class ElanObject:
 
             t_counter += 1
 
-        if annot_value_lst:
-            self.add_extra_tags(
-                tier_name, start, end, ANNOTATION_WORD_SEP.join(annot_value_lst), 'annotation'
-            )
+        self._update_ann(tier_name, start, end, annot_value_lst, nrm_value_lst)
 
-        if nrm_value_lst:
-            self.add_extra_tags(
-                tier_name, start, end, ANNOTATION_WORD_SEP.join(nrm_value_lst), 'standartization'
-            )
+    def update_anns(self, tier_names, starts, ends, annotations):
+        for t_counter, (tier_name, start, end, annotation) in enumerate(zip(tier_names, starts, ends, annotations)):
+            annot_value_lst = []
+            nrm_value_lst = []
+            for token in annotation:
+                nrm = token[0]
+                anns = token[1]
+                lemma = anns[0][0] if anns else ''
+                morph = anns[0][1] if anns else ''
+                try:
+                    if lemma + morph:
+                        annot_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), lemma, morph]))
+                    if nrm:
+                        nrm_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), nrm]))
+                except IndexError:
+                    print(
+                        'Exception while saving. Normalization: %s,'
+                        'Lemmata: %s, Morphology: %s, Counter: %s' % (nrm, lemma, morph, t_counter)
+                    )
+
+            self._update_ann(tier_name, start, end, annot_value_lst, nrm_value_lst)
 
 
 def clean_transcription(transcription):

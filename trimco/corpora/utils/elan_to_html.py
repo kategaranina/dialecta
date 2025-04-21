@@ -79,35 +79,7 @@ class ElanToHTML:
 
         transcript = '\n'.join(transcripts)
         annotations = standartizator.get_annotation(transcript, standartizations=standartizations or None)
-
-        for t_counter, (tier_name, start, end, annotation) in enumerate(zip(tier_names, starts, ends, annotations)):
-            annot_value_lst = []
-            nrm_value_lst = []
-            for token in annotation:
-                nrm = token[0]
-                anns = token[1]
-                lemma = anns[0][0] if anns else ''
-                morph = anns[0][1] if anns else ''
-                try:
-                    if lemma + morph:
-                        annot_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), lemma, morph]))
-                    if nrm:
-                        nrm_value_lst.append(ANNOTATION_PART_SEP.join([str(t_counter), nrm]))
-                except IndexError:
-                    print(
-                        'Exception while saving. Normalization: %s,'
-                        'Lemmata: %s, Morphology: %s, Counter: %s' % (nrm, lemma, morph, t_counter)
-                    )
-
-            # TODO: copypaste from elan_utils:135
-            if annot_value_lst:
-                self.elan_obj.add_extra_tags(
-                    tier_name, start, end, ANNOTATION_WORD_SEP.join(annot_value_lst), 'annotation'
-                )
-            if nrm_value_lst:
-                self.elan_obj.add_extra_tags(
-                    tier_name, start, end, ANNOTATION_WORD_SEP.join(nrm_value_lst), 'standartization'
-                )
+        self.elan_obj.update_anns(tier_names, starts, ends, annotations)
 
     def build_html(self):
         print('Transcription > Standard learning examples:', self.file_obj.data.path)

@@ -8,7 +8,7 @@ from .elan_utils import (
     get_annotation_alignment
 )
 from .format_utils import (
-    LEMMA_ANN_SEP, STANDARTIZATION_REGEX,
+    ANNOTATION_PART_SEP, STANDARTIZATION_REGEX,
     STANDARTIZATION_NUM_REGEX, ANNOTATION_NUM_REGEX
 )
 
@@ -111,7 +111,7 @@ def insert_words_in_mongo(words):
 
 def insert_manual_annotation_in_mongo(model, word, standartization, lemma, grammar):
     standartization = standartization.lower()
-    annotation = lemma.lower() + LEMMA_ANN_SEP + grammar
+    annotation = lemma.lower() + ANNOTATION_PART_SEP + grammar
     insert_one_word_in_mongo(word.lower(), model, [standartization])
     insert_one_standartization_in_mongo(standartization, model, [annotation])
 
