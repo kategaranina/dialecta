@@ -190,14 +190,21 @@ class RecordingAdmin(VersionAdmin):
         reannotated = []
 
         for rec in unchecked_recs:
+            clean_rec = rec.data.path.rsplit('/', 1)[-1]
             elan_converter = ElanToHTML(rec)
             elan_converter.make_backup()
-            elan_converter.reannotate_elan(do_standartization=False)
-            elan_converter.change_status_and_save()
-            print('Reannotated and saved', rec.data.path)
-            reannotated.append(rec.data.path.rsplit('/', 1)[-1])
 
-        return HttpResponse('Reannotated:\n' + '\n'.join(reannotated))
+            try:
+                elan_converter.reannotate_elan(do_standartization=False)
+                elan_converter.change_status_and_save()
+                print('Reannotated and saved', rec.data.path)
+                reannotated.append(clean_rec)
+            except Exception as e:
+                reannotated.append(clean_rec + ' ERROR ' + str(e))
+                print('ERROR in ' + rec.data.path)
+                print(e)
+
+        return HttpResponse('Reannotated:<br>' + '<br>'.join(reannotated))
 
     @csrf_exempt
     def ajax_dispatcher(self, request):

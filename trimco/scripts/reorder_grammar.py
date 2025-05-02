@@ -62,7 +62,7 @@ def reverse_tags():
 
 def get_correct_rec_path(rec):
     clean_rec = rec[0].rsplit('/', 1)[-1]
-    rec_full_path = "../data/media/all/" + clean_rec
+    rec_full_path = "../data/media/" + clean_rec
     return clean_rec, rec_full_path
 
 
@@ -83,7 +83,7 @@ def get_tiers(rec):
             print('ERROR: ' + rec + ': lacking tiers for ' + speaker_tier)
             continue
 
-        yield orig_tier, standartization_tier, annotation_tier
+        yield speaker_tier, orig_tier, standartization_tier, annotation_tier
 
 
 def get_annotations(orig_tier, standartization_tier, annotation_tier):
@@ -135,7 +135,7 @@ def process_tags_from_one_tier(all_tags, orig_tier, standartization_tier, annota
 
 def get_tags_by_recording(rec):
     all_tags = defaultdict(list)
-    for orig_tier, standartization_tier, annotation_tier in get_tiers(rec):
+    for _, orig_tier, standartization_tier, annotation_tier in get_tiers(rec):
         all_tags = process_tags_from_one_tier(all_tags, orig_tier, standartization_tier, annotation_tier)
     return all_tags
 
@@ -273,26 +273,24 @@ def reorder_tags_for_recs(annotation_menu, recs):
         tier_names, starts, ends, all_anns = [], [], [], []
         print(clean_rec)
 
-        for orig_tier, standartization_tier, annotation_tier in get_tiers(rec_full_path):
+        for speaker_tier_name, orig_tier, standartization_tier, annotation_tier in get_tiers(rec_full_path):
             for start, end, standartizations, annotations in get_annotations(orig_tier, standartization_tier, annotation_tier):
                 anns = parse_anns_from_annotation(standartizations, annotations)
                 new_anns = []
-                for ann in anns:
-                    if "acc2" in ann[2]:
-                        print("acc2", clean_rec, ann[0], ann[1], ann[2], sep=";")
-                    tags = ann[2].split(ANNOTATION_TAG_SEP)
+                for token in anns:
+                    tags = token[2].split(ANNOTATION_TAG_SEP)
                     final_tags, errors = reorder_tags_for_word(
-                        clean_rec, tags, ann[0], ann[1], annotation_menu, errors
+                        clean_rec, tags, token[0], token[1], annotation_menu, errors
                     )
-                    # new_anns.append((ann[0], [(ann[1], ANNOTATION_TAG_SEP.join(final_tags))]))
+                    new_anns.append((token[0], [(token[1], ANNOTATION_TAG_SEP.join(final_tags))]))
 
-                tier_names.append(orig_tier)
+                tier_names.append(speaker_tier_name)
                 starts.append(start)
                 ends.append(end)
                 all_anns.append(new_anns)
 
-        # elan_obj.update_anns(tier_names, starts, ends, all_anns)
-        # elan_obj.save()
+        elan_obj.update_anns(tier_names, starts, ends, all_anns)
+        elan_obj.save()
 
     # print_errors(errors)
 
@@ -309,10 +307,7 @@ def get_undefined_tags(recs):
                 not_present[tag][0].append(clean_rec)
                 not_present[tag][1].extend(examples[:3])
 
-    # print(json.dumps(not_present, indent=2))
-
     not_present_template = {k: ["", "", v[1][:3]] for k, v in sorted(not_present.items())}
-    # print(json.dumps(not_present_template, indent=2, ensure_ascii=False))
     for k, v in not_present_template.items():
         print(k + ';' + ', '.join(v[2]))
 

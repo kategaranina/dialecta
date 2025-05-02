@@ -144,10 +144,10 @@ class ElanObject:
         self._update_ann(tier_name, start, end, annot_value_lst, nrm_value_lst)
 
     def update_anns(self, tier_names, starts, ends, annotations):
-        for t_counter, (tier_name, start, end, annotation) in enumerate(zip(tier_names, starts, ends, annotations)):
+        for tier_name, start, end, annotation in zip(tier_names, starts, ends, annotations):
             annot_value_lst = []
             nrm_value_lst = []
-            for token in annotation:
+            for t_counter, token in enumerate(annotation):
                 nrm = token[0]
                 anns = token[1]
                 lemma = anns[0][0] if anns else ''

@@ -71,10 +71,11 @@ class ElanToHTML:
                 transcripts.append(transcript)
 
                 if not do_standartization:
-                    spl_text = transcript.split()
+                    spl_text = transcript.split() or ['']
                     standartization = self._get_standartization_for_annot(tier_name, annot_data)
                     assert standartization, 'do_standartization is False, but no standartizations in eaf'
-                    assert len(standartization) == len(spl_text), 'transcript and standartizations do not match'
+                    assert len(standartization) == len(spl_text), \
+                        'transcript and standartizations do not match:' + str(standartization) + ' ' + str(spl_text)
                     standartizations.append(list(zip(spl_text, standartization)))
 
         transcript = '\n'.join(transcripts)
