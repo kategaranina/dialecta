@@ -108,8 +108,26 @@ def get_tag_value_from_obj(tag, key):
 def parse_anns_from_annotation(standartizations, annotations):
     anns = []
 
-    for i, (lemma, raw_ann) in annotations.items():
-        std = standartizations.get(i, "")
+    if not annotations or not standartizations:
+        return anns
+
+    max_idx = max(
+        max(annotations.keys()),
+        max(standartizations.keys())
+    )
+
+    for i in range(max_idx + 1):
+        if i not in standartizations:
+            anns.append(("", "", ""))
+            continue
+
+        std = standartizations[i]
+        if i not in annotations:
+            anns.append((std, "", ""))
+            continue
+
+        lemma, raw_ann = annotations[i]
+
         if raw_ann == 'длуg-NOUN-m-gen-sg-inan':
             anns.append((std, lemma, 'NOUN-m-gen-sg-inan'))
             continue
@@ -278,11 +296,12 @@ def reorder_tags_for_recs(annotation_menu, recs):
                 anns = parse_anns_from_annotation(standartizations, annotations)
                 new_anns = []
                 for token in anns:
-                    tags = token[2].split(ANNOTATION_TAG_SEP)
+                    std, lemma, token_ann = token
+                    tags = token_ann.split(ANNOTATION_TAG_SEP)
                     final_tags, errors = reorder_tags_for_word(
-                        clean_rec, tags, token[0], token[1], annotation_menu, errors
+                        clean_rec, tags, std, lemma, annotation_menu, errors
                     )
-                    new_anns.append((token[0], [(token[1], ANNOTATION_TAG_SEP.join(final_tags))]))
+                    new_anns.append((std, [(lemma, ANNOTATION_TAG_SEP.join(final_tags))]))
 
                 tier_names.append(speaker_tier_name)
                 starts.append(start)
