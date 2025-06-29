@@ -82,6 +82,17 @@ FIX BREADCRUMPS, SEE BASE.HTML:
 </form>
 </div>
 
+<div id="replace_warning">
+    <span class="red_warning"><span class="b">NB 1!</span> After replace, each page must be saved separately. Otherwise, the changes are lost.</span>
+
+    <span class="red_warning"><span class="b">NB 2!</span> If you have edited a field which was in the query and after saving you go to the non-next
+    and non-previous page, the results list <span class="b">will shift</span>, which means that you will skip some examples.
+    If you go to the next or previous page, the results won't shift.</span>
+
+    <span class="warning">Example: I search for "CONJ" in the "Annotation tags" field and then use Replace to change all "CONJ" to "CONJ2".
+    If after saving this change on page 1 I go to page 3, the results will be "shifted" - they are relevant,
+    but some examples are missing. If I go from page 1 to page 2, all the examples will be there.</span>
+</div>
 
 <div id="page_nums"></div>
 <div id="search_result"></div>

@@ -19,7 +19,6 @@ def compile_query(dialect, transcription, standartization, lemma, annotation):
         query_parts['standartization'] = standartization.lower()
 
     if annotation:
-        # todo: check for lemmata with spaces
         annotation = annotation.lower().replace(ANNOTATION_TAG_SEP, ' ')
         ann_parts = annotation.split()
         query_parts['annotation.tags'] = {'$all': ann_parts}

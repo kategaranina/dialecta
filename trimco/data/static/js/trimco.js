@@ -66,6 +66,7 @@
                         $('#save_to_file').removeClass('fa-spinner off').addClass('fa-floppy-o');
                     }
                     else if (req_type == 'search') {
+                        $('#replace_warning').show();
                         $('#search_result').html(result.result);
                         prev_page_info = result.page_info;
                         if (result.total_pages != null) {

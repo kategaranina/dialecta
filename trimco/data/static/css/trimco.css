@@ -338,3 +338,21 @@ token::after {
     background-color: transparent;
     border: none;
 }
+
+#replace_warning {
+    display: block;
+    padding: 30px 0 0 43px;
+    max-width: 75%;
+    display: none;
+}
+
+.red_warning {
+    font-size: 10pt;
+    display: block;
+    color: #d1284c;
+    padding-bottom: 5px;
+}
+
+.b {
+    font-weight: bold
+}
