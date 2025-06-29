@@ -5,6 +5,7 @@ div#grp-content-container {
 .eaf_display {
 	margin-top: -30px;
 	margin-bottom: -80px;
+	max-width: 800px;
 }
 #workbench {
 	position: fixed;
@@ -101,7 +102,7 @@ div#eaf_display {
 	float: left;
 }
 div.annot_wrapper {
-	padding-top: 43pt;
+	padding-top: 30pt;
 	display: flex;
 }
 div.audiofragment {
@@ -210,6 +211,10 @@ note:after {
 .selected {
 	background: #F39814;
 	color: white;
+}
+token {
+    display: inline-block;
+    padding-bottom: 35px
 }
 token::after { 
  content: "\00a0";
