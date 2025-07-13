@@ -76,7 +76,7 @@ class AnnotationMenu:
         for category, tags in self.surface_tags_by_category.items():
             options = ['<option id="blank"></option>']
             for tag in tags:
-                options.append(f'<option id="{tag}">{tag}</option>')
+                options.append('<option id="' + tag + '">' + tag + '</option>')
 
             select_form = (
                 "<div class='manualAnnotationContainer'>"
