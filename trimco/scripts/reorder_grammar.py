@@ -35,7 +35,7 @@ grammemes_config_path = 'annotation_grammemes.json'
 with open('../data/static/' + grammemes_config_path) as f:
     grammeme_config = json.load(f)
 
-conn = sqlite3.connect('../db_20250111.sqlite3')
+conn = sqlite3.connect('../db.sqlite3')
 c = conn.cursor()
 
 m = pymorphy2.MorphAnalyzer()
