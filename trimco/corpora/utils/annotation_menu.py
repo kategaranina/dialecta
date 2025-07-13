@@ -29,19 +29,19 @@ class AnnotationMenu:
         )
 
         self.menu_html_str_1 = (
-            f"<div id='manual_annotation' data-order='{self._serialize_config_order()}'>"
-            f"<span>Manual annotation</span>"
-            f"<form style='display: table;'>"
-            f"{lemma_input_str}"
-            f"{form_input_str}"
-            f"{''.join(self._get_main_options())}"
-            f"</form>"
-            f"</div>"
+            "<div id='manual_annotation' data-order='" + self._serialize_config_order() + "'>"
+            + "<span>Manual annotation</span>"
+            + "<form style='display: table;'>"
+            + lemma_input_str
+            + form_input_str
+            + ''.join(self._get_main_options())
+            + "</form>"
+            + "</div>"
         )
         self.menu_html_str_2 = (
-            f'<form>'
-            f'{"".join(self._get_facultative_options())}'
-            f'</form>'
+            '<form>'
+            + "".join(self._get_facultative_options())
+            + '</form>'
         )
 
     @staticmethod
@@ -79,13 +79,13 @@ class AnnotationMenu:
                 options.append(f'<option id="{tag}">{tag}</option>')
 
             select_form = (
-                f"<div class='manualAnnotationContainer'>"
-                f"<label for='{category}'>{category.title()}</label>"
-                f"<select class='manualAnnotation' "
-                f"id='{category}' "
-                f"title='{category}'>"
-                f"{''.join(options)}"
-                f'</select></div>'
+                "<div class='manualAnnotationContainer'>"
+                + "<label for='" + category + "'>" + category.title() + "</label>"
+                + "<select class='manualAnnotation' "
+                + "id='" + category + "' "
+                + "title='" + category + "'>"
+                + ''.join(options)
+                + '</select></div>'
             )
             main_options.append(select_form)
 
@@ -96,11 +96,11 @@ class AnnotationMenu:
         for tag, tag_dict in self.config['facultative'].items():
             categories = tag_dict['categories']
             tag_html = (
-                f"<div class='manualAnnotationContainer'><label>"
-                f"<input type='checkbox' class='manualAnnotation' "
-                f"name='{tag}' value='{tag}' data-dep='{json.dumps(categories)}'>"
-                f"{tag_dict['label']}"
-                f"</label></div>"
+                "<div class='manualAnnotationContainer'><label>"
+                + "<input type='checkbox' class='manualAnnotation' "
+                + "name='" + tag + "' value='" + tag + "' data-dep='" + json.dumps(categories) + "'>"
+                + tag_dict['label']
+                + "</label></div>"
             )
             facultative_options.append(tag_html)
         return facultative_options
