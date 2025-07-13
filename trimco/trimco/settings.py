@@ -156,7 +156,7 @@ else:
 
 GRAPPELLI_ADMIN_TITLE = 'BaltSlavDialects 0.1'
 
-NORMALIZER_PATH = '/home/apertium/dialecta/csmtiser/'
+NORMALIZER_PATH = '/data/csmtiser/'
 
 MONGO_URL = 'mongodb://localhost:27017/'
 MONGO_DB_NAME = 'dialecta'
