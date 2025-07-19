@@ -46,7 +46,7 @@ class AnnotationMenu:
 
     @staticmethod
     def _read_config(json_name):
-        with open(os.path.join(_STATIC_ROOT, json_name)) as f:
+        with open(os.path.join(_STATIC_ROOT, json_name), encoding='utf-8') as f:
             config = json.load(f)
         return config
 

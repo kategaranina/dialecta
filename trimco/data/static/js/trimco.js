@@ -30,7 +30,6 @@
                     return;
                 }
 
-                console.log(x, t, m);
                 alert('Something went wrong. Try again later. If the error persists, please contact developers and describe the problem.')
                 processing_request = false;
                 if (req_type == 'save_elan_req') {
@@ -41,7 +40,7 @@
                 result = $.parseJSON(response);  // Get the results sent from ajax to here
                 processing_request = false
                 if (result.error) { // If the function fails
-                    console.log(result.error_text); // Error to log
+                    // console.log(result.error_text); // Error to log
                 } else {
                     if (req_type == 'trt_annot_req') {
                         if (req_data['mode'] == 'manual') {
@@ -124,8 +123,6 @@
     };
 
     function apply_auto_annotation(token, normalization, annotation) {
-        console.log($.now(), token, normalization, annotation);
-
         var norm_tag = $('<nrm>'+normalization+'</nrm>');
         var lemma_tag = $('<lemma>'+annotation[0][0]+'</lemma>');
         var morph_tag = $('<morph>'+annotation[0][1]+'</morph></info>');
@@ -262,7 +259,7 @@
             var blank_option = $(this).find('option#blank');
             if (order.includes(select_id)) {
                 container.addClass('active');
-                container.attr('idx', order[select_id]);
+                container.attr('idx', order.indexOf(select_id));
             } else {
                 container.removeClass('active');
                 container.removeAttr('idx');
@@ -604,7 +601,6 @@
 
         /*MERGE CONTROLS*/
         $('#merge_left').click(function(e) {
-            console.log('left clicked');
             if (!$('trt.focused#0').length) {
                 focused_right_lst = [];
                 focused_left_lst = [];
@@ -624,11 +620,9 @@
                 left_trt_tag.addClass('focused')
                 focused_left_lst.push(left_trt_tag);
             };
-            console.log(focused_left_lst);
         });
 
         $('#merge_right').click(function(e) {
-            console.log('right clicked');
             if (!$('trt.focused#0').length) {
                 focused_right_lst = [];
                 focused_left_lst = [];
@@ -648,7 +642,6 @@
                 right_trt_tag.addClass('focused')
                 focused_right_lst.push(right_trt_tag);
             };
-            console.log(focused_right_lst);
         });
 
         $(document).on('click', 'trt', function() {

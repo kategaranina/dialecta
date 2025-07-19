@@ -32,7 +32,7 @@ class Standartizator:
         self.path = settings.NORMALIZER_PATH  # specified in the last line of trimco.settings.py
         self.morph_rus = pymorphy2.MorphAnalyzer()  # TODO: replace with some context-dependent analyser, i.e. mystem
 
-        with open(os.path.join(settings.DATA_DIR, 'static', 'words_PRED.txt')) as f:
+        with open(os.path.join(settings.DATA_DIR, 'static', 'words_PRED.txt'), encoding='utf-8') as f:
             self.words_pred = f.read().split('\n')
 
         with open(os.path.join(settings.DATA_DIR, 'static', 'automatic_overriden.csv')) as f:

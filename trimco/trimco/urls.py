@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.conf.urls import include, url
 from django.contrib import admin
-# from queries import urls as queries_urls
+from django.views.static import serve
 
 import django
 
@@ -31,10 +31,10 @@ from django.conf import settings
 
 if settings.DEBUG:
     urlpatterns += [
-        url(r'^media/(?P<path>.*)$', django.views.static.serve, {
+        url(r'^media/(?P<path>.*)$', serve, {
             'document_root': settings.MEDIA_ROOT,
         }),
-        url(r'^static/(?P<path>.*)$', django.views.static.serve, {
+        url(r'^static/(?P<path>.*)$', serve, {
             'document_root': settings.STATICFILES_DIRS[0],
         }),
         ]
