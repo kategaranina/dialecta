@@ -229,6 +229,7 @@
 
     function get_order_by_tag(pos, tagsDict) {
         var orderConfig = $('#manual_annotation').data('order')[pos];
+        if (orderConfig == null) return [];
         var configKeys = Object.keys(orderConfig).map(key => key.split(','));
         var tagKeyset = new Set(Object.values(tagsDict));
 
