@@ -35,7 +35,7 @@ class Standartizator:
         with open(os.path.join(settings.DATA_DIR, 'static', 'words_PRED.txt'), encoding='utf-8') as f:
             self.words_pred = f.read().split('\n')
 
-        with open(os.path.join(settings.DATA_DIR, 'static', 'automatic_overriden.csv')) as f:
+        with open(os.path.join(settings.DATA_DIR, 'static', 'automatic_overriden.csv'), encoding='utf-8') as f:
             self.automatic_overriden = {line.split()[0]: line.split()[1] for line in f}
 
     def get_manual_standartizations(self, orig):
