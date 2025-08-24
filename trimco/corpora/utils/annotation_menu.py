@@ -93,7 +93,8 @@ class AnnotationMenu:
 
     def _get_facultative_options(self):
         facultative_options = []
-        for tag, tag_dict in self.config['facultative'].items():
+        for tag_dict in self.config['facultative']:
+            tag = tag_dict['tag']
             categories = tag_dict['categories']
             tag_html = (
                 "<div class='manualAnnotationContainer'><label>"
@@ -147,14 +148,15 @@ class AnnotationMenu:
     def order_facultative_tags(self, facultative_tags, compulsory_tags, word=None):
         all_tags = compulsory_tags + facultative_tags
 
-        def tag_suitable(tag, v):
+        def tag_suitable(tag_info):
+            tag = tag_info['tag']
             if tag not in facultative_tags:
                 return False
 
-            is_for_all = v['categories'][0] == "ALLFORMS"
+            is_for_all = tag_info['categories'][0] == "ALLFORMS"
             is_in_category = any(
                 all(cat in all_tags for cat in cats.split('.'))
-                for cats in v['categories']
+                for cats in tag_info['categories']
             )
             if not (is_for_all or is_in_category):
                 print("facultative present but is not allowed by category\n", tag, all_tags, word, "\n")
@@ -162,8 +164,8 @@ class AnnotationMenu:
             return is_for_all or is_in_category
 
         facultative = [
-            t for t, v in self.config['facultative'].items()  # iterating through config to keep the order fixed
-            if tag_suitable(t, v)
+            t["tag"] for t in self.config['facultative']  # iterating through config to keep the order fixed
+            if tag_suitable(t)
         ]
         return facultative
 
@@ -176,7 +178,12 @@ class AnnotationMenu:
             self.config['grammemes'][t]['category']: self.config['grammemes'][t]['surface_tag']
             for t in tags_lst if t in self.config['grammemes']
         }
-        facultative_lst = [t for t in tags_lst if t in self.config['facultative']]
+
+        all_facultative_set = set(i['tag'] for i in self.config['facultative'])
+        facultative_lst = [
+            t for t in tags_lst
+            if t in all_facultative_set
+        ]
 
         pos = tags_dict.get('part of speech')
         if pos is None:  # UNKN, LATIN, PNCT

@@ -516,8 +516,9 @@
       ]
     }
   },
-  "facultative": {
-    "Name": {
+  "facultative": [
+    {
+      "tag": "Name",
       "label": "First Name",
       "description": "имя",
       "categories": [
@@ -525,7 +526,8 @@
       ],
       "examples": "Николай"
     },
-    "COMPL": {
+    {
+      "tag": "COMPL",
       "label": "Complementizer",
       "description": "союз-комплементайзер (актантный союз)",
       "categories": [
@@ -533,7 +535,8 @@
       ],
       "examples": ""
     },
-    "Q": {
+    {
+      "tag": "Q",
       "label": "Interrogative",
       "description": "вопросительная частица",
       "categories": [
@@ -541,7 +544,8 @@
       ],
       "examples": "ли"
     },
-    "WH": {
+    {
+      "tag": "WH",
       "label": "Question",
       "description": "вопросительное",
       "categories": [
@@ -551,7 +555,8 @@
       ],
       "examples": "NPRO: кто, ADJF.Apro: какой, ADV.Apro: где"
     },
-    "rel": {
+    {
+      "tag": "rel",
       "label": "Relative",
       "description": "относительнoе местоимениe",
       "categories": [
@@ -561,7 +566,8 @@
       ],
       "examples": "NPRO: кто, ADJF.Apro: какой, ADV.Apro: где"
     },
-    "Abbr": {
+    {
+      "tag": "Abbr",
       "label": "Abbreviation",
       "description": "аббревиатура",
       "categories": [
@@ -569,7 +575,8 @@
       ],
       "examples": "МГУ"
     },
-    "Surn": {
+    {
+      "tag": "Surn",
       "label": "Last Name",
       "description": "фамилия",
       "categories": [
@@ -577,7 +584,8 @@
       ],
       "examples": "Толстой"
     },
-    "Patr": {
+    {
+      "tag": "Patr",
       "label": "Patronymic Name",
       "description": "отчество",
       "categories": [
@@ -585,7 +593,8 @@
       ],
       "examples": "Андреевич"
     },
-    "Geox": {
+    {
+      "tag": "Geox",
       "label": "Toponym",
       "description": "топоним",
       "categories": [
@@ -593,7 +602,8 @@
       ],
       "examples": "Ярославль"
     },
-    "Sgtm": {
+    {
+      "tag": "Sgtm",
       "label": "Singularia tantum",
       "description": "только единственное число",
       "categories": [
@@ -601,7 +611,8 @@
       ],
       "examples": "электричество, мороженое"
     },
-    "Pltm": {
+    {
+      "tag": "Pltm",
       "label": "Pluralia tantum",
       "description": "только множественное число",
       "categories": [
@@ -609,7 +620,8 @@
       ],
       "examples": "ножницы"
     },
-    "Fixd": {
+    {
+      "tag": "Fixd",
       "label": "Fixed form",
       "description": "неизменяемое",
       "categories": [
@@ -617,7 +629,8 @@
       ],
       "examples": "манго"
     },
-    "Apro": {
+    {
+      "tag": "Apro",
       "label": "Pronominal",
       "description": "местоименное",
       "categories": [
@@ -628,7 +641,8 @@
       ],
       "examples": "ADJF: такой, ADJS: таков, ADV: там, NUMR: сколько"
     },
-    "Anum": {
+    {
+      "tag": "Anum",
       "label": "Ordinal",
       "description": "порядковое",
       "categories": [
@@ -636,7 +650,8 @@
       ],
       "examples": "первый"
     },
-    "dmns": {
+    {
+      "tag": "dmns",
       "label": "Demonstrative",
       "description": "указательное",
       "categories": [
@@ -646,7 +661,8 @@
       ],
       "examples": "ADJF.Apro: этот, ADV.Apro: там, NUMR.Apro: столько"
     },
-    "Poss": {
+    {
+      "tag": "Poss",
       "label": "Possessive",
       "description": "притяжательное",
       "categories": [
@@ -654,7 +670,8 @@
       ],
       "examples": "ADJF: папина, волчий, ADJF.Apro: твой"
     },
-    "Coll": {
+    {
+      "tag": "Coll",
       "label": "Collective Numeral",
       "description": "собирательное числительное",
       "categories": [
@@ -662,7 +679,8 @@
       ],
       "examples": "четверо"
     },
-    "AUX": {
+    {
+      "tag": "AUX",
       "label": "Auxiliary Verb",
       "description": "вспомогательный глалол",
       "categories": [
@@ -670,7 +688,8 @@
       ],
       "examples": "буду"
     },
-    "COP": {
+    {
+      "tag": "COP",
       "label": "Copula",
       "description": "cвязка (копула)",
       "categories": [
@@ -678,7 +697,8 @@
       ],
       "examples": ""
     },
-    "Afp": {
+    {
+      "tag": "Afp",
       "label": "Form after prepositions",
       "description": "Форма после предлогов",
       "categories": [
@@ -686,7 +706,8 @@
       ],
       "examples": "ней, ним"
     },
-    "short": {
+    {
+      "tag": "short",
       "label": "Short Form",
       "description": "краткая форма",
       "categories": [
@@ -694,7 +715,8 @@
       ],
       "examples": "мя (сокр. меня); тя (сокр. тебя)"
     },
-    "ANTP": {
+    {
+      "tag": "ANTP",
       "label": "Anteriority participle",
       "description": "деепричастие на -ши",
       "categories": [
@@ -702,7 +724,8 @@
       ],
       "examples": "сделавши"
     },
-    "Cmp2": {
+    {
+      "tag": "Cmp2",
       "label": "Po- Comparative",
       "description": "сравнительная степень на по-",
       "categories": [
@@ -710,7 +733,8 @@
       ],
       "examples": "получше"
     },
-    "Cmp.ej": {
+    {
+      "tag": "Cmp.ej",
       "label": "V-oj Comparative",
       "description": "форма компаратива на -ей",
       "categories": [
@@ -718,7 +742,8 @@
       ],
       "examples": "красивей"
     },
-    "super": {
+    {
+      "tag": "super",
       "label": "Superlative",
       "description": "превосходная степень",
       "categories": [
@@ -726,7 +751,8 @@
       ],
       "examples": "лучший"
     },
-    "neg": {
+    {
+      "tag": "neg",
       "label": "Negative",
       "description": "отрицание",
       "categories": [
@@ -739,7 +765,8 @@
       ],
       "examples": "ADJF: несортовой, VERB: не_было, PRCL: не"
     },
-    "Vpre": {
+    {
+      "tag": "Vpre",
       "label": "Prep. Variation",
       "description": "Вариант предлога ( со, подо, ...)",
       "categories": [
@@ -747,7 +774,8 @@
       ],
       "examples": "со, надо, обо etc."
     },
-    "2PVB": {
+    {
+      "tag": "2PVB",
       "label": "Double Prefix",
       "description": "двойной префикс",
       "categories": [
@@ -757,7 +785,8 @@
       ],
       "examples": "перевыполнить"
     },
-    "Mult": {
+    {
+      "tag": "Mult",
       "label": "Multiple",
       "description": "многократный",
       "categories": [
@@ -765,7 +794,8 @@
       ],
       "examples": "хаживать"
     },
-    "refl": {
+    {
+      "tag": "refl",
       "label": "Reflexive",
       "description": "возвратный",
       "categories": [
@@ -774,7 +804,8 @@
       ],
       "examples": "VERB: одеваться, NPRO: себя"
     },
-    "dim": {
+    {
+      "tag": "dim",
       "label": "Deminutive",
       "description": "деминутив",
       "categories": [
@@ -783,7 +814,8 @@
       ],
       "examples": "NOUN: ключик, ADJF: лёгенькая"
     },
-    "V.be": {
+    {
+      "tag": "V.be",
       "label": "V-be Ending",
       "description": "форма на -ье",
       "categories": [
@@ -791,7 +823,8 @@
       ],
       "examples": "уменье"
     },
-    "V.en": {
+    {
+      "tag": "V.en",
       "label": "V-en Ending",
       "description": "форма на -енен",
       "categories": [
@@ -799,7 +832,8 @@
       ],
       "examples": "совершенен"
     },
-    "V.bi": {
+    {
+      "tag": "V.bi",
       "label": "V-bi Ending",
       "description": "форма на -ьи",
       "categories": [
@@ -807,7 +841,8 @@
       ],
       "examples": ""
     },
-    "V.ey": {
+    {
+      "tag": "V.ey",
       "label": "V-ey",
       "description": "форма на -ею",
       "categories": [
@@ -815,7 +850,8 @@
       ],
       "examples": "неделею"
     },
-    "V.oy": {
+    {
+      "tag": "V.oy",
       "label": "V-oy",
       "description": "форма на -ою",
       "categories": [
@@ -823,7 +859,8 @@
       ],
       "examples": "водою"
     },
-    "incl": {
+    {
+      "tag": "incl",
       "label": "Inclusive",
       "description": "говорящий включён в действие",
       "categories": [
@@ -832,7 +869,8 @@
       ],
       "examples": "VERB.impr: пойдемте, NPRO: мы"
     },
-    "dist": {
+    {
+      "tag": "dist",
       "label": "Distortion",
       "description": "искажение",
       "categories": [
@@ -840,7 +878,8 @@
       ],
       "examples": ""
     },
-    "dial.stem": {
+    {
+      "tag": "dial.stem",
       "label": "Dial. Stem",
       "description": "в литературнм языке не наблюдается чередования, характерного для данной основы",
       "categories": [
@@ -848,7 +887,8 @@
       ],
       "examples": ""
     },
-    "dial.stemalter": {
+    {
+      "tag": "dial.stemalter",
       "label": "Dial. Stem Alteration",
       "description": "изменение основы по всей парадигме",
       "categories": [
@@ -856,7 +896,8 @@
       ],
       "examples": ""
     },
-    "dial.refl": {
+    {
+      "tag": "dial.refl",
       "label": "Dial. Reflexive",
       "description": "отличие диалектного глагола от литературного в применении возвратного постфикса",
       "categories": [
@@ -864,7 +905,8 @@
       ],
       "examples": ""
     },
-    "dial.refltype": {
+    {
+      "tag": "dial.refltype",
       "label": "Dial. Reflexive Type",
       "description": "фиксирует как алломорфы возвратного постфикса, вообще не встречающиеся в литературном языке (-се и -си), так и употребление какого-л. алломорфа, где в ЛЯ требуется другой",
       "categories": [
@@ -872,7 +914,8 @@
       ],
       "examples": ""
     },
-    "dial.gend": {
+    {
+      "tag": "dial.gend",
       "label": "Dial. Gender",
       "description": "oтвечает за отклонения от литературной нормы в сфере родовой принадлежности лексем",
       "categories": [
@@ -880,7 +923,8 @@
       ],
       "examples": ""
     },
-    "dial.lex": {
+    {
+      "tag": "dial.lex",
       "label": "Dial. Lex.",
       "description": "форма диалектной лексемы",
       "categories": [
@@ -888,7 +932,8 @@
       ],
       "examples": ""
     },
-    "dial.flex": {
+    {
+      "tag": "dial.flex",
       "label": "Dial. Flex.",
       "description": "диалектное окончание",
       "categories": [
@@ -896,7 +941,8 @@
       ],
       "examples": ""
     },
-    "dial.type": {
+    {
+      "tag": "dial.type",
       "label": "Dial. Type",
       "description": "диалектный тип словоизменения",
       "categories": [
@@ -904,7 +950,8 @@
       ],
       "examples": ""
     },
-    "dial.flextype": {
+    {
+      "tag": "dial.flextype",
       "label": "Dial. Flex. Type",
       "description": "выбор между пометами type и flex неоднозначен",
       "categories": [
@@ -912,7 +959,8 @@
       ],
       "examples": ""
     },
-    "dial.case": {
+    {
+      "tag": "dial.case",
       "label": "Dial. Case",
       "description": "описывает употребление (с точки зрения литературного языка) одной падежной формы вместо другой",
       "categories": [
@@ -920,7 +968,8 @@
       ],
       "examples": ""
     },
-    "dial.contr": {
+    {
+      "tag": "dial.contr",
       "label": "Dial. Contraction",
       "description": "стяжённая форма прилагательного",
       "categories": [
@@ -928,7 +977,8 @@
       ],
       "examples": ""
     },
-    "dial.pref": {
+    {
+      "tag": "dial.pref",
       "label": "Dial. Prefix",
       "description": "наличие префикса",
       "categories": [
@@ -936,5 +986,5 @@
       ],
       "examples": ""
     }
-  }
+  ]
 }

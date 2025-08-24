@@ -28,6 +28,9 @@ from corpora.utils.elan_utils import (
 from corpora.utils.annotation_menu import AnnotationMenu
 
 
+TAG_REORDER_ONLY = True
+
+
 with open('../data/auxiliary/legacy_manual_anns.json') as f:
     legacy_manual_anns = json.load(f)
 
@@ -54,10 +57,10 @@ def reverse_tags():
     reverse_compulsory = {v['surface_tag']: v for k, v in grammeme_config['grammemes'].items()}
     assert len(reverse_compulsory) == len(grammeme_config['grammemes'])
 
-    reverse_faculatative = {k: k for k in grammeme_config["facultative"].keys()}
-    assert len(reverse_faculatative) == len(grammeme_config["facultative"])
+    facultative_set = {k['tag'] for k in grammeme_config["facultative"]}
+    assert len(facultative_set) == len(grammeme_config["facultative"])
 
-    return reverse_compulsory, reverse_faculatative
+    return reverse_compulsory, facultative_set
 
 
 def get_correct_rec_path(rec):
@@ -133,7 +136,11 @@ def parse_anns_from_annotation(standartizations, annotations):
             continue
 
         fixed = hyphens_to_dots(raw_ann)
-        ann = re.search(r"[а-яёА-ЯЁ ]-([^а-яёА-ЯЁ ]+)", fixed).group(1)
+        ann = re.search(r"[а-яёА-ЯЁ ]-([^а-яёА-ЯЁ ]+)", fixed)
+        if ann is None and not TAG_REORDER_ONLY:
+            raise ValueError
+
+        ann = ann.group(1) if not TAG_REORDER_ONLY else fixed
         anns.append((std, lemma, ann))
 
     return anns
@@ -259,8 +266,9 @@ def fix_legacy_tag_combinations(word, tags):
 def reorder_tags_for_word(rec, tags, std, lemma, annotation_menu, errors):
     reverse_compulsory, all_facultative = reverse_tags()
     compulsory_tags_dict = {}
-    tags = fix_legacy_tags(tags)
-    tags = fix_legacy_tag_combinations(lemma, tags)
+    if not TAG_REORDER_ONLY:
+        tags = fix_legacy_tags(tags)
+        tags = fix_legacy_tag_combinations(lemma, tags)
 
     for tag in tags:
         if tag in reverse_compulsory:
