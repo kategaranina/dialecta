@@ -46,7 +46,7 @@ class RecordingAdmin(VersionAdmin):
     fields = (
         'string_id',
         ('audio','data'),
-        ('edit_transcription', 'annotate_transcription'),
+        ('edit_transcription', 'annotate_grammar', 'annotate_transcription'),
         ('auto_annotated', 'checked'),
         ('recording_date', 'recording_time', 'recording_place'),
         'file_check',
@@ -68,6 +68,7 @@ class RecordingAdmin(VersionAdmin):
         'speakerlist',
         'file_check',
         'edit_transcription',
+        'annotate_grammar',
         'annotate_transcription'
     )
 
@@ -90,6 +91,7 @@ class RecordingAdmin(VersionAdmin):
         my_urls = [
             url(r'\d+/edit/$', self.admin_site.admin_view(self.edit)),
             url(r'\d+/auto/$', self.admin_site.admin_view(self.auto_annotate)),
+            url(r'\d+/grammar/$', self.admin_site.admin_view(self.reannotate_grammar)),
             url(r'^reannotate_grammar_all/$', self.admin_site.admin_view(self.reannotate_grammar_all_unchecked)),
             url(r'^search/$', self.admin_site.admin_view(self.search)),
             url(r'^ajax/$', self.ajax_dispatcher, name='ajax'),
@@ -168,6 +170,37 @@ class RecordingAdmin(VersionAdmin):
         try:
             self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
             self.elan_converter = ElanToHTML(self.recording_obj, mode='auto-annotation')
+            self.elan_converter.build_page()
+
+            annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()
+
+            context = {
+                'ctext': self.elan_converter.html,
+                'audio_path': self.recording_obj.audio.name,
+                'media': self.media['js'],
+                'annot_menu_select': annot_menu_select,
+                'annot_menu_checkboxes': annot_menu_checkboxes,
+                'auto_annotation_option': True
+            }
+
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
+
+        self.processing_request = False
+        return render_to_response(self.editor_template, context_instance=RequestContext(request, context))
+
+    @transaction.atomic
+    def reannotate_grammar(self, request):
+        if self.processing_request:
+            return CONFLICT_RESPONSE
+
+        self.processing_request = True
+
+        try:
+            self.recording_obj = get_object_or_404(Recording, id=request.path.split('/')[-3])
+            self.elan_converter = ElanToHTML(self.recording_obj, mode='auto-grammar')
             self.elan_converter.build_page()
 
             annot_menu_select, annot_menu_checkboxes = annotation_menu.build_annotation_menu()

@@ -23,10 +23,11 @@ class ElanToHTML:
         self.dialect = self.file_obj.to_dialect  # gets 'Dialect' field of recording
 
     def build_page(self):
-        if self.mode == 'auto-annotation':
+        if self.mode in ['auto-annotation', 'auto-grammar']:
+            do_standartization = True if self.mode == 'auto-annotation' else False
             # before building html, auto-annotation of the whole elan is performed
             self.make_backup()
-            self.reannotate_elan()
+            self.reannotate_elan(do_standartization=do_standartization)
             # change 'auto_annotated' status of recording to True after performing automatic annotation
             self.change_status_and_save()
 

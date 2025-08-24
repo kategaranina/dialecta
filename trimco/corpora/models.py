@@ -97,9 +97,14 @@ class Recording(models.Model):
             return mark_safe('<a href="/admin/corpora/recording/%s/edit" class="grp-button">Edit</a>' % self.pk)
         return '(add transcription data and save to enable editing)'
 
+    def annotate_grammar(self):
+        if self.pk is not None and self.data is not None:
+            return mark_safe('<a href="/admin/corpora/recording/%s/grammar" class="grp-button">Auto annotate grammar</a>' % self.pk)
+        return '(add transcription data and save to enable automatic grammar annotation)'
+
     def annotate_transcription(self):
         if self.pk is not None and self.data is not None:
-            return mark_safe('<a href="/admin/corpora/recording/%s/auto" class="grp-button">Perform automatic annotation</a>' % self.pk)
+            return mark_safe('<a href="/admin/corpora/recording/%s/auto" class="grp-button">Auto normalize and annotate grammar</a>' % self.pk)
         return '(add transcription data and save to enable automatic annotation)'
 
     def file_check(self): 
