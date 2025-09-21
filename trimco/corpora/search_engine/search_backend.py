@@ -107,15 +107,21 @@ def search(
     return result_html, page_info, total_pages
 
 
-def saved_recording_to_db(eaf_path, audio_path, html, dialect):
+def saved_recording_to_db(eaf_path, audio_path, dialect, html=None):
     eaf_filename = eaf_path.rsplit('/', 1)[-1]
     audio_filename = audio_path.rsplit('/', 1)[-1]
 
     query = {'elan': eaf_filename}
     match = SENTENCE_COLLECTION.find_one(query)
 
+    if match is not None and html is not None:
+        html_to_db(html)  # update sentences that are pre-selected in html
+        return
+
+    ### inserting a whole recording
+
     if match is not None:
-        html_to_db(html)
-    else:
-        sentences = process_one_elan(eaf_filename, audio_filename, dialect)
-        insert_sentences_in_mongo(sentences)
+        SENTENCE_COLLECTION.delete_many(query)
+
+    sentences = process_one_elan(eaf_filename, audio_filename, dialect)
+    insert_sentences_in_mongo(sentences)

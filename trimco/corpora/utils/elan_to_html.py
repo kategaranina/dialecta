@@ -10,6 +10,7 @@ from .format_utils import (
     get_audio_link, get_audio_annot_div,
     get_annot_div, get_participant_tag_and_status
 )
+from ..search_engine.search_backend import saved_recording_to_db
 
 
 class ElanToHTML:
@@ -30,6 +31,11 @@ class ElanToHTML:
             self.reannotate_elan(do_standartization=do_standartization)
             # change 'auto_annotated' status of recording to True after performing automatic annotation
             self.change_status_and_save()
+            saved_recording_to_db(
+                eaf_path=self.path,
+                audio_path=self.audio_file_path,
+                dialect=self.dialect.id
+            )
 
         self.build_html()
 
