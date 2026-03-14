@@ -7,8 +7,8 @@ from .standartizator import Standartizator
 from .elan_utils import ElanObject, clean_transcription
 from .format_utils import (
     ANNOTATION_WORD_SEP, ANNOTATION_PART_SEP,
-    get_audio_link, get_audio_annot_div,
-    get_annot_div, get_participant_tag_and_status
+    get_audio_annot_div, get_annot_div,
+    get_participant_tag_and_status
 )
 from ..search_engine.search_backend import saved_recording_to_db
 
@@ -93,7 +93,7 @@ class ElanToHTML:
         print('Transcription > Standard learning examples:', self.file_obj.data.path)
 
         i = 0
-        html = get_audio_link(self.audio_file_path)
+        html = ""
 
         for annot_data in self.elan_obj.annot_data_lst:
             tier_name = annot_data[3]
@@ -109,7 +109,7 @@ class ElanToHTML:
             normz_tokens_dict = self.get_additional_tags_dict(tier_name+'_standartization', annot_data[0], annot_data[1])
             annot_tokens_dict = self.get_additional_tags_dict(tier_name+'_annotation', annot_data[0], annot_data[1])
             participant, tier_status = get_participant_tag_and_status(tier_obj.attributes['PARTICIPANT'], tier_id)
-            audio_div = get_audio_annot_div(annot_data[0], annot_data[1])
+            audio_div = get_audio_annot_div(annot_data[0], annot_data[1], self.audio_file_path)
             annot_div = get_annot_div(
                 tier_name, self.dialect.id, participant, transcript, normz_tokens_dict, annot_tokens_dict,
                 elan_file=str(self.path).rsplit('/', 1)[-1]

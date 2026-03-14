@@ -15,6 +15,7 @@ from corpora.utils.annotation_menu import annotation_menu
 from corpora.utils.word_list import insert_manual_annotation_in_mongo
 from corpora.search_engine.search_backend import search, saved_recording_to_db
 from corpora.search_engine.db_to_html import html_to_db
+from corpora.utils.audio_cutter import cut_audio_from_request
 from morphology.models import Dialect
 
 from django.http import HttpResponse
@@ -95,7 +96,8 @@ class RecordingAdmin(VersionAdmin):
             url(r'^reannotate_grammar_all/$', self.admin_site.admin_view(self.reannotate_grammar_all_unchecked)),
             url(r'^search/$', self.admin_site.admin_view(self.search)),
             url(r'^ajax/$', self.ajax_dispatcher, name='ajax'),
-            url(r'^ajax_search/$', self.ajax_search_dispatcher, name='ajax_search')
+            url(r'^ajax_search/$', self.ajax_search_dispatcher, name='ajax_search'),
+            url(r'^play_audio/$', self.play_audio, name="play_audio")
         ]
         return my_urls + urls
 
@@ -377,6 +379,26 @@ class RecordingAdmin(VersionAdmin):
 
         self.processing_request = False
         return HttpResponse(json.dumps(response))
+
+    @transaction.atomic
+    def play_audio(self, request):
+        if self.processing_request:
+            return CONFLICT_RESPONSE
+
+        self.processing_request = True
+        try:
+            audio, err = cut_audio_from_request(request)
+        except Exception:
+            self.processing_request = False
+            print(traceback.format_exc())
+            raise Exception(traceback.format_exc())
+        if err != "":
+            self.processing_request = False
+            print(err)
+            raise Exception(err)
+
+        self.processing_request = False
+        return audio
 
 
 @admin.register(Corpus)

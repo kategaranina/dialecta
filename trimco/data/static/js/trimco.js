@@ -425,30 +425,32 @@
     }
 
     /* PLAY SOUND */
-    function audiofragment_click(audio_fragment) {
+    function audiofragment_click(audio_fragment, is_search_mode) {
         var active_button = audio_fragment.find(">:first-child");
         if (!active_button.hasClass('fa-play')){
                 return false;
         }
         active_button.removeClass('fa-play').addClass('fa-spinner off');
-        var starttime = audio_fragment.attr('starttime');
-        var duration = audio_fragment.attr('endtime') - starttime;
-        var sound = new Howl({
-            urls: [$(audio_fragment).parent().prevAll('#elan_audio').attr('src')],
-            sprite: {
-                segment: [starttime, duration],
-            },
-            onload: function() {
-                active_button.removeClass('fa-spinner off').addClass('fa-play');
-            },
-            onplay: function() {
-                active_button.removeClass('fa-play').addClass('fa-pause');
-            },
-            onend: function() {
-                active_button.removeClass('fa-pause').addClass('fa-play');
-            },
-        });
-        sound.play('segment');
+
+        var src = audio_fragment.attr('audio');
+        var req_data = {
+            'audio_path': src,
+            'start': audio_fragment.attr('starttime'),
+            'end': audio_fragment.attr('endtime'),
+        }
+
+         var req_str = new URLSearchParams(req_data).toString();
+         if (!is_search_mode) { var req_base = "../../play_audio?" } else { var req_base = "../../recording/play_audio?" }
+         var req = req_base + req_str;
+
+         var audio = new Audio(req);
+         audio.onended = function() {
+            active_button.removeClass('fa-spinner off').addClass('fa-play');
+         };
+         audio.onerror = function () {
+            active_button.removeClass('fa-spinner off').addClass('fa-exclamation');
+        };
+        audio.play();
     }
 
     function check_search_mode() {
@@ -582,10 +584,11 @@
         var dictionary = new Typo("ru_RU", false, false, {dictionaryPath: "/static/js/Typo.js-master/typo/dictionaries"});
         console.log(dictionary.suggest("молако"));
         */
-
-        if (!check_search_mode()) {
+        var is_search_mode = check_search_mode();
+        if (!is_search_mode) {
             adjust_DOM_spacing();
-            create_audio();
+            $(".audiofragment .fa-spinner").removeClass('fa-spinner off').addClass('fa-play');
+            // create_audio();
         };
 
         $("#grp-context-navigation").append(
@@ -594,7 +597,7 @@
 
         /*AUDIO: PLAY AT CLICK*/
         $(document).on('click', '.audiofragment', function() {
-            audiofragment_click($(this));
+            audiofragment_click($(this), is_search_mode);
         });
 
         var focused_right_lst = [];

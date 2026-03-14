@@ -30,12 +30,10 @@ def get_participant_tag_and_status(participant, tier_name):
     return participant, tier_status
 
 
-def get_audio_annot_div(stttime, endtime):
-    return '<div class="audiofragment" starttime="%s" endtime="%s"><button class="fa fa-spinner off"></button></div>' % (stttime, endtime)
-
-
-def get_audio_link(audio_file_path):
-    return '<audio id="elan_audio" src="/media/%s" preload></audio>' % audio_file_path
+def get_audio_annot_div(stttime, endtime, audio_file_path):
+    return '<div class="audiofragment" starttime="%s" endtime="%s" audio="/media/%s"><button class="fa fa-spinner off"></button></div>' % (
+        stttime, endtime, audio_file_path
+    )
 
 
 def prettify_transcript(transcript):

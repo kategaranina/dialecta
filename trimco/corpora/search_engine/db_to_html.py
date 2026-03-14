@@ -4,8 +4,8 @@ from lxml import etree
 
 from corpora.utils.db_utils import SENTENCE_COLLECTION
 from corpora.utils.format_utils import (
-    TECH_REGEX, get_audio_link, get_audio_annot_div,
-    get_annot_div, get_participant_tag_and_status
+    TECH_REGEX, get_audio_annot_div, get_annot_div,
+    get_participant_tag_and_status
 )
 from corpora.utils.elan_utils import split_ann_for_db
 
@@ -62,12 +62,9 @@ def db_response_to_html(results, reverse=False):
             elan_file=item['elan']
         )
 
-        audio_annot_div = get_audio_annot_div(item['audio']['start'], item['audio']['end'])
+        audio_annot_div = get_audio_annot_div(item['audio']['start'], item['audio']['end'], item['audio']['file'])
         annot_wrapper_div = '<div class="annot_wrapper %s">%s%s</div>' % (participant_status, audio_annot_div, annot_div)
-
-        audio_div = get_audio_link(item['audio']['file'])
-        item_div = audio_div + annot_wrapper_div
-        item_divs.append(item_div)
+        item_divs.append(annot_wrapper_div)
 
         page_info['max'] = {
             'elan': item['elan'],
