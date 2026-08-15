@@ -74,10 +74,14 @@ class Standartizator:
             # an element of lines looks like:
             # ['I\tИ', 'stálo\tстало', 'užó\tужо', "n'a\tне", "óz'erъm\tозером"]
 
-            normalization_list = [
-                [self.get_auto_standartization(word) for word in line]
-                for line in lines
-            ]
+            normalization_list = []
+            for line in lines:
+                line_stds = []
+                for word in line:
+                    orig, std = self.get_auto_standartization(word)
+                    if orig:
+                        line_stds.append((orig, std))
+                normalization_list.append(line_stds)
 
             return normalization_list
 
@@ -154,7 +158,9 @@ class Standartizator:
 
         manual_corr = self.manual_words.get(orig.lower())
         if manual_corr is not None:
-            return self.get_annotation_options_list_from_manual_words(standartization, manual_corr)
+            manual_list = self.get_annotation_options_list_from_manual_words(standartization, manual_corr)
+            if manual_list:
+                return manual_list
 
         final_list = []
         standartization_from_db = find_standartization(standartization, model=str(self.model))

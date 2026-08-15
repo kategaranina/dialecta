@@ -61,7 +61,7 @@ def prettify_transcript(transcript):
                 if not re.match('[a-zA-Z]', el_2):
                     continue  # removing non-alphabetic values
 
-                if 'unint' in el_2 or '.' in el_2:
+                if TECH_REGEX.match(el_2):  # here catching unint variations
                     new_el += '<note>%s.</note>' % el_2.strip('.')
                 else:
                     new_el += '<token><trt>%s</trt></token>' % el_2

@@ -145,7 +145,7 @@ class AnnotationMenu:
 
         return final_tags
 
-    def order_facultative_tags(self, facultative_tags, compulsory_tags, word=None):
+    def order_facultative_tags(self, facultative_tags, compulsory_tags, word=None, debug=False):
         all_tags = compulsory_tags + facultative_tags
 
         def tag_suitable(tag_info):
@@ -158,7 +158,7 @@ class AnnotationMenu:
                 all(cat in all_tags for cat in cats.split('.'))
                 for cats in tag_info['categories']
             )
-            if not (is_for_all or is_in_category):
+            if not (is_for_all or is_in_category) and debug:
                 print("facultative present but is not allowed by category\n", tag, all_tags, word, "\n")
 
             return is_for_all or is_in_category

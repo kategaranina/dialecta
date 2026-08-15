@@ -72,8 +72,13 @@ def process_one_tier(eaf_filename, audio_filename, dialect, speaker, tier_name, 
     return sentences
 
 
-def process_one_elan(eaf_filename, audio_filename, dialect):
-    full_eaf_filename = os.path.join(MEDIA_ROOT, eaf_filename)
+def process_one_elan(eaf_filename, audio_filename, dialect, is_filename_relative=True):
+    if is_filename_relative:
+        full_eaf_filename = os.path.join(MEDIA_ROOT, eaf_filename)
+    else:
+        full_eaf_filename = eaf_filename
+        eaf_filename = eaf_filename.split('/')[-1]
+
     eaf_obj = Eaf(full_eaf_filename)
     sentences = []
 

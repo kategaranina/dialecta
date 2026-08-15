@@ -283,7 +283,7 @@ def reorder_tags_for_word(rec, tags, std, lemma, annotation_menu, errors):
         compulsory_tags_dict, tags, std, lemma, errors
     )
     raw_facultative = [t for t in tags if t in all_facultative]
-    facultative = annotation_menu.order_facultative_tags(raw_facultative, final_tags, std)
+    facultative = annotation_menu.order_facultative_tags(raw_facultative, final_tags, std, debug=True)
     final_tags += facultative
 
     return final_tags, errors
