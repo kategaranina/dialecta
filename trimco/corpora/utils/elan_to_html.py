@@ -52,8 +52,18 @@ class ElanToHTML:
         self.file_obj.auto_annotated = True
         self.file_obj.save()
 
-    def _get_standartization_for_annot(self, tier_name, annot_data):
-        normz_tokens_dict = self.get_additional_tags_dict(tier_name + '_standartization', annot_data[0], annot_data[1])
+    def _get_standartization_for_annot(self, tier_name, start, end, tokens):
+        if not tokens:
+            return []
+
+        if tokens == [""]:
+            return [""]
+
+        normz_tokens_dict = self.get_additional_tags_dict(tier_name + '_standartization', start, end)
+        for idx in range(len(tokens)):
+            if idx not in normz_tokens_dict:
+                normz_tokens_dict[idx] = [""]
+
         normz_sorted = sorted(normz_tokens_dict.items())
         standartization = [item[1][0] for item in normz_sorted]
         return standartization
@@ -78,13 +88,14 @@ class ElanToHTML:
                 transcripts.append(transcript)
 
                 if not do_standartization:
-                    spl_text = transcript.split() or ['']
-                    standartization = self._get_standartization_for_annot(tier_name, annot_data)
+                    spl_text = transcript.split()
+                    standartization = self._get_standartization_for_annot(tier_name, annot_data[0], annot_data[1], spl_text)
                     assert standartization, 'do_standartization is False, but no standartizations in eaf'
                     assert len(standartization) == len(spl_text), \
                         'transcript and standartizations do not match:' + str(standartization) + ' ' + str(spl_text)
                     standartizations.append(list(zip(spl_text, standartization)))
 
+        # todo: no [unint] there!! it's cleaned up by clean_transcription
         transcript = '\n'.join(transcripts)
         annotations = standartizator.get_annotation(transcript, standartizations=standartizations or None)
         self.elan_obj.update_anns(tier_names, starts, ends, annotations)
@@ -132,7 +143,7 @@ class ElanToHTML:
             tier_obj = self.elan_obj.get_tier_obj_by_name(tier_name)
             if tier_obj.attributes['TIER_ID'] != 'comment':
                 transcription = annot_data[2]
-                normalization = ' '.join(self._get_standartization_for_annot(tier_name, annot_data))
+                normalization = ' '.join(self._get_standartization_for_annot(tier_name, annot_data[0], annot_data[1], transcription.split()))
                 examples.append((transcription, normalization))
 
         return examples
