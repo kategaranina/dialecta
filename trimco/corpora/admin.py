@@ -47,7 +47,7 @@ class RecordingAdmin(VersionAdmin):
     fields = (
         'string_id',
         ('audio','data'),
-        ('edit_transcription', 'annotate_grammar', 'annotate_transcription'),
+        ('edit_transcription', 'annotate_transcription'),  # 'annotate_grammar',
         ('auto_annotated', 'checked'),
         ('recording_date', 'recording_time', 'recording_place'),
         'file_check',
@@ -69,7 +69,7 @@ class RecordingAdmin(VersionAdmin):
         'speakerlist',
         'file_check',
         'edit_transcription',
-        'annotate_grammar',
+        # 'annotate_grammar',
         'annotate_transcription'
     )
 
