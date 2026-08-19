@@ -14,6 +14,8 @@ from .format_utils import (
 
 
 def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annotation_tier):
+    n_warnings = 0
+
     tier_alignment = get_tier_alignment(orig_tier, standartization_tier, annotation_tier)
     for orig, standartization, annotation in tier_alignment.values():
         standartizations = get_annotation_alignment(standartization, num_regex=STANDARTIZATION_NUM_REGEX)
@@ -23,6 +25,7 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
             std = standartizations.get(i)
             if std is None:
                 print('WARNING: ' + eaf_filename, 'no std for word ' + str(i), orig, standartization, '', sep='\n')
+                n_warnings += 1
                 continue
 
             words['words'][word].append(std)
@@ -30,11 +33,12 @@ def process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annot
             ann = annotations.get(i)
             if ann is None:
                 print('WARNING: ' + eaf_filename, 'no ann for word ' + str(i), orig, annotation, '', sep='\n')
+                n_warnings += 1
                 continue
 
             words['standartizations'][std].append(ann)
 
-    return words
+    return words, n_warnings
 
 
 def reformat_words_for_db(words, model_name):
@@ -52,6 +56,8 @@ def reformat_words_for_db(words, model_name):
 
 
 def process_one_elan(eaf_filename, model_name):
+    n_warnings = 0
+
     eaf_obj = Eaf(eaf_filename)
     words = {
         'words': defaultdict(list),
@@ -72,8 +78,10 @@ def process_one_elan(eaf_filename, model_name):
             print('ERROR: ' + eaf_filename + ': lacking tiers for ' + speaker)
             continue
 
-        words = process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annotation_tier)
+        words, n_warnings_tier = process_one_tier(eaf_filename, words, orig_tier, standartization_tier, annotation_tier)
+        n_warnings += n_warnings_tier
 
+    print('N WARNINGS FOR ' + eaf_filename + ': ' + str(n_warnings))
     return reformat_words_for_db(words, model_name)
 
 
